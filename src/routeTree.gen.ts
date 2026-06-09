@@ -9,38 +9,674 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as HelpRouteImport } from './routes/help'
+import { Route as TeacherRouteRouteImport } from './routes/teacher/route'
+import { Route as StudentRouteRouteImport } from './routes/student/route'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TeacherIndexRouteImport } from './routes/teacher/index'
+import { Route as StudentIndexRouteImport } from './routes/student/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as TeacherStudentsRouteImport } from './routes/teacher/students'
+import { Route as TeacherSettingsRouteImport } from './routes/teacher/settings'
+import { Route as TeacherQuizzesRouteImport } from './routes/teacher/quizzes'
+import { Route as TeacherMaterialsRouteImport } from './routes/teacher/materials'
+import { Route as TeacherLiveRouteImport } from './routes/teacher/live'
+import { Route as TeacherHelpRouteImport } from './routes/teacher/help'
+import { Route as TeacherGradingRouteImport } from './routes/teacher/grading'
+import { Route as TeacherGradebookRouteImport } from './routes/teacher/gradebook'
+import { Route as TeacherDiscussionsRouteImport } from './routes/teacher/discussions'
+import { Route as TeacherCoursesRouteImport } from './routes/teacher/courses'
+import { Route as TeacherCalendarRouteImport } from './routes/teacher/calendar'
+import { Route as TeacherAssignmentsRouteImport } from './routes/teacher/assignments'
+import { Route as TeacherAntiCheatRouteImport } from './routes/teacher/anti-cheat'
+import { Route as StudentSettingsRouteImport } from './routes/student/settings'
+import { Route as StudentQuizzesRouteImport } from './routes/student/quizzes'
+import { Route as StudentPlannerRouteImport } from './routes/student/planner'
+import { Route as StudentMyCoursesRouteImport } from './routes/student/my-courses'
+import { Route as StudentMaterialsRouteImport } from './routes/student/materials'
+import { Route as StudentLiveRouteImport } from './routes/student/live'
+import { Route as StudentHelpRouteImport } from './routes/student/help'
+import { Route as StudentGradesRouteImport } from './routes/student/grades'
+import { Route as StudentDiscussionsRouteImport } from './routes/student/discussions'
+import { Route as StudentCoursesRouteImport } from './routes/student/courses'
+import { Route as StudentCalendarRouteImport } from './routes/student/calendar'
+import { Route as StudentAssignmentsRouteImport } from './routes/student/assignments'
+import { Route as StudentAntiCheatRouteImport } from './routes/student/anti-cheat'
+import { Route as StudentAnalyticsRouteImport } from './routes/student/analytics'
+import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as AdminSystemRouteImport } from './routes/admin/system'
+import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
+import { Route as AdminResetsRouteImport } from './routes/admin/resets'
+import { Route as AdminManagementRouteImport } from './routes/admin/management'
+import { Route as AdminMaintenanceRouteImport } from './routes/admin/maintenance'
+import { Route as AdminHelpRouteImport } from './routes/admin/help'
+import { Route as AdminHealthRouteImport } from './routes/admin/health'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
+import { Route as ApiV1SystemRouteImport } from './routes/api/v1/system'
+import { Route as ApiV1LearningRouteImport } from './routes/api/v1/learning'
+import { Route as ApiV1AuthRouteImport } from './routes/api/v1/auth'
+import { Route as ApiV1AssessmentRouteImport } from './routes/api/v1/assessment'
+import { Route as ApiV1SystemUploadRouteImport } from './routes/api/v1/system/upload'
+import { Route as ApiV1AuthInviteRouteImport } from './routes/api/v1/auth/invite'
+import { Route as ApiPublicV1AuthInviteAcceptRouteImport } from './routes/api/public/v1/auth/invite/accept'
 
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TeacherRouteRoute = TeacherRouteRouteImport.update({
+  id: '/teacher',
+  path: '/teacher',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudentRouteRoute = StudentRouteRouteImport.update({
+  id: '/student',
+  path: '/student',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TeacherIndexRoute = TeacherIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => TeacherRouteRoute,
+} as any)
+const StudentIndexRoute = StudentIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => StudentRouteRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const TeacherStudentsRoute = TeacherStudentsRouteImport.update({
+  id: '/students',
+  path: '/students',
+  getParentRoute: () => TeacherRouteRoute,
+} as any)
+const TeacherSettingsRoute = TeacherSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => TeacherRouteRoute,
+} as any)
+const TeacherQuizzesRoute = TeacherQuizzesRouteImport.update({
+  id: '/quizzes',
+  path: '/quizzes',
+  getParentRoute: () => TeacherRouteRoute,
+} as any)
+const TeacherMaterialsRoute = TeacherMaterialsRouteImport.update({
+  id: '/materials',
+  path: '/materials',
+  getParentRoute: () => TeacherRouteRoute,
+} as any)
+const TeacherLiveRoute = TeacherLiveRouteImport.update({
+  id: '/live',
+  path: '/live',
+  getParentRoute: () => TeacherRouteRoute,
+} as any)
+const TeacherHelpRoute = TeacherHelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => TeacherRouteRoute,
+} as any)
+const TeacherGradingRoute = TeacherGradingRouteImport.update({
+  id: '/grading',
+  path: '/grading',
+  getParentRoute: () => TeacherRouteRoute,
+} as any)
+const TeacherGradebookRoute = TeacherGradebookRouteImport.update({
+  id: '/gradebook',
+  path: '/gradebook',
+  getParentRoute: () => TeacherRouteRoute,
+} as any)
+const TeacherDiscussionsRoute = TeacherDiscussionsRouteImport.update({
+  id: '/discussions',
+  path: '/discussions',
+  getParentRoute: () => TeacherRouteRoute,
+} as any)
+const TeacherCoursesRoute = TeacherCoursesRouteImport.update({
+  id: '/courses',
+  path: '/courses',
+  getParentRoute: () => TeacherRouteRoute,
+} as any)
+const TeacherCalendarRoute = TeacherCalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
+  getParentRoute: () => TeacherRouteRoute,
+} as any)
+const TeacherAssignmentsRoute = TeacherAssignmentsRouteImport.update({
+  id: '/assignments',
+  path: '/assignments',
+  getParentRoute: () => TeacherRouteRoute,
+} as any)
+const TeacherAntiCheatRoute = TeacherAntiCheatRouteImport.update({
+  id: '/anti-cheat',
+  path: '/anti-cheat',
+  getParentRoute: () => TeacherRouteRoute,
+} as any)
+const StudentSettingsRoute = StudentSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => StudentRouteRoute,
+} as any)
+const StudentQuizzesRoute = StudentQuizzesRouteImport.update({
+  id: '/quizzes',
+  path: '/quizzes',
+  getParentRoute: () => StudentRouteRoute,
+} as any)
+const StudentPlannerRoute = StudentPlannerRouteImport.update({
+  id: '/planner',
+  path: '/planner',
+  getParentRoute: () => StudentRouteRoute,
+} as any)
+const StudentMyCoursesRoute = StudentMyCoursesRouteImport.update({
+  id: '/my-courses',
+  path: '/my-courses',
+  getParentRoute: () => StudentRouteRoute,
+} as any)
+const StudentMaterialsRoute = StudentMaterialsRouteImport.update({
+  id: '/materials',
+  path: '/materials',
+  getParentRoute: () => StudentRouteRoute,
+} as any)
+const StudentLiveRoute = StudentLiveRouteImport.update({
+  id: '/live',
+  path: '/live',
+  getParentRoute: () => StudentRouteRoute,
+} as any)
+const StudentHelpRoute = StudentHelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => StudentRouteRoute,
+} as any)
+const StudentGradesRoute = StudentGradesRouteImport.update({
+  id: '/grades',
+  path: '/grades',
+  getParentRoute: () => StudentRouteRoute,
+} as any)
+const StudentDiscussionsRoute = StudentDiscussionsRouteImport.update({
+  id: '/discussions',
+  path: '/discussions',
+  getParentRoute: () => StudentRouteRoute,
+} as any)
+const StudentCoursesRoute = StudentCoursesRouteImport.update({
+  id: '/courses',
+  path: '/courses',
+  getParentRoute: () => StudentRouteRoute,
+} as any)
+const StudentCalendarRoute = StudentCalendarRouteImport.update({
+  id: '/calendar',
+  path: '/calendar',
+  getParentRoute: () => StudentRouteRoute,
+} as any)
+const StudentAssignmentsRoute = StudentAssignmentsRouteImport.update({
+  id: '/assignments',
+  path: '/assignments',
+  getParentRoute: () => StudentRouteRoute,
+} as any)
+const StudentAntiCheatRoute = StudentAntiCheatRouteImport.update({
+  id: '/anti-cheat',
+  path: '/anti-cheat',
+  getParentRoute: () => StudentRouteRoute,
+} as any)
+const StudentAnalyticsRoute = StudentAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => StudentRouteRoute,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminSystemRoute = AdminSystemRouteImport.update({
+  id: '/system',
+  path: '/system',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminResetsRoute = AdminResetsRouteImport.update({
+  id: '/resets',
+  path: '/resets',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminManagementRoute = AdminManagementRouteImport.update({
+  id: '/management',
+  path: '/management',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminMaintenanceRoute = AdminMaintenanceRouteImport.update({
+  id: '/maintenance',
+  path: '/maintenance',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminHelpRoute = AdminHelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminHealthRoute = AdminHealthRouteImport.update({
+  id: '/health',
+  path: '/health',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const ApiV1SystemRoute = ApiV1SystemRouteImport.update({
+  id: '/api/v1/system',
+  path: '/api/v1/system',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1LearningRoute = ApiV1LearningRouteImport.update({
+  id: '/api/v1/learning',
+  path: '/api/v1/learning',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1AuthRoute = ApiV1AuthRouteImport.update({
+  id: '/api/v1/auth',
+  path: '/api/v1/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1AssessmentRoute = ApiV1AssessmentRouteImport.update({
+  id: '/api/v1/assessment',
+  path: '/api/v1/assessment',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1SystemUploadRoute = ApiV1SystemUploadRouteImport.update({
+  id: '/upload',
+  path: '/upload',
+  getParentRoute: () => ApiV1SystemRoute,
+} as any)
+const ApiV1AuthInviteRoute = ApiV1AuthInviteRouteImport.update({
+  id: '/invite',
+  path: '/invite',
+  getParentRoute: () => ApiV1AuthRoute,
+} as any)
+const ApiPublicV1AuthInviteAcceptRoute =
+  ApiPublicV1AuthInviteAcceptRouteImport.update({
+    id: '/api/public/v1/auth/invite/accept',
+    path: '/api/public/v1/auth/invite/accept',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
+  '/student': typeof StudentRouteRouteWithChildren
+  '/teacher': typeof TeacherRouteRouteWithChildren
+  '/help': typeof HelpRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/health': typeof AdminHealthRoute
+  '/admin/help': typeof AdminHelpRoute
+  '/admin/maintenance': typeof AdminMaintenanceRoute
+  '/admin/management': typeof AdminManagementRoute
+  '/admin/resets': typeof AdminResetsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/system': typeof AdminSystemRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/student/analytics': typeof StudentAnalyticsRoute
+  '/student/anti-cheat': typeof StudentAntiCheatRoute
+  '/student/assignments': typeof StudentAssignmentsRoute
+  '/student/calendar': typeof StudentCalendarRoute
+  '/student/courses': typeof StudentCoursesRoute
+  '/student/discussions': typeof StudentDiscussionsRoute
+  '/student/grades': typeof StudentGradesRoute
+  '/student/help': typeof StudentHelpRoute
+  '/student/live': typeof StudentLiveRoute
+  '/student/materials': typeof StudentMaterialsRoute
+  '/student/my-courses': typeof StudentMyCoursesRoute
+  '/student/planner': typeof StudentPlannerRoute
+  '/student/quizzes': typeof StudentQuizzesRoute
+  '/student/settings': typeof StudentSettingsRoute
+  '/teacher/anti-cheat': typeof TeacherAntiCheatRoute
+  '/teacher/assignments': typeof TeacherAssignmentsRoute
+  '/teacher/calendar': typeof TeacherCalendarRoute
+  '/teacher/courses': typeof TeacherCoursesRoute
+  '/teacher/discussions': typeof TeacherDiscussionsRoute
+  '/teacher/gradebook': typeof TeacherGradebookRoute
+  '/teacher/grading': typeof TeacherGradingRoute
+  '/teacher/help': typeof TeacherHelpRoute
+  '/teacher/live': typeof TeacherLiveRoute
+  '/teacher/materials': typeof TeacherMaterialsRoute
+  '/teacher/quizzes': typeof TeacherQuizzesRoute
+  '/teacher/settings': typeof TeacherSettingsRoute
+  '/teacher/students': typeof TeacherStudentsRoute
+  '/admin/': typeof AdminIndexRoute
+  '/student/': typeof StudentIndexRoute
+  '/teacher/': typeof TeacherIndexRoute
+  '/api/v1/assessment': typeof ApiV1AssessmentRoute
+  '/api/v1/auth': typeof ApiV1AuthRouteWithChildren
+  '/api/v1/learning': typeof ApiV1LearningRoute
+  '/api/v1/system': typeof ApiV1SystemRouteWithChildren
+  '/api/v1/auth/invite': typeof ApiV1AuthInviteRoute
+  '/api/v1/system/upload': typeof ApiV1SystemUploadRoute
+  '/api/public/v1/auth/invite/accept': typeof ApiPublicV1AuthInviteAcceptRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/help': typeof HelpRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/health': typeof AdminHealthRoute
+  '/admin/help': typeof AdminHelpRoute
+  '/admin/maintenance': typeof AdminMaintenanceRoute
+  '/admin/management': typeof AdminManagementRoute
+  '/admin/resets': typeof AdminResetsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/system': typeof AdminSystemRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/student/analytics': typeof StudentAnalyticsRoute
+  '/student/anti-cheat': typeof StudentAntiCheatRoute
+  '/student/assignments': typeof StudentAssignmentsRoute
+  '/student/calendar': typeof StudentCalendarRoute
+  '/student/courses': typeof StudentCoursesRoute
+  '/student/discussions': typeof StudentDiscussionsRoute
+  '/student/grades': typeof StudentGradesRoute
+  '/student/help': typeof StudentHelpRoute
+  '/student/live': typeof StudentLiveRoute
+  '/student/materials': typeof StudentMaterialsRoute
+  '/student/my-courses': typeof StudentMyCoursesRoute
+  '/student/planner': typeof StudentPlannerRoute
+  '/student/quizzes': typeof StudentQuizzesRoute
+  '/student/settings': typeof StudentSettingsRoute
+  '/teacher/anti-cheat': typeof TeacherAntiCheatRoute
+  '/teacher/assignments': typeof TeacherAssignmentsRoute
+  '/teacher/calendar': typeof TeacherCalendarRoute
+  '/teacher/courses': typeof TeacherCoursesRoute
+  '/teacher/discussions': typeof TeacherDiscussionsRoute
+  '/teacher/gradebook': typeof TeacherGradebookRoute
+  '/teacher/grading': typeof TeacherGradingRoute
+  '/teacher/help': typeof TeacherHelpRoute
+  '/teacher/live': typeof TeacherLiveRoute
+  '/teacher/materials': typeof TeacherMaterialsRoute
+  '/teacher/quizzes': typeof TeacherQuizzesRoute
+  '/teacher/settings': typeof TeacherSettingsRoute
+  '/teacher/students': typeof TeacherStudentsRoute
+  '/admin': typeof AdminIndexRoute
+  '/student': typeof StudentIndexRoute
+  '/teacher': typeof TeacherIndexRoute
+  '/api/v1/assessment': typeof ApiV1AssessmentRoute
+  '/api/v1/auth': typeof ApiV1AuthRouteWithChildren
+  '/api/v1/learning': typeof ApiV1LearningRoute
+  '/api/v1/system': typeof ApiV1SystemRouteWithChildren
+  '/api/v1/auth/invite': typeof ApiV1AuthInviteRoute
+  '/api/v1/system/upload': typeof ApiV1SystemUploadRoute
+  '/api/public/v1/auth/invite/accept': typeof ApiPublicV1AuthInviteAcceptRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
+  '/student': typeof StudentRouteRouteWithChildren
+  '/teacher': typeof TeacherRouteRouteWithChildren
+  '/help': typeof HelpRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/health': typeof AdminHealthRoute
+  '/admin/help': typeof AdminHelpRoute
+  '/admin/maintenance': typeof AdminMaintenanceRoute
+  '/admin/management': typeof AdminManagementRoute
+  '/admin/resets': typeof AdminResetsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/system': typeof AdminSystemRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/student/analytics': typeof StudentAnalyticsRoute
+  '/student/anti-cheat': typeof StudentAntiCheatRoute
+  '/student/assignments': typeof StudentAssignmentsRoute
+  '/student/calendar': typeof StudentCalendarRoute
+  '/student/courses': typeof StudentCoursesRoute
+  '/student/discussions': typeof StudentDiscussionsRoute
+  '/student/grades': typeof StudentGradesRoute
+  '/student/help': typeof StudentHelpRoute
+  '/student/live': typeof StudentLiveRoute
+  '/student/materials': typeof StudentMaterialsRoute
+  '/student/my-courses': typeof StudentMyCoursesRoute
+  '/student/planner': typeof StudentPlannerRoute
+  '/student/quizzes': typeof StudentQuizzesRoute
+  '/student/settings': typeof StudentSettingsRoute
+  '/teacher/anti-cheat': typeof TeacherAntiCheatRoute
+  '/teacher/assignments': typeof TeacherAssignmentsRoute
+  '/teacher/calendar': typeof TeacherCalendarRoute
+  '/teacher/courses': typeof TeacherCoursesRoute
+  '/teacher/discussions': typeof TeacherDiscussionsRoute
+  '/teacher/gradebook': typeof TeacherGradebookRoute
+  '/teacher/grading': typeof TeacherGradingRoute
+  '/teacher/help': typeof TeacherHelpRoute
+  '/teacher/live': typeof TeacherLiveRoute
+  '/teacher/materials': typeof TeacherMaterialsRoute
+  '/teacher/quizzes': typeof TeacherQuizzesRoute
+  '/teacher/settings': typeof TeacherSettingsRoute
+  '/teacher/students': typeof TeacherStudentsRoute
+  '/admin/': typeof AdminIndexRoute
+  '/student/': typeof StudentIndexRoute
+  '/teacher/': typeof TeacherIndexRoute
+  '/api/v1/assessment': typeof ApiV1AssessmentRoute
+  '/api/v1/auth': typeof ApiV1AuthRouteWithChildren
+  '/api/v1/learning': typeof ApiV1LearningRoute
+  '/api/v1/system': typeof ApiV1SystemRouteWithChildren
+  '/api/v1/auth/invite': typeof ApiV1AuthInviteRoute
+  '/api/v1/system/upload': typeof ApiV1SystemUploadRoute
+  '/api/public/v1/auth/invite/accept': typeof ApiPublicV1AuthInviteAcceptRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/student'
+    | '/teacher'
+    | '/help'
+    | '/admin/analytics'
+    | '/admin/health'
+    | '/admin/help'
+    | '/admin/maintenance'
+    | '/admin/management'
+    | '/admin/resets'
+    | '/admin/settings'
+    | '/admin/system'
+    | '/admin/users'
+    | '/student/analytics'
+    | '/student/anti-cheat'
+    | '/student/assignments'
+    | '/student/calendar'
+    | '/student/courses'
+    | '/student/discussions'
+    | '/student/grades'
+    | '/student/help'
+    | '/student/live'
+    | '/student/materials'
+    | '/student/my-courses'
+    | '/student/planner'
+    | '/student/quizzes'
+    | '/student/settings'
+    | '/teacher/anti-cheat'
+    | '/teacher/assignments'
+    | '/teacher/calendar'
+    | '/teacher/courses'
+    | '/teacher/discussions'
+    | '/teacher/gradebook'
+    | '/teacher/grading'
+    | '/teacher/help'
+    | '/teacher/live'
+    | '/teacher/materials'
+    | '/teacher/quizzes'
+    | '/teacher/settings'
+    | '/teacher/students'
+    | '/admin/'
+    | '/student/'
+    | '/teacher/'
+    | '/api/v1/assessment'
+    | '/api/v1/auth'
+    | '/api/v1/learning'
+    | '/api/v1/system'
+    | '/api/v1/auth/invite'
+    | '/api/v1/system/upload'
+    | '/api/public/v1/auth/invite/accept'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/help'
+    | '/admin/analytics'
+    | '/admin/health'
+    | '/admin/help'
+    | '/admin/maintenance'
+    | '/admin/management'
+    | '/admin/resets'
+    | '/admin/settings'
+    | '/admin/system'
+    | '/admin/users'
+    | '/student/analytics'
+    | '/student/anti-cheat'
+    | '/student/assignments'
+    | '/student/calendar'
+    | '/student/courses'
+    | '/student/discussions'
+    | '/student/grades'
+    | '/student/help'
+    | '/student/live'
+    | '/student/materials'
+    | '/student/my-courses'
+    | '/student/planner'
+    | '/student/quizzes'
+    | '/student/settings'
+    | '/teacher/anti-cheat'
+    | '/teacher/assignments'
+    | '/teacher/calendar'
+    | '/teacher/courses'
+    | '/teacher/discussions'
+    | '/teacher/gradebook'
+    | '/teacher/grading'
+    | '/teacher/help'
+    | '/teacher/live'
+    | '/teacher/materials'
+    | '/teacher/quizzes'
+    | '/teacher/settings'
+    | '/teacher/students'
+    | '/admin'
+    | '/student'
+    | '/teacher'
+    | '/api/v1/assessment'
+    | '/api/v1/auth'
+    | '/api/v1/learning'
+    | '/api/v1/system'
+    | '/api/v1/auth/invite'
+    | '/api/v1/system/upload'
+    | '/api/public/v1/auth/invite/accept'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/student'
+    | '/teacher'
+    | '/help'
+    | '/admin/analytics'
+    | '/admin/health'
+    | '/admin/help'
+    | '/admin/maintenance'
+    | '/admin/management'
+    | '/admin/resets'
+    | '/admin/settings'
+    | '/admin/system'
+    | '/admin/users'
+    | '/student/analytics'
+    | '/student/anti-cheat'
+    | '/student/assignments'
+    | '/student/calendar'
+    | '/student/courses'
+    | '/student/discussions'
+    | '/student/grades'
+    | '/student/help'
+    | '/student/live'
+    | '/student/materials'
+    | '/student/my-courses'
+    | '/student/planner'
+    | '/student/quizzes'
+    | '/student/settings'
+    | '/teacher/anti-cheat'
+    | '/teacher/assignments'
+    | '/teacher/calendar'
+    | '/teacher/courses'
+    | '/teacher/discussions'
+    | '/teacher/gradebook'
+    | '/teacher/grading'
+    | '/teacher/help'
+    | '/teacher/live'
+    | '/teacher/materials'
+    | '/teacher/quizzes'
+    | '/teacher/settings'
+    | '/teacher/students'
+    | '/admin/'
+    | '/student/'
+    | '/teacher/'
+    | '/api/v1/assessment'
+    | '/api/v1/auth'
+    | '/api/v1/learning'
+    | '/api/v1/system'
+    | '/api/v1/auth/invite'
+    | '/api/v1/system/upload'
+    | '/api/public/v1/auth/invite/accept'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  StudentRouteRoute: typeof StudentRouteRouteWithChildren
+  TeacherRouteRoute: typeof TeacherRouteRouteWithChildren
+  HelpRoute: typeof HelpRoute
+  ApiV1AssessmentRoute: typeof ApiV1AssessmentRoute
+  ApiV1AuthRoute: typeof ApiV1AuthRouteWithChildren
+  ApiV1LearningRoute: typeof ApiV1LearningRoute
+  ApiV1SystemRoute: typeof ApiV1SystemRouteWithChildren
+  ApiPublicV1AuthInviteAcceptRoute: typeof ApiPublicV1AuthInviteAcceptRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/teacher': {
+      id: '/teacher'
+      path: '/teacher'
+      fullPath: '/teacher'
+      preLoaderRoute: typeof TeacherRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/student': {
+      id: '/student'
+      path: '/student'
+      fullPath: '/student'
+      preLoaderRoute: typeof StudentRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +684,475 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/teacher/': {
+      id: '/teacher/'
+      path: '/'
+      fullPath: '/teacher/'
+      preLoaderRoute: typeof TeacherIndexRouteImport
+      parentRoute: typeof TeacherRouteRoute
+    }
+    '/student/': {
+      id: '/student/'
+      path: '/'
+      fullPath: '/student/'
+      preLoaderRoute: typeof StudentIndexRouteImport
+      parentRoute: typeof StudentRouteRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/teacher/students': {
+      id: '/teacher/students'
+      path: '/students'
+      fullPath: '/teacher/students'
+      preLoaderRoute: typeof TeacherStudentsRouteImport
+      parentRoute: typeof TeacherRouteRoute
+    }
+    '/teacher/settings': {
+      id: '/teacher/settings'
+      path: '/settings'
+      fullPath: '/teacher/settings'
+      preLoaderRoute: typeof TeacherSettingsRouteImport
+      parentRoute: typeof TeacherRouteRoute
+    }
+    '/teacher/quizzes': {
+      id: '/teacher/quizzes'
+      path: '/quizzes'
+      fullPath: '/teacher/quizzes'
+      preLoaderRoute: typeof TeacherQuizzesRouteImport
+      parentRoute: typeof TeacherRouteRoute
+    }
+    '/teacher/materials': {
+      id: '/teacher/materials'
+      path: '/materials'
+      fullPath: '/teacher/materials'
+      preLoaderRoute: typeof TeacherMaterialsRouteImport
+      parentRoute: typeof TeacherRouteRoute
+    }
+    '/teacher/live': {
+      id: '/teacher/live'
+      path: '/live'
+      fullPath: '/teacher/live'
+      preLoaderRoute: typeof TeacherLiveRouteImport
+      parentRoute: typeof TeacherRouteRoute
+    }
+    '/teacher/help': {
+      id: '/teacher/help'
+      path: '/help'
+      fullPath: '/teacher/help'
+      preLoaderRoute: typeof TeacherHelpRouteImport
+      parentRoute: typeof TeacherRouteRoute
+    }
+    '/teacher/grading': {
+      id: '/teacher/grading'
+      path: '/grading'
+      fullPath: '/teacher/grading'
+      preLoaderRoute: typeof TeacherGradingRouteImport
+      parentRoute: typeof TeacherRouteRoute
+    }
+    '/teacher/gradebook': {
+      id: '/teacher/gradebook'
+      path: '/gradebook'
+      fullPath: '/teacher/gradebook'
+      preLoaderRoute: typeof TeacherGradebookRouteImport
+      parentRoute: typeof TeacherRouteRoute
+    }
+    '/teacher/discussions': {
+      id: '/teacher/discussions'
+      path: '/discussions'
+      fullPath: '/teacher/discussions'
+      preLoaderRoute: typeof TeacherDiscussionsRouteImport
+      parentRoute: typeof TeacherRouteRoute
+    }
+    '/teacher/courses': {
+      id: '/teacher/courses'
+      path: '/courses'
+      fullPath: '/teacher/courses'
+      preLoaderRoute: typeof TeacherCoursesRouteImport
+      parentRoute: typeof TeacherRouteRoute
+    }
+    '/teacher/calendar': {
+      id: '/teacher/calendar'
+      path: '/calendar'
+      fullPath: '/teacher/calendar'
+      preLoaderRoute: typeof TeacherCalendarRouteImport
+      parentRoute: typeof TeacherRouteRoute
+    }
+    '/teacher/assignments': {
+      id: '/teacher/assignments'
+      path: '/assignments'
+      fullPath: '/teacher/assignments'
+      preLoaderRoute: typeof TeacherAssignmentsRouteImport
+      parentRoute: typeof TeacherRouteRoute
+    }
+    '/teacher/anti-cheat': {
+      id: '/teacher/anti-cheat'
+      path: '/anti-cheat'
+      fullPath: '/teacher/anti-cheat'
+      preLoaderRoute: typeof TeacherAntiCheatRouteImport
+      parentRoute: typeof TeacherRouteRoute
+    }
+    '/student/settings': {
+      id: '/student/settings'
+      path: '/settings'
+      fullPath: '/student/settings'
+      preLoaderRoute: typeof StudentSettingsRouteImport
+      parentRoute: typeof StudentRouteRoute
+    }
+    '/student/quizzes': {
+      id: '/student/quizzes'
+      path: '/quizzes'
+      fullPath: '/student/quizzes'
+      preLoaderRoute: typeof StudentQuizzesRouteImport
+      parentRoute: typeof StudentRouteRoute
+    }
+    '/student/planner': {
+      id: '/student/planner'
+      path: '/planner'
+      fullPath: '/student/planner'
+      preLoaderRoute: typeof StudentPlannerRouteImport
+      parentRoute: typeof StudentRouteRoute
+    }
+    '/student/my-courses': {
+      id: '/student/my-courses'
+      path: '/my-courses'
+      fullPath: '/student/my-courses'
+      preLoaderRoute: typeof StudentMyCoursesRouteImport
+      parentRoute: typeof StudentRouteRoute
+    }
+    '/student/materials': {
+      id: '/student/materials'
+      path: '/materials'
+      fullPath: '/student/materials'
+      preLoaderRoute: typeof StudentMaterialsRouteImport
+      parentRoute: typeof StudentRouteRoute
+    }
+    '/student/live': {
+      id: '/student/live'
+      path: '/live'
+      fullPath: '/student/live'
+      preLoaderRoute: typeof StudentLiveRouteImport
+      parentRoute: typeof StudentRouteRoute
+    }
+    '/student/help': {
+      id: '/student/help'
+      path: '/help'
+      fullPath: '/student/help'
+      preLoaderRoute: typeof StudentHelpRouteImport
+      parentRoute: typeof StudentRouteRoute
+    }
+    '/student/grades': {
+      id: '/student/grades'
+      path: '/grades'
+      fullPath: '/student/grades'
+      preLoaderRoute: typeof StudentGradesRouteImport
+      parentRoute: typeof StudentRouteRoute
+    }
+    '/student/discussions': {
+      id: '/student/discussions'
+      path: '/discussions'
+      fullPath: '/student/discussions'
+      preLoaderRoute: typeof StudentDiscussionsRouteImport
+      parentRoute: typeof StudentRouteRoute
+    }
+    '/student/courses': {
+      id: '/student/courses'
+      path: '/courses'
+      fullPath: '/student/courses'
+      preLoaderRoute: typeof StudentCoursesRouteImport
+      parentRoute: typeof StudentRouteRoute
+    }
+    '/student/calendar': {
+      id: '/student/calendar'
+      path: '/calendar'
+      fullPath: '/student/calendar'
+      preLoaderRoute: typeof StudentCalendarRouteImport
+      parentRoute: typeof StudentRouteRoute
+    }
+    '/student/assignments': {
+      id: '/student/assignments'
+      path: '/assignments'
+      fullPath: '/student/assignments'
+      preLoaderRoute: typeof StudentAssignmentsRouteImport
+      parentRoute: typeof StudentRouteRoute
+    }
+    '/student/anti-cheat': {
+      id: '/student/anti-cheat'
+      path: '/anti-cheat'
+      fullPath: '/student/anti-cheat'
+      preLoaderRoute: typeof StudentAntiCheatRouteImport
+      parentRoute: typeof StudentRouteRoute
+    }
+    '/student/analytics': {
+      id: '/student/analytics'
+      path: '/analytics'
+      fullPath: '/student/analytics'
+      preLoaderRoute: typeof StudentAnalyticsRouteImport
+      parentRoute: typeof StudentRouteRoute
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/system': {
+      id: '/admin/system'
+      path: '/system'
+      fullPath: '/admin/system'
+      preLoaderRoute: typeof AdminSystemRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/resets': {
+      id: '/admin/resets'
+      path: '/resets'
+      fullPath: '/admin/resets'
+      preLoaderRoute: typeof AdminResetsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/management': {
+      id: '/admin/management'
+      path: '/management'
+      fullPath: '/admin/management'
+      preLoaderRoute: typeof AdminManagementRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/maintenance': {
+      id: '/admin/maintenance'
+      path: '/maintenance'
+      fullPath: '/admin/maintenance'
+      preLoaderRoute: typeof AdminMaintenanceRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/help': {
+      id: '/admin/help'
+      path: '/help'
+      fullPath: '/admin/help'
+      preLoaderRoute: typeof AdminHelpRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/health': {
+      id: '/admin/health'
+      path: '/health'
+      fullPath: '/admin/health'
+      preLoaderRoute: typeof AdminHealthRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/api/v1/system': {
+      id: '/api/v1/system'
+      path: '/api/v1/system'
+      fullPath: '/api/v1/system'
+      preLoaderRoute: typeof ApiV1SystemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/learning': {
+      id: '/api/v1/learning'
+      path: '/api/v1/learning'
+      fullPath: '/api/v1/learning'
+      preLoaderRoute: typeof ApiV1LearningRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/auth': {
+      id: '/api/v1/auth'
+      path: '/api/v1/auth'
+      fullPath: '/api/v1/auth'
+      preLoaderRoute: typeof ApiV1AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/assessment': {
+      id: '/api/v1/assessment'
+      path: '/api/v1/assessment'
+      fullPath: '/api/v1/assessment'
+      preLoaderRoute: typeof ApiV1AssessmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/system/upload': {
+      id: '/api/v1/system/upload'
+      path: '/upload'
+      fullPath: '/api/v1/system/upload'
+      preLoaderRoute: typeof ApiV1SystemUploadRouteImport
+      parentRoute: typeof ApiV1SystemRoute
+    }
+    '/api/v1/auth/invite': {
+      id: '/api/v1/auth/invite'
+      path: '/invite'
+      fullPath: '/api/v1/auth/invite'
+      preLoaderRoute: typeof ApiV1AuthInviteRouteImport
+      parentRoute: typeof ApiV1AuthRoute
+    }
+    '/api/public/v1/auth/invite/accept': {
+      id: '/api/public/v1/auth/invite/accept'
+      path: '/api/public/v1/auth/invite/accept'
+      fullPath: '/api/public/v1/auth/invite/accept'
+      preLoaderRoute: typeof ApiPublicV1AuthInviteAcceptRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AdminRouteRouteChildren {
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminHealthRoute: typeof AdminHealthRoute
+  AdminHelpRoute: typeof AdminHelpRoute
+  AdminMaintenanceRoute: typeof AdminMaintenanceRoute
+  AdminManagementRoute: typeof AdminManagementRoute
+  AdminResetsRoute: typeof AdminResetsRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminSystemRoute: typeof AdminSystemRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminHealthRoute: AdminHealthRoute,
+  AdminHelpRoute: AdminHelpRoute,
+  AdminMaintenanceRoute: AdminMaintenanceRoute,
+  AdminManagementRoute: AdminManagementRoute,
+  AdminResetsRoute: AdminResetsRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminSystemRoute: AdminSystemRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
+
+interface StudentRouteRouteChildren {
+  StudentAnalyticsRoute: typeof StudentAnalyticsRoute
+  StudentAntiCheatRoute: typeof StudentAntiCheatRoute
+  StudentAssignmentsRoute: typeof StudentAssignmentsRoute
+  StudentCalendarRoute: typeof StudentCalendarRoute
+  StudentCoursesRoute: typeof StudentCoursesRoute
+  StudentDiscussionsRoute: typeof StudentDiscussionsRoute
+  StudentGradesRoute: typeof StudentGradesRoute
+  StudentHelpRoute: typeof StudentHelpRoute
+  StudentLiveRoute: typeof StudentLiveRoute
+  StudentMaterialsRoute: typeof StudentMaterialsRoute
+  StudentMyCoursesRoute: typeof StudentMyCoursesRoute
+  StudentPlannerRoute: typeof StudentPlannerRoute
+  StudentQuizzesRoute: typeof StudentQuizzesRoute
+  StudentSettingsRoute: typeof StudentSettingsRoute
+  StudentIndexRoute: typeof StudentIndexRoute
+}
+
+const StudentRouteRouteChildren: StudentRouteRouteChildren = {
+  StudentAnalyticsRoute: StudentAnalyticsRoute,
+  StudentAntiCheatRoute: StudentAntiCheatRoute,
+  StudentAssignmentsRoute: StudentAssignmentsRoute,
+  StudentCalendarRoute: StudentCalendarRoute,
+  StudentCoursesRoute: StudentCoursesRoute,
+  StudentDiscussionsRoute: StudentDiscussionsRoute,
+  StudentGradesRoute: StudentGradesRoute,
+  StudentHelpRoute: StudentHelpRoute,
+  StudentLiveRoute: StudentLiveRoute,
+  StudentMaterialsRoute: StudentMaterialsRoute,
+  StudentMyCoursesRoute: StudentMyCoursesRoute,
+  StudentPlannerRoute: StudentPlannerRoute,
+  StudentQuizzesRoute: StudentQuizzesRoute,
+  StudentSettingsRoute: StudentSettingsRoute,
+  StudentIndexRoute: StudentIndexRoute,
+}
+
+const StudentRouteRouteWithChildren = StudentRouteRoute._addFileChildren(
+  StudentRouteRouteChildren,
+)
+
+interface TeacherRouteRouteChildren {
+  TeacherAntiCheatRoute: typeof TeacherAntiCheatRoute
+  TeacherAssignmentsRoute: typeof TeacherAssignmentsRoute
+  TeacherCalendarRoute: typeof TeacherCalendarRoute
+  TeacherCoursesRoute: typeof TeacherCoursesRoute
+  TeacherDiscussionsRoute: typeof TeacherDiscussionsRoute
+  TeacherGradebookRoute: typeof TeacherGradebookRoute
+  TeacherGradingRoute: typeof TeacherGradingRoute
+  TeacherHelpRoute: typeof TeacherHelpRoute
+  TeacherLiveRoute: typeof TeacherLiveRoute
+  TeacherMaterialsRoute: typeof TeacherMaterialsRoute
+  TeacherQuizzesRoute: typeof TeacherQuizzesRoute
+  TeacherSettingsRoute: typeof TeacherSettingsRoute
+  TeacherStudentsRoute: typeof TeacherStudentsRoute
+  TeacherIndexRoute: typeof TeacherIndexRoute
+}
+
+const TeacherRouteRouteChildren: TeacherRouteRouteChildren = {
+  TeacherAntiCheatRoute: TeacherAntiCheatRoute,
+  TeacherAssignmentsRoute: TeacherAssignmentsRoute,
+  TeacherCalendarRoute: TeacherCalendarRoute,
+  TeacherCoursesRoute: TeacherCoursesRoute,
+  TeacherDiscussionsRoute: TeacherDiscussionsRoute,
+  TeacherGradebookRoute: TeacherGradebookRoute,
+  TeacherGradingRoute: TeacherGradingRoute,
+  TeacherHelpRoute: TeacherHelpRoute,
+  TeacherLiveRoute: TeacherLiveRoute,
+  TeacherMaterialsRoute: TeacherMaterialsRoute,
+  TeacherQuizzesRoute: TeacherQuizzesRoute,
+  TeacherSettingsRoute: TeacherSettingsRoute,
+  TeacherStudentsRoute: TeacherStudentsRoute,
+  TeacherIndexRoute: TeacherIndexRoute,
+}
+
+const TeacherRouteRouteWithChildren = TeacherRouteRoute._addFileChildren(
+  TeacherRouteRouteChildren,
+)
+
+interface ApiV1AuthRouteChildren {
+  ApiV1AuthInviteRoute: typeof ApiV1AuthInviteRoute
+}
+
+const ApiV1AuthRouteChildren: ApiV1AuthRouteChildren = {
+  ApiV1AuthInviteRoute: ApiV1AuthInviteRoute,
+}
+
+const ApiV1AuthRouteWithChildren = ApiV1AuthRoute._addFileChildren(
+  ApiV1AuthRouteChildren,
+)
+
+interface ApiV1SystemRouteChildren {
+  ApiV1SystemUploadRoute: typeof ApiV1SystemUploadRoute
+}
+
+const ApiV1SystemRouteChildren: ApiV1SystemRouteChildren = {
+  ApiV1SystemUploadRoute: ApiV1SystemUploadRoute,
+}
+
+const ApiV1SystemRouteWithChildren = ApiV1SystemRoute._addFileChildren(
+  ApiV1SystemRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
+  StudentRouteRoute: StudentRouteRouteWithChildren,
+  TeacherRouteRoute: TeacherRouteRouteWithChildren,
+  HelpRoute: HelpRoute,
+  ApiV1AssessmentRoute: ApiV1AssessmentRoute,
+  ApiV1AuthRoute: ApiV1AuthRouteWithChildren,
+  ApiV1LearningRoute: ApiV1LearningRoute,
+  ApiV1SystemRoute: ApiV1SystemRouteWithChildren,
+  ApiPublicV1AuthInviteAcceptRoute: ApiPublicV1AuthInviteAcceptRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
