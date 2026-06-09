@@ -130,9 +130,9 @@ export const supabaseStorage: Storage = {
   async list(bucket, prefix) {
     const { data, error } = await supabaseAdmin.storage.from(bucket).list(prefix);
     if (error) throw new Error(error.message);
-    return (data ?? []).map((o) => ({
+    return ((data ?? []) as Array<{ name: string; updated_at: string | null; metadata?: { size?: number } }>).map((o) => ({
       name: o.name,
-      size: (o as { metadata?: { size?: number } }).metadata?.size,
+      size: o.metadata?.size,
       updatedAt: o.updated_at ?? undefined,
     }));
   },
