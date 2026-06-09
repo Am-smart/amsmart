@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as HelpRouteImport } from './routes/help'
 import { Route as TeacherRouteRouteImport } from './routes/teacher/route'
 import { Route as StudentRouteRouteImport } from './routes/student/route'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
@@ -53,6 +54,11 @@ import { Route as AdminHelpRouteImport } from './routes/admin/help'
 import { Route as AdminHealthRouteImport } from './routes/admin/health'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
 
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TeacherRouteRoute = TeacherRouteRouteImport.update({
   id: '/teacher',
   path: '/teacher',
@@ -274,6 +280,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteRouteWithChildren
   '/student': typeof StudentRouteRouteWithChildren
   '/teacher': typeof TeacherRouteRouteWithChildren
+  '/help': typeof HelpRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/health': typeof AdminHealthRoute
   '/admin/help': typeof AdminHelpRoute
@@ -316,6 +323,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/help': typeof HelpRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/health': typeof AdminHealthRoute
   '/admin/help': typeof AdminHelpRoute
@@ -362,6 +370,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteRouteWithChildren
   '/student': typeof StudentRouteRouteWithChildren
   '/teacher': typeof TeacherRouteRouteWithChildren
+  '/help': typeof HelpRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/health': typeof AdminHealthRoute
   '/admin/help': typeof AdminHelpRoute
@@ -409,6 +418,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/student'
     | '/teacher'
+    | '/help'
     | '/admin/analytics'
     | '/admin/health'
     | '/admin/help'
@@ -451,6 +461,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/help'
     | '/admin/analytics'
     | '/admin/health'
     | '/admin/help'
@@ -496,6 +507,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/student'
     | '/teacher'
+    | '/help'
     | '/admin/analytics'
     | '/admin/health'
     | '/admin/help'
@@ -542,10 +554,18 @@ export interface RootRouteChildren {
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
   StudentRouteRoute: typeof StudentRouteRouteWithChildren
   TeacherRouteRoute: typeof TeacherRouteRouteWithChildren
+  HelpRoute: typeof HelpRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/teacher': {
       id: '/teacher'
       path: '/teacher'
@@ -963,6 +983,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRouteRoute: AdminRouteRouteWithChildren,
   StudentRouteRoute: StudentRouteRouteWithChildren,
   TeacherRouteRoute: TeacherRouteRouteWithChildren,
+  HelpRoute: HelpRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
