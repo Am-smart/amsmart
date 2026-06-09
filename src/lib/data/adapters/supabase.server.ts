@@ -6,9 +6,17 @@
  * `createServerFn` handlers or server routes.
  */
 
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { supabaseAdmin as typedAdmin } from "@/integrations/supabase/client.server";
 import type { Database, QueryOptions, Where } from "../database";
 import type { Storage, UploadOptions, SignedUrlOptions } from "../storage";
+
+// Cast away the generic schema typing: this adapter is schema-agnostic by
+// design — typed access lives in higher-level repository modules.
+const supabaseAdmin = typedAdmin as unknown as {
+  from: (table: string) => any;
+  storage: { from: (bucket: string) => any };
+  rpc: (name: string, args?: Record<string, unknown>) => any;
+};
 
 function applyWhere<Q extends { eq: (col: string, val: unknown) => Q }>(q: Q, where?: Where): Q {
   if (!where) return q;
@@ -125,7 +133,7 @@ export const supabaseStorage: Storage = {
     return (data ?? []).map((o) => ({
       name: o.name,
       size: (o as { metadata?: { size?: number } }).metadata?.size,
-      updatedAt: o.updated_at,
+      updatedAt: o.updated_at ?? undefined,
     }));
   },
 };
