@@ -78,7 +78,7 @@ export const learningDb = {
         .eq('student_id', studentId)
         .in('lesson_id', lessonIds);
     if (error) dbUtils.handleError(error);
-    return data?.map(c => c.lesson_id) || [];
+    return data?.map((c: any) => c.lesson_id) || [];
   },
 
   async getLessonCompletions(studentId: string, sessionId: string): Promise<unknown[]> {

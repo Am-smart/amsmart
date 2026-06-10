@@ -226,21 +226,21 @@ export const systemDb = {
         .eq('title', title)
         .eq('message', message)
         .gt('created_at', since);
-    return (data || []).map(n => n.user_id);
+    return (data || []).map((n: any) => n.user_id);
   },
 
   async findAllUserIdsByRole(role?: string): Promise<string[]> {
     let query = supabase.from('users').select('id');
     if (role) query = query.eq('role', role);
     const { data } = await query;
-    return (data || []).map(u => u.id);
+    return (data || []).map((u: any) => u.id);
   },
 
   async findEnrollmentStudentIds(courseId: string): Promise<string[]> {
     const { data } = await supabase.from('enrollments')
         .select('student_id')
         .eq('course_id', courseId);
-    return (data || []).map(s => s.student_id);
+    return (data || []).map((s: any) => s.student_id);
   },
 
   // Broadcast Operations (Table-based)
@@ -385,7 +385,7 @@ export const systemDb = {
       ).in('id', userIds);
 
       if (!userError && userData) {
-        const userMap = new Map(userData.map(u => [u.id, u]));
+        const userMap = new Map(userData.map((u: any) => [u.id, u]));
         return logs.map(log => ({
           ...log,
           users: log.user_id ? userMap.get(log.user_id) as { full_name: string; email: string } : undefined
