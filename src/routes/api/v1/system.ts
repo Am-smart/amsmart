@@ -130,7 +130,8 @@ const GET = withHandler(async (user, request) => {
 
 const POST = withHandler(async (user, request) => {
   const body = sanitizeObject(await request.json()) as Record<string, any>;
-  const { action, ...data } = body;
+  const { action, ...rest } = body;
+  const data: any = rest;
 
   switch (action) {
     case "log":
