@@ -34,11 +34,11 @@ export class PushService {
     }
   }
 
-  async sendNotification(_s: PushSubscription, _p: PushPayload): Promise<{ ok: boolean; reason?: string }> {
-    return { ok: false, reason: "push-disabled" };
+  async sendNotification(_s: PushSubscription, _p: PushPayload): Promise<{ success: boolean; expired?: boolean; reason?: string }> {
+    return { success: false, expired: false, reason: "push-disabled" };
   }
 
-  async sendToMany(subs: PushSubscription[], p: PushPayload): Promise<Array<{ ok: boolean; reason?: string }>> {
+  async sendToMany(subs: PushSubscription[], p: PushPayload): Promise<Array<{ success: boolean; expired?: boolean; reason?: string }>> {
     return Promise.all(subs.map((s) => this.sendNotification(s, p)));
   }
 }
