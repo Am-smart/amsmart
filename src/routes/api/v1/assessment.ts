@@ -1,30 +1,136 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { withHandler } from "@/lib/api/api-utils";
+import { assessmentService } from "@/lib/services";
+import { AssessmentMapper } from "@/lib/mappers";
+import { rbac } from "@/lib/auth/rbac";
+import { AssessmentDomain } from "@/lib/domain/assessment.domain";
+import { sanitizeObject } from "@/lib/validation";
+import { BadRequestError, UnauthorizedError } from "@/lib/api-error";
 
-/**
- * Assessment (assignments/quizzes/submissions)
- * Migrated from legacy Next.js route — handler bodies are stubs.
- * Implement using `getDatabase()` / `getStorage()` from
- * `@/lib/data/provider.server` to stay provider-agnostic.
- */
+const GET = withHandler(async (user, request) => {
+  const { searchParams } = new URL(request.url);
+  const action = searchParams.get("action");
+  const limit = searchParams.get("limit") ? parseInt(searchParams.get("limit")!) : undefined;
+  const offset = searchParams.get("offset") ? parseInt(searchParams.get("offset")!) : undefined;
+
+  switch (action) {
+    case "assignments": {
+      const teacherId = searchParams.get("teacherId") || undefined;
+      const courseId = searchParams.get("courseId") || undefined;
+      const assignments = await assessmentService.getAssignments(teacherId, courseId, user.sessionId!, limit, offset, user.id, user.role);
+      return assignments.map(AssessmentMapper.toAssignmentDTO);
+    }
+    case "quizzes": {
+      const id = searchParams.get("id") || undefined;
+      if (id) {
+        const quiz = await assessmentService.getQuiz(id, user.sessionId!, user.id, user.role);
+        return AssessmentMapper.toQuizDTO(quiz);
+      }
+      const courseId = searchParams.get("courseId") || undefined;
+      const teacherId = searchParams.get("teacherId") || undefined;
+      const quizzes = await assessmentService.getQuizzes(courseId, teacherId, user.sessionId!, limit, offset, user.id, user.role);
+      return quizzes.map(AssessmentMapper.toQuizDTO);
+    }
+    case "submissions": {
+      const assignmentId = searchParams.get("assignmentId") || undefined;
+      const studentId = searchParams.get("studentId") || undefined;
+      const status = searchParams.get("status") || undefined;
+      const courseId = searchParams.get("courseId") || undefined;
+      const subs = await assessmentService.getSubmissions(assignmentId, studentId, user.sessionId!, limit, offset, user.id, user.role, status, courseId);
+      return subs.map(AssessmentMapper.toSubmissionDTO);
+    }
+    default:
+      throw new BadRequestError("Invalid GET action");
+  }
+});
+
+const POST = withHandler(async (user, request) => {
+  const body = sanitizeObject(await request.json()) as Record<string, any>;
+  const { action, ...data } = body;
+
+  switch (action) {
+    case "save-assignment": {
+      if (!rbac.can(user, "assignment:manage")) throw new UnauthorizedError();
+      AssessmentDomain.validateAssignment(data);
+      const s = AssessmentDomain.sanitizeEntity(data);
+      const a = await assessmentService.saveAssignment(user.id, s, user.sessionId!, user);
+      return AssessmentMapper.toAssignmentDTO(a);
+    }
+    case "submit-assignment": {
+      if (!rbac.can(user, "assignment:submit")) throw new UnauthorizedError();
+      const { assignmentId, ...content } = data;
+      if (!assignmentId) throw new BadRequestError("assignmentId is required");
+      AssessmentDomain.validateSubmission(content);
+      const sub = await assessmentService.submitAssignment(user.id, assignmentId, content, user.sessionId!);
+      return AssessmentMapper.toSubmissionDTO(sub);
+    }
+    case "save-quiz": {
+      if (!rbac.can(user, "quiz:manage")) throw new UnauthorizedError();
+      AssessmentDomain.validateQuiz(data);
+      const s = AssessmentDomain.sanitizeEntity(data);
+      const q = await assessmentService.saveQuiz(user.id, s, user.sessionId!, user);
+      return AssessmentMapper.toQuizDTO(q);
+    }
+    case "submit-quiz": {
+      if (!rbac.can(user, "quiz:take")) throw new UnauthorizedError();
+      const { quizId, ...content } = data;
+      if (!quizId) throw new BadRequestError("quizId is required");
+      return assessmentService.submitQuiz(user.id, quizId, content, user.sessionId!);
+    }
+    default:
+      throw new BadRequestError("Invalid POST action");
+  }
+});
+
+const DELETE = withHandler(async (user, request) => {
+  const { searchParams } = new URL(request.url);
+  const action = searchParams.get("action");
+  const id = searchParams.get("id");
+  if (!id) throw new BadRequestError("id is required");
+
+  switch (action) {
+    case "assignment":
+      if (!rbac.can(user, "assignment:manage")) throw new UnauthorizedError();
+      await assessmentService.deleteAssignment(id, user.sessionId!, user);
+      return { success: true };
+    case "quiz":
+      if (!rbac.can(user, "quiz:manage")) throw new UnauthorizedError();
+      await assessmentService.deleteQuiz(id, user.sessionId!, user);
+      return { success: true };
+    default:
+      throw new BadRequestError("Invalid DELETE action");
+  }
+});
+
+const PATCH = withHandler(async (user, request) => {
+  const { searchParams } = new URL(request.url);
+  const action = searchParams.get("action");
+  const id = searchParams.get("id");
+  const body = sanitizeObject(await request.json()) as Record<string, any>;
+  const { action: _a, ...data } = body;
+  if (!id) throw new BadRequestError("id is required");
+
+  switch (action) {
+    case "grade-submission": {
+      if (!rbac.can(user, "assignment:grade")) throw new UnauthorizedError();
+      if (data.grade !== undefined && (data.grade < 0 || data.grade > 100)) {
+        throw new BadRequestError("Grade must be between 0 and 100");
+      }
+      await assessmentService.gradeSubmission(id, data, user.sessionId!, user.id, user.role);
+      return { success: true };
+    }
+    default:
+      throw new BadRequestError("Invalid PATCH action");
+  }
+});
+
 export const Route = createFileRoute("/api/v1/assessment")({
   server: {
     handlers: {
-      GET: async ({ request }) => {
-        // TODO: port logic from legacy Next.js /api/v1/assessment route.
-        return Response.json({ ok: true, route: "/api/v1/assessment", method: "GET" }, { status: 501 });
-      },
-      POST: async ({ request }) => {
-        // TODO: port logic from legacy Next.js /api/v1/assessment route.
-        return Response.json({ ok: true, route: "/api/v1/assessment", method: "POST" }, { status: 501 });
-      },
-      PUT: async ({ request }) => {
-        // TODO: port logic from legacy Next.js /api/v1/assessment route.
-        return Response.json({ ok: true, route: "/api/v1/assessment", method: "PUT" }, { status: 501 });
-      },
-      DELETE: async ({ request }) => {
-        // TODO: port logic from legacy Next.js /api/v1/assessment route.
-        return Response.json({ ok: true, route: "/api/v1/assessment", method: "DELETE" }, { status: 501 });
-      },
+      GET: ({ request }) => GET(request),
+      POST: ({ request }) => POST(request),
+      PATCH: ({ request }) => PATCH(request),
+      DELETE: ({ request }) => DELETE(request),
     },
   },
 });
