@@ -8,7 +8,7 @@
  * Auth/session is read from the project's custom `app-user-session` cookie
  * via `@tanstack/react-start/server` (NOT `next/headers`).
  */
-import { getCookie, deleteCookie, getHeader } from "@tanstack/react-start/server";
+import { getCookie, deleteCookie, getRequestHeader } from "@tanstack/react-start/server";
 import { authService } from "@/lib/services";
 import type { User } from "@/lib/types";
 import { getErrorMessage, mapErrorToStatus } from "@/lib/api-error";
@@ -60,9 +60,9 @@ export function withHandler<T>(
   return async (request: Request): Promise<Response> => {
     // CSRF Protection on mutating requests
     if (checkCSRF && ["POST", "PUT", "PATCH", "DELETE"].includes(request.method)) {
-      const origin = getHeader("origin");
-      const referer = getHeader("referer");
-      const host = getHeader("host");
+      const origin = getRequestHeader("origin");
+      const referer = getRequestHeader("referer");
+      const host = getRequestHeader("host");
 
       if (!origin && !referer) {
         return jsonError("CSRF Protection: Origin/Referer required", 403);
@@ -81,8 +81,8 @@ export function withHandler<T>(
         }
       }
 
-      const requestedWith = getHeader("x-requested-with");
-      const sessionHeader = getHeader("x-session-id");
+      const requestedWith = getRequestHeader("x-requested-with");
+      const sessionHeader = getRequestHeader("x-session-id");
       if (!requestedWith && !sessionHeader) {
         return jsonError("CSRF Protection: Missing X-Requested-With header", 403);
       }
