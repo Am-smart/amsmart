@@ -1,18 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { withHandler } from "@/lib/api/api-utils";
+import { systemService } from "@/lib/services";
+import { BadRequestError } from "@/lib/api-error";
 
-/**
- * System upload
- * Migrated from legacy Next.js route — handler bodies are stubs.
- * Implement using `getDatabase()` / `getStorage()` from
- * `@/lib/data/provider.server` to stay provider-agnostic.
- */
+const POST = withHandler(async (user, request) => {
+  const formData = await request.formData();
+  const file = formData.get("file") as File | null;
+  const category = (formData.get("category") as string) || "general";
+  if (!file) throw new BadRequestError("No file provided");
+  return systemService.uploadFile(file, category, user.id, user.sessionId!);
+});
+
 export const Route = createFileRoute("/api/v1/system/upload")({
   server: {
     handlers: {
-      POST: async ({ request }) => {
-        // TODO: port logic from legacy Next.js /api/v1/system/upload route.
-        return Response.json({ ok: true, route: "/api/v1/system/upload", method: "POST" }, { status: 501 });
-      },
+      POST: ({ request }) => POST(request),
     },
   },
 });

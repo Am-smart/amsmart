@@ -1,26 +1,24 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { withHandler } from "@/lib/api/api-utils";
+import { authService } from "@/lib/services";
+import { sanitizeObject } from "@/lib/validation";
+import { BadRequestError, UnauthorizedError } from "@/lib/api-error";
 
 /**
- * Auth invites (issue)
- * Migrated from legacy Next.js route — handler bodies are stubs.
- * Implement using `getDatabase()` / `getStorage()` from
- * `@/lib/data/provider.server` to stay provider-agnostic.
+ * Invite issuance endpoint. Legacy clients also call `/api/v1/auth?action=generate-invite`;
+ * this route exposes a dedicated POST for issuing invites (admin/teacher only).
  */
+const POST = withHandler(async (user, request) => {
+  if (!user) throw new UnauthorizedError();
+  const body = sanitizeObject(await request.json()) as Record<string, any>;
+  if (!body.role) throw new BadRequestError("role is required");
+  return authService.generateInvite(user, body.role, body.email);
+});
+
 export const Route = createFileRoute("/api/v1/auth/invite")({
   server: {
     handlers: {
-      GET: async ({ request }) => {
-        // TODO: port logic from legacy Next.js /api/v1/auth/invite route.
-        return Response.json({ ok: true, route: "/api/v1/auth/invite", method: "GET" }, { status: 501 });
-      },
-      POST: async ({ request }) => {
-        // TODO: port logic from legacy Next.js /api/v1/auth/invite route.
-        return Response.json({ ok: true, route: "/api/v1/auth/invite", method: "POST" }, { status: 501 });
-      },
-      DELETE: async ({ request }) => {
-        // TODO: port logic from legacy Next.js /api/v1/auth/invite route.
-        return Response.json({ ok: true, route: "/api/v1/auth/invite", method: "DELETE" }, { status: 501 });
-      },
+      POST: ({ request }) => POST(request),
     },
   },
 });
