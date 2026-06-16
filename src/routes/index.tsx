@@ -1,33 +1,101 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState, useEffect, useCallback } from "react";
+import { useAuth } from "@/components/AppContext";
+import { useRouter, useSearchParams } from "@/lib/next-compat";
+import { Hero } from "@/components/layout/Hero";
+import { LandingSections } from "@/components/layout/LandingSections";
+import { LandingFooter } from "@/components/layout/LandingFooter";
+import { LandingHeader } from "@/components/layout/LandingHeader";
+import { LoginForm } from "@/components/auth/LoginForm";
+import { SignupForm } from "@/components/auth/SignupForm";
+import { ResetPasswordForm } from "@/components/auth/ResetPasswordForm";
 
 export const Route = createFileRoute("/")({
+  // Landing uses AppContext which reads from IndexedDB / localStorage on mount.
+  ssr: false,
   head: () => ({
     meta: [
-      { title: "SmartLMS" },
-      { name: "description", content: "Learning management for students, teachers, and admins." },
-      { property: "og:title", content: "SmartLMS" },
-      { property: "og:description", content: "Learning management for students, teachers, and admins." },
+      { title: "SmartLMS - Modern Learning Platform" },
+      { name: "description", content: "Empower your education with our all-in-one learning management system." },
+      { property: "og:title", content: "SmartLMS - Modern Learning Platform" },
+      { property: "og:description", content: "Empower your education with our all-in-one learning management system." },
     ],
   }),
-  component: Landing,
+  component: HomePage,
 });
 
-// TODO: port the original landing / login UI from the legacy Next.js
-// `src/app/page.tsx`. For now this is a role chooser so the migrated
-// route shells are reachable end-to-end.
-function Landing() {
+type AuthView = "login" | "signup" | "reset";
+type AuthRole = "student" | "teacher" | "admin";
+
+function HomePage() {
+  const [showAuth, setShowAuth] = useState(false);
+  const [authView, setAuthView] = useState<AuthView>("login");
+  const [selectedRole, setSelectedRole] = useState<AuthRole>("student");
+  const { user, role, isLoading } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("signup") === "true") {
+      setAuthView("signup");
+      setShowAuth(true);
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, "", newUrl);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!isLoading && user && role) {
+      if (window.location.search.includes("signup=true")) return;
+      router.push(`/${role}`);
+    }
+  }, [user, role, isLoading, router]);
+
+  const toggleAuth = useCallback((view: AuthView = "login", initialRole?: AuthRole) => {
+    setAuthView(view);
+    if (initialRole) setSelectedRole(initialRole);
+    setShowAuth(true);
+  }, []);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-3xl font-semibold">SmartLMS</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Migration in progress.</p>
-        <div className="mt-6 flex justify-center gap-3 text-sm">
-          <Link to="/student" className="rounded-md border px-4 py-2 hover:bg-accent">Student</Link>
-          <Link to="/teacher" className="rounded-md border px-4 py-2 hover:bg-accent">Teacher</Link>
-          <Link to="/admin" className="rounded-md border px-4 py-2 hover:bg-accent">Admin</Link>
-          <Link to="/help" className="rounded-md border px-4 py-2 hover:bg-accent">Help</Link>
+    <div className="landing-page">
+      <LandingHeader
+        onSignIn={() => toggleAuth("login")}
+        onGetStarted={() => toggleAuth("signup")}
+      />
+      <main>
+        <Hero onRoleSelect={(r) => toggleAuth("signup", r)} />
+        <LandingSections />
+      </main>
+      <LandingFooter onRoleSelect={(r) => toggleAuth("signup", r)} />
+
+      {showAuth && (
+        <div className="fixed inset-0 bg-black/50 z-[2000] flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-full py-4 sm:py-8">
+            {authView === "login" && (
+              <LoginForm
+                onClose={() => setShowAuth(false)}
+                onShowSignup={() => setAuthView("signup")}
+                onShowReset={() => setAuthView("reset")}
+              />
+            )}
+            {authView === "signup" && (
+              <SignupForm
+                key={selectedRole}
+                initialRole={selectedRole}
+                onClose={() => setShowAuth(false)}
+                onShowLogin={() => setAuthView("login")}
+              />
+            )}
+            {authView === "reset" && (
+              <ResetPasswordForm
+                onClose={() => setShowAuth(false)}
+                onShowLogin={() => setAuthView("login")}
+              />
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

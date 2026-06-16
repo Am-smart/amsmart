@@ -119,7 +119,25 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <AppShell>
+        <Outlet />
+      </AppShell>
     </QueryClientProvider>
+  );
+}
+
+// AppProvider + TimerProvider are client-only (IndexedDB / window APIs).
+// Lazy-mount them so SSR/prerender of public routes never executes their effects.
+import { lazy, Suspense } from "react";
+const AppProviders = lazy(() => import("@/components/AppProviders"));
+
+function AppShell({ children }: { children: ReactNode }) {
+  if (typeof window === "undefined") {
+    return <>{children}</>;
+  }
+  return (
+    <Suspense fallback={<>{children}</>}>
+      <AppProviders>{children}</AppProviders>
+    </Suspense>
   );
 }
