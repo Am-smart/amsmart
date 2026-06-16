@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import Image from 'next/image';
+// next/image replaced with native img in TanStack Start migration
 import { Upload, Image as ImageIcon } from 'lucide-react';
 import { CourseDTO } from '@/lib/types';
 import { useIndexedDB } from '@/hooks/useIndexedDB';

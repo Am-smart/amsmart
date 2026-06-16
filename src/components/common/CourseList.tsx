@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import Image from 'next/image';
+// next/image replaced with native img in TanStack Start migration
 import { CourseDTO } from '@/lib/types';
 import {
   Card,
