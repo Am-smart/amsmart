@@ -5,7 +5,7 @@ import {
   User, Maintenance, Notification, CourseDTO, EnrollmentDTO, AssignmentDTO, SubmissionDTO, SignupRequestDTO
 } from '@/lib/types';
 import { useIndexedDB } from '@/hooks/useIndexedDB';
-import { Toast, ToastMessage, ToastType } from './ui/Toast';
+import { Toast, ToastMessage, ToastType } from './ui-legacy/Toast';
 import * as actions from '@/lib/api-actions';
 import { sessionManager } from '@/lib/session-manager';
 import { useRouter } from '@/lib/next-compat';
