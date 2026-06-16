@@ -202,11 +202,11 @@ export const CourseEditor: React.FC<CourseEditorProps> = ({ course, teacherId, o
                             <div className="w-16 h-16 rounded-xl border-2 border-slate-100 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0 relative">
                                 {formData.thumbnail_url && (
                                     formData.thumbnail_url.startsWith('http') ? (
-                                        <Image
+                                        <img
                                             src={formData.thumbnail_url}
                                             alt="Preview"
-                                            fill
-                                            sizes="64px"
+                                            style={{position:"absolute",inset:0,width:"100%",height:"100%"}}
+                                            
                                             className="object-cover"
                                         />
                                     ) : (
