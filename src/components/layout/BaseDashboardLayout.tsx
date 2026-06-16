@@ -5,7 +5,7 @@ import { useAuth } from '@/components/auth/AuthContext';
 import { UnifiedSidebar } from "@/components/common/UnifiedSidebar"
 import { UserRole, User } from "@/lib/types";
 import { ForcePasswordChange } from "@/components/auth/ForcePasswordChange";
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname } from '@/lib/next-compat';
 import { useAppContext } from '../AppContext';
 import { MaintenanceOverlay } from './MaintenanceOverlay';
 

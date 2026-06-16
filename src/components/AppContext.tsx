@@ -8,7 +8,7 @@ import { useIndexedDB } from '@/hooks/useIndexedDB';
 import { Toast, ToastMessage, ToastType } from './ui/Toast';
 import * as actions from '@/lib/api-actions';
 import { sessionManager } from '@/lib/session-manager';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/lib/next-compat';
 
 export type AppLoadingStatus = 'idle' | 'auth' | 'data' | 'ready';
 

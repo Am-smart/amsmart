@@ -5,7 +5,7 @@ import { useAppContext } from '../AppContext';
 import { NotificationPanel } from './NotificationPanel';
 import { markNotificationAsRead, markAllNotificationsAsRead, dismissNotification, acknowledgeNotification } from '@/lib/api-actions';
 import { Notification, User } from '@/lib/types';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/lib/next-compat';
 import { parseDeepLink } from '@/lib/utils';
 
 interface HeaderStats {
