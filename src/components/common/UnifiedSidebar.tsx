@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sidebar, SidebarItem } from '../ui/Sidebar';
+import { Sidebar, SidebarItem } from '../ui-legacy/Sidebar';
 import { UserRole } from '@/lib/types';
 import {
   LayoutDashboard,

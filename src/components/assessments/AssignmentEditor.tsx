@@ -6,7 +6,7 @@ import { Plus, Paperclip, Settings } from 'lucide-react';
 import { saveAssignment } from '@/lib/api-actions';
 import { useAuth } from '@/components/auth/AuthContext';
 import { ASSESSMENT_STATUS, ANTI_CHEAT_VIOLATIONS } from '@/lib/constants';
-import { Modal } from '@/components/ui/Modal';
+import { Modal } from '@/components/ui-legacy/Modal';
 import { AntiCheatConfigModal } from './AntiCheatConfigModal';
 
 interface AssignmentEditorProps {

@@ -5,7 +5,7 @@ import { useAppContext } from '@/components/AppContext';
 import { Plus, Settings } from 'lucide-react';
 import { saveQuiz } from '@/lib/api-actions';
 import { ASSESSMENT_STATUS, ANTI_CHEAT_VIOLATIONS } from '@/lib/constants';
-import { Modal } from '@/components/ui/Modal';
+import { Modal } from '@/components/ui-legacy/Modal';
 import { AntiCheatConfigModal } from './AntiCheatConfigModal';
 
 interface QuizEditorProps {

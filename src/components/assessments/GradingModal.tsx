@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { SubmissionDTO, QuestionDTO } from '@/lib/types';
 import { useAppContext } from '@/components/AppContext';
 import { gradeSubmission } from '@/lib/api-actions';
-import { Modal } from '@/components/ui/Modal';
+import { Modal } from '@/components/ui-legacy/Modal';
 
 interface GradingModalProps {
     submission: SubmissionDTO;

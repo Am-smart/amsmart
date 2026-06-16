@@ -1,6 +1,6 @@
 import React from 'react';
 import { AssignmentDTO, SubmissionDTO } from '@/lib/types';
-import { Countdown } from '@/components/ui/Countdown';
+import { Countdown } from '@/components/ui-legacy/Countdown';
 import { FileText, Calendar, CheckCircle2, Clock, AlertCircle, MessageSquare, RotateCcw } from 'lucide-react';
 
 interface AssignmentsListProps {

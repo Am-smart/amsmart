@@ -4,7 +4,7 @@ import { useIndexedDB } from '@/hooks/useIndexedDB';
 import { useAppContext } from '../AppContext';
 import { useAuth } from '../auth/AuthContext';
 import { savePlannerItem, deletePlannerItem, getPlannerItems } from '@/lib/api-actions';
-import { Countdown } from '@/components/ui/Countdown';
+import { Countdown } from '@/components/ui-legacy/Countdown';
 import { Edit2, Check, X, Trash2 } from 'lucide-react';
 
 interface PlannerViewProps {

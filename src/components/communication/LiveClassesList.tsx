@@ -1,6 +1,6 @@
 import React from 'react';
 import { LiveClassDTO } from '@/lib/types';
-import { Countdown } from '@/components/ui/Countdown';
+import { Countdown } from '@/components/ui-legacy/Countdown';
 import { Video, Calendar, Clock, Globe, ShieldCheck, PlayCircle, Lock } from 'lucide-react';
 
 interface LiveClassesListProps {

@@ -6,7 +6,7 @@ import { useIndexedDB } from '@/hooks/useIndexedDB';
 import { useAppContext } from '@/components/AppContext';
 import { saveCourse } from '@/lib/api-actions';
 import { useAuth } from '@/components/auth/AuthContext';
-import { Modal } from '@/components/ui/Modal';
+import { Modal } from '@/components/ui-legacy/Modal';
 
 interface CourseEditorProps {
     teacherId: string;

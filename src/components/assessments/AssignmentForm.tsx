@@ -4,7 +4,7 @@ import * as actions from '@/lib/api-actions';
 import { useAntiCheat } from '@/hooks/useAntiCheat';
 import { useIndexedDB } from '@/hooks/useIndexedDB';
 import { useAppContext } from '@/components/AppContext';
-import { FileUpload } from '@/components/ui/FileUpload';
+import { FileUpload } from '@/components/ui-legacy/FileUpload';
 import { Shield } from 'lucide-react';
 
 interface AssignmentFormProps {

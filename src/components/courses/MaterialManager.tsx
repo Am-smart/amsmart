@@ -3,7 +3,7 @@ import { useAuth } from '@/components/auth/AuthContext';
 import { MaterialDTO, CourseDTO } from '@/lib/types';
 import { useAppContext } from '@/components/AppContext';
 import { saveMaterial, deleteMaterial } from '@/lib/api-actions';
-import { FileUpload } from '@/components/ui/FileUpload';
+import { FileUpload } from '@/components/ui-legacy/FileUpload';
 
 interface MaterialManagerProps {
     initialMaterials: MaterialDTO[];

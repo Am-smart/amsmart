@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal } from '@/components/ui/Modal';
+import { Modal } from '@/components/ui-legacy/Modal';
 import { ANTI_CHEAT_VIOLATIONS } from '@/lib/constants';
 import { Shield, AlertCircle } from 'lucide-react';
 

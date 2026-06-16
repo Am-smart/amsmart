@@ -1,6 +1,6 @@
 import React from 'react';
 import { QuizDTO, QuizSubmissionDTO } from '@/lib/types';
-import { Countdown } from '@/components/ui/Countdown';
+import { Countdown } from '@/components/ui-legacy/Countdown';
 import { HelpCircle, Trophy, History, PlayCircle, Lock, Ban, Timer, GraduationCap } from 'lucide-react';
 
 interface QuizzesListProps {

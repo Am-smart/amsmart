@@ -10,8 +10,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle
-} from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
+} from '@/components/ui-legacy/Card';
+import { Button } from '@/components/ui-legacy/Button';
 import { BookOpen, Calendar, Trash2, Edit } from 'lucide-react';
 
 interface CourseListProps {

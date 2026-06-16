@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Bell } from 'lucide-react';
-import { Header } from '../ui/Header';
+import { Header } from '../ui-legacy/Header';
 import { useAppContext } from '../AppContext';
 import { NotificationPanel } from './NotificationPanel';
 import { markNotificationAsRead, markAllNotificationsAsRead, dismissNotification, acknowledgeNotification } from '@/lib/api-actions';

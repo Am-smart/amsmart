@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { UserRole } from '@/lib/types';
 import { generateInvite } from '@/lib/api-actions';
 import { Copy, Check, X, Mail, Shield, User, GraduationCap } from 'lucide-react';
-import { Modal } from '@/components/ui/Modal';
+import { Modal } from '@/components/ui-legacy/Modal';
 
 interface InviteModalProps {
     isOpen: boolean;
