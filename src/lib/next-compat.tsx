@@ -81,3 +81,25 @@ export const Image = React.forwardRef<HTMLImageElement, React.ImgHTMLAttributes<
     return <img ref={ref} {...props} />;
   },
 );
+
+// `next/dynamic` shim — returns a React.lazy-wrapped component, ignoring
+// `ssr: false` (our role layouts already opt out of SSR) and rendering
+// the provided `loading` element via Suspense.
+type DynamicOptions = { ssr?: boolean; loading?: () => React.ReactNode };
+export function dynamic<T extends React.ComponentType<any>>(
+  loader: () => Promise<T>,
+  options: DynamicOptions = {},
+): React.ComponentType<React.ComponentProps<T>> {
+  const Lazy = React.lazy(async () => {
+    const mod = await loader();
+    return { default: mod as unknown as T };
+  });
+  const Fallback = options.loading ?? (() => null);
+  return function DynamicComponent(props: React.ComponentProps<T>) {
+    return (
+      <React.Suspense fallback={<Fallback />}>
+        <Lazy {...(props as any)} />
+      </React.Suspense>
+    );
+  };
+}
