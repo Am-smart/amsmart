@@ -1,18 +1,22 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute("/admin/health")({
-  head: () => ({ meta: [{ title: "Admin Health — SmartLMS" }] }),
-  component: Page,
-});
+import React, { useState, useEffect } from 'react';
+import { SystemHealth } from "@/components/system/SystemMisc";
 
-// TODO: port UI from legacy Next.js /admin/health page.
-function Page() {
-  return (
-    <section>
-      <h1 className="text-2xl font-semibold">Admin Health</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
-        Migrated route skeleton. Port the original page contents here.
-      </p>
-    </section>
-  );
+function HealthPage() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(false);
+  }, []);
+
+  if (isLoading) return <div className="animate-pulse">Loading system health...</div>;
+
+  return <SystemHealth />;
 }
+
+
+export const Route = createFileRoute('/admin/health')({
+  head: () => ({ meta: [{ title: "Admin — Health — SmartLMS" }] }),
+  component: HealthPage,
+});

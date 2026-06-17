@@ -1,18 +1,24 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute("/teacher/settings")({
-  head: () => ({ meta: [{ title: "Teacher Settings — SmartLMS" }] }),
-  component: Page,
-});
+import React from 'react';
+import { useAuth } from '@/components/auth/AuthContext';
+import { TeacherSettings } from "@/components/system/TeacherSettings";
 
-// TODO: port UI from legacy Next.js /teacher/settings page.
-function Page() {
+function SettingsPage() {
+  const { user, updateProfile } = useAuth();
+
+  if (!user) return null;
+
   return (
-    <section>
-      <h1 className="text-2xl font-semibold">Teacher Settings</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
-        Migrated route skeleton. Port the original page contents here.
-      </p>
-    </section>
+    <TeacherSettings
+        user={user}
+        onUpdate={updateProfile}
+    />
   );
 }
+
+
+export const Route = createFileRoute('/teacher/settings')({
+  head: () => ({ meta: [{ title: "Teacher — Settings — SmartLMS" }] }),
+  component: SettingsPage,
+});
