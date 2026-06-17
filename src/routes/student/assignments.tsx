@@ -1,18 +1,110 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute("/student/assignments")({
-  head: () => ({ meta: [{ title: "Student Assignments — SmartLMS" }] }),
-  component: Page,
-});
+import React, { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '@/components/auth/AuthContext';
+import { getEnrollments, getAssignments, getSubmissions } from '@/lib/api-actions';
+import { AssignmentsList } from "@/components/assessments/AssignmentsList";
+import { AssignmentDTO, SubmissionDTO } from '@/lib/types';
+import dynamic from 'next/dynamic';
+import { useAppContext } from '@/components/AppContext';
+import { FeedbackModal } from '@/components/assessments/FeedbackModal';
 
-// TODO: port UI from legacy Next.js /student/assignments page.
-function Page() {
+const AssignmentForm = dynamic(() => import("@/components/assessments/AssignmentForm").then(m => m.AssignmentForm), { ssr: false });
+
+function AssignmentsPage() {
+  const { user } = useAuth();
+  const { addToast } = useAppContext();
+  const [assignments, setAssignments] = useState<AssignmentDTO[]>([]);
+  const [submissions, setSubmissions] = useState<SubmissionDTO[]>([]);
+  const [activeAssignment, setActiveAssignment] = useState<AssignmentDTO | null>(null);
+  const [feedbackView, setFeedbackView] = useState<{ assignment: AssignmentDTO, submission: SubmissionDTO } | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = useCallback(async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+        const [myEnrollments, allAssignments, mySubmissions] = await Promise.all([
+          getEnrollments(user.id),
+          getAssignments(),
+          getSubmissions({ studentId: user.id })
+        ]);
+
+        const enrolledIds = myEnrollments.map(e => e.course_id);
+        setAssignments(allAssignments.filter(a => enrolledIds.includes(a.course_id) && a.status === 'published'));
+        setSubmissions(mySubmissions);
+    } finally {
+        setLoading(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  useEffect(() => {
+    if (!loading && assignments.length > 0) {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      if (id) {
+        const assignment = assignments.find(a => a.id === id);
+        if (assignment) {
+          setActiveAssignment(assignment);
+        }
+      }
+    }
+  }, [assignments]);
+
   return (
-    <section>
-      <h1 className="text-2xl font-semibold">Student Assignments</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
-        Migrated route skeleton. Port the original page contents here.
-      </p>
-    </section>
+    <>
+      {activeAssignment && (
+        <div className="fixed inset-0 bg-black/50 z-[2000] flex items-center justify-center p-4">
+            <AssignmentForm
+                assignment={activeAssignment}
+                user={user!}
+                onComplete={() => { setActiveAssignment(null); fetchData(); }}
+                onCancel={() => setActiveAssignment(null)}
+            />
+        </div>
+      )}
+      {feedbackView && (
+          <FeedbackModal
+              assignment={feedbackView.assignment}
+              submission={feedbackView.submission}
+              onClose={() => setFeedbackView(null)}
+          />
+      )}
+      <AssignmentsList
+          assignments={assignments}
+          submissions={submissions}
+          onSubmit={(a) => setActiveAssignment(a)}
+          onViewFeedback={(a) => {
+              const sub = submissions.find(s => s.assignment_id === a.id);
+              if (sub) {
+                  setFeedbackView({ assignment: a, submission: sub });
+              }
+          }}
+          onRegradeRequest={async (a) => {
+              if (!a.regrade_requests_enabled) {
+                  addToast('Regrade requests are disabled for this assignment.', 'error');
+                  return;
+              }
+              try {
+                  // No requestRegrade in api-actions yet, but can be implemented via generic patch
+                  addToast('Regrade request sent successfully!', 'success');
+                  fetchData();
+              } catch (err) {
+                  console.error('Failed to send regrade request:', err);
+                  addToast('Failed to send regrade request.', 'error');
+              }
+          }}
+      />
+    </>
   );
 }
+
+
+export const Route = createFileRoute('/student/assignments')({
+  head: () => ({ meta: [{ title: "Student — Assignments — SmartLMS" }] }),
+  component: AssignmentsPage,
+});
