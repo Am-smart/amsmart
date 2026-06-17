@@ -42,12 +42,12 @@ function UsersPage() {
         <UserManagement
             users={users}
             onEdit={setEditingUser}
-            onDelete={async (id) => {
+            onDelete={async (id: string) => {
                 if (!confirm('Are you sure you want to delete this user?')) return;
                 await deleteUser(id);
                 fetchUsers();
             }}
-            onUpdate={async (id, updates) => {
+            onUpdate={async (id: string, updates: Record<string, unknown>) => {
                 const res = await saveUser({ ...updates, id });
                 if (res.success) fetchUsers();
             }}
