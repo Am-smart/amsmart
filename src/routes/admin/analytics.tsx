@@ -1,18 +1,33 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute("/admin/analytics")({
-  head: () => ({ meta: [{ title: "Admin Analytics — SmartLMS" }] }),
-  component: Page,
-});
+import React, { useState, useEffect } from 'react';
+import { getUsers, getCourses } from '@/lib/api-actions';
+import { AdminAnalytics } from "@/components/system/SystemMisc";
 
-// TODO: port UI from legacy Next.js /admin/analytics page.
-function Page() {
-  return (
-    <section>
-      <h1 className="text-2xl font-semibold">Admin Analytics</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
-        Migrated route skeleton. Port the original page contents here.
-      </p>
-    </section>
-  );
+function AnalyticsPage() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setError(null);
+    Promise.all([getUsers(), getCourses()])
+      .then(() => setIsLoading(false))
+      .catch(err => {
+        console.error('Failed to load analytics:', err);
+        setError('Failed to load analytics data');
+        setIsLoading(false);
+      });
+  }, []);
+
+  if (isLoading) return <div className="animate-pulse">Loading analytics...</div>;
+  if (error) return <div className="text-red-600 font-semibold">{error}</div>;
+
+  return <AdminAnalytics />;
 }
+
+
+export const Route = createFileRoute('/admin/analytics')({
+  head: () => ({ meta: [{ title: "Admin — Analytics — SmartLMS" }] }),
+  component: AnalyticsPage,
+});
