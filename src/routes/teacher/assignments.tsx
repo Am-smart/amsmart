@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import dynamic from 'next/dynamic';
+import { dynamic } from '@/lib/next-compat';
 import { useAuth } from '@/components/auth/AuthContext';
 import * as actions from '@/lib/api-actions';
 import { AssignmentDTO } from '@/lib/types';

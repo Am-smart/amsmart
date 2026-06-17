@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/components/auth/AuthContext';
 import { getSubmissions } from '@/lib/api-actions';
-import dynamic from 'next/dynamic';
+import { dynamic } from '@/lib/next-compat';
 import { GradingQueue } from "@/components/assessments/GradingQueue";
 import { SubmissionDTO } from '@/lib/types';
 

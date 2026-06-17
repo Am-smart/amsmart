@@ -5,7 +5,7 @@ import { useAuth } from '@/components/auth/AuthContext';
 import { getEnrollments, getQuizzes, getQuizSubmissions } from '@/lib/api-actions';
 import { QuizzesList } from "@/components/assessments/QuizzesList";
 import { QuizDTO, QuizSubmissionDTO } from '@/lib/types';
-import dynamic from 'next/dynamic';
+import { dynamic } from '@/lib/next-compat';
 import { QuizResultModal } from '@/components/assessments/QuizResultModal';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 

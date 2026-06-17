@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/components/auth/AuthContext';
-import dynamic from 'next/dynamic';
+import { dynamic } from '@/lib/next-compat';
 import { getEnrollments } from '@/lib/api-actions';
 
 const PlannerView = dynamic(() => import("@/components/planner/PlannerView").then(mod => mod.PlannerView), {

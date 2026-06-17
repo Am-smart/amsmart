@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import dynamic from 'next/dynamic';
+import { dynamic } from '@/lib/next-compat';
 
 const UserManagement = dynamic(() => import('@/components/users/UserManagement').then(mod => mod.UserManagement), {
     loading: () => <div className="h-96 bg-slate-100 animate-pulse rounded-lg" />

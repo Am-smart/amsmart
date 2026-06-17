@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/components/auth/AuthContext';
 import * as actions from '@/lib/api-actions';
-import dynamic from 'next/dynamic';
+import { dynamic } from '@/lib/next-compat';
 
 const CourseEditor = dynamic(() => import('@/components/courses/CourseEditor').then(mod => mod.CourseEditor), {
     loading: () => <div className="h-96 bg-slate-100 animate-pulse rounded-lg" />

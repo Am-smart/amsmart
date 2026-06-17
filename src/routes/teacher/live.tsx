@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/components/auth/AuthContext';
-import dynamic from 'next/dynamic';
+import { dynamic } from '@/lib/next-compat';
 import { getCourses, getLiveClasses } from '@/lib/api-actions';
 import { LiveClassDTO } from '@/lib/types';
 

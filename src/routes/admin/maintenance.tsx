@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { getCourses, getMaintenance } from '@/lib/api-actions';
-import dynamic from 'next/dynamic';
+import { dynamic } from '@/lib/next-compat';
 
 const MaintenancePanel = dynamic(() => import('@/components/system/MaintenancePanel').then(mod => mod.MaintenancePanel), {
     loading: () => <div className="h-48 bg-slate-100 animate-pulse rounded-lg" />

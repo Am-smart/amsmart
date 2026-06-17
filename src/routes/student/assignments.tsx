@@ -5,7 +5,7 @@ import { useAuth } from '@/components/auth/AuthContext';
 import { getEnrollments, getAssignments, getSubmissions } from '@/lib/api-actions';
 import { AssignmentsList } from "@/components/assessments/AssignmentsList";
 import { AssignmentDTO, SubmissionDTO } from '@/lib/types';
-import dynamic from 'next/dynamic';
+import { dynamic } from '@/lib/next-compat';
 import { useAppContext } from '@/components/AppContext';
 import { FeedbackModal } from '@/components/assessments/FeedbackModal';
 
