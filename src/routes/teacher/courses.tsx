@@ -16,7 +16,7 @@ const LessonEditor = dynamic(() => import('@/components/courses/LessonEditor').t
 });
 import { CourseDTO } from '@/lib/types';
 import { CourseList } from '@/components/common/CourseList';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui-legacy/Button';
 import { Plus } from 'lucide-react';
 
 function CoursesPage() {

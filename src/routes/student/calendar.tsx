@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/components/auth/AuthContext';
 import { getAssignments, getQuizzes, getLiveClasses, getEnrollments, getSubmissions } from '@/lib/api-actions';
-import { CalendarView } from "@/components/ui/CalendarView";
+import { CalendarView } from "@/components/ui-legacy/CalendarView";
 import { AssignmentDTO, QuizDTO, LiveClassDTO, SubmissionDTO } from '@/lib/types';
 
 interface CalendarEvent {

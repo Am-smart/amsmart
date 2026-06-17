@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import React from 'react';
 import { useAuth } from '@/components/auth/AuthContext';
 import { useAppContext } from '@/components/AppContext';
-import { StatCard } from '@/components/ui/StatCard';
+import { StatCard } from '@/components/ui-legacy/StatCard';
 
 function AdminDashboard() {
   const { user } = useAuth();

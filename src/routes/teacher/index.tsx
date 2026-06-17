@@ -3,8 +3,8 @@ import { createFileRoute } from '@tanstack/react-router';
 import React from 'react';
 import { useAuth } from '@/components/auth/AuthContext';
 import { useAppContext } from '@/components/AppContext';
-import { StatCard } from '@/components/ui/StatCard';
-import { EmptyState } from '@/components/ui/EmptyState';
+import { StatCard } from '@/components/ui-legacy/StatCard';
+import { EmptyState } from '@/components/ui-legacy/EmptyState';
 import { BookOpen, CheckSquare } from 'lucide-react';
 import { useRouter } from '@/lib/next-compat';
 

@@ -4,7 +4,7 @@ import React from 'react';
 import { useAuth } from '@/components/auth/AuthContext';
 import { useAppContext } from '@/components/AppContext';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
-import { EmptyState } from '@/components/ui/EmptyState';
+import { EmptyState } from '@/components/ui-legacy/EmptyState';
 import { BookOpen, FileText } from 'lucide-react';
 import { useRouter } from '@/lib/next-compat';
 
