@@ -9,6 +9,9 @@ import { Toast, ToastMessage, ToastType } from './ui-legacy/Toast';
 import * as actions from '@/lib/api-actions';
 import { sessionManager } from '@/lib/session-manager';
 import { useRouter } from '@/lib/next-compat';
+import { useQueryClient } from '@tanstack/react-query';
+import { useDashboardData } from '@/hooks/queries/useDashboard';
+import { useNotifications } from '@/hooks/queries/useNotifications';
 
 export type AppLoadingStatus = 'idle' | 'auth' | 'data' | 'ready';
 
@@ -66,18 +69,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const { setCache, getCache, addToQueue, isOnline, isBackendConnected, checkBackend, pullData } = useIndexedDB();
   const [maintenance, setMaintenance] = useState<Maintenance>({ id: "system-config", enabled: false, schedules: [] });
   const [isCurrentlyInMaintenance, setIsCurrentlyInMaintenance] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
-  const [stats, setStats] = useState<DashboardStats>({ courses: 0, dueSoon: 0 });
-  const [enrollments, setEnrollments] = useState<EnrollmentDTO[]>([]);
-  const [courses, setCourses] = useState<CourseDTO[]>([]);
-  const [assignments, setAssignments] = useState<AssignmentDTO[]>([]);
-  const [submissions, setSubmissions] = useState<SubmissionDTO[]>([]);
 
   const router = useRouter();
+  const queryClient = useQueryClient();
   const initialized = useRef(false);
   const initPromise = useRef<Promise<void> | null>(null);
+
+  // TanStack Query-backed dashboard + notifications
+  const dashboard = useDashboardData(user);
+  const notificationsQuery = useNotifications(user?.id, !!user);
+  const notifications = (notificationsQuery.data ?? []) as Notification[];
 
   const addToast = useCallback((message: string, type: ToastType, duration?: number) => {
     const id = Math.random().toString(36).substring(2, 9);
@@ -132,18 +135,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     // 1. Trigger full client-side data purge (Storage + IndexedDB)
     sessionManager.cleanupSession();
 
-    // 2. Clear application state
+    // 2. Clear application state + Query cache
     setUser(null);
-    setNotifications([]);
-    setStats({ courses: 0, dueSoon: 0 });
-    setEnrollments([]);
-    setCourses([]);
-    setAssignments([]);
-    setSubmissions([]);
+    queryClient.clear();
 
     // 3. SPA-friendly redirect
     router.push('/');
-  }, [router]);
+  }, [router, queryClient]);
 
   const updateProfile = useCallback(async (updates: Partial<User>) => {
     if (!user) return;
@@ -230,192 +228,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return () => window.removeEventListener('sync-conflict', handleSyncConflict);
   }, [addToast]);
 
-  // Notifications logic
-  const fetchNotifications = useCallback(async (userId: string, force = false) => {
+  // Notifications are managed by TanStack Query; expose an imperative
+  // refresh handle for legacy callers (header bell, etc.).
+  const fetchNotifications = useCallback(async (userId: string, _force?: boolean) => {
     if (!userId || userId === 'undefined' || userId === 'null') return;
-    try {
-      const cachedNotes = await getCache<Notification[]>('notifications', force ? 0 : 60000);
-      if (cachedNotes) {
-        setNotifications(cachedNotes);
-        if (!force) return;
-      }
+    void _force;
+    await notificationsQuery.invalidate();
+  }, [notificationsQuery]);
 
-      if (isOnline) {
-        const isConnected = await checkBackend();
-        if (!isConnected) return;
+  // Dashboard data is sourced from useDashboardData; refresh triggers
+  // a Query invalidation so the role-specific hook refetches.
+  const refreshDashboardData = useCallback(async () => {
+    await dashboard.refresh();
+  }, [dashboard]);
 
-        try {
-          const n = await actions.getNotifications(userId);
-          if (n && Array.isArray(n)) {
-            setNotifications(n);
-            await setCache('notifications', n);
-          }
-        } catch (fetchErr) {
-          console.error('Failed to fetch notifications:', fetchErr);
-        }
-      }
-    } catch (err) {
-      console.error('Notification init error:', err);
-    }
-  }, [getCache, setCache, isOnline, checkBackend]);
-
+  // Drive loading status off the dashboard query for backward-compat consumers.
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-    if (user) {
-        fetchNotifications(user.id);
-        interval = setInterval(() => {
-            if (isOnline) fetchNotifications(user.id);
-        }, 5 * 60 * 1000);
-    }
-    return () => {
-        if (interval) clearInterval(interval);
-    };
-  }, [user, isOnline, fetchNotifications]);
-
-  // Dashboard Data
-  const refreshDashboardData = useCallback(async (force = false) => {
     if (!user) return;
-
-    // Caching Strategy: Use IndexedDB even when online if data is fresh (< 2 mins)
-    // to prevent redundant fetching on route changes or component re-renders.
-    const CACHE_TTL = 2 * 60 * 1000;
-
-    if (!force) {
-        const lastRefresh = await getCache<number>('last_dashboard_refresh');
-        if (lastRefresh && Date.now() - lastRefresh < CACHE_TTL) {
-            // Data is fresh, just load from cache into state
-            if (user.role === 'student') {
-                const [ce, ca, cs] = await Promise.all([
-                    getCache<EnrollmentDTO[]>('my_enrollments'),
-                    getCache<AssignmentDTO[]>('active_assignments'),
-                    getCache<SubmissionDTO[]>('my_submissions')
-                ]);
-                if (ce) setEnrollments(ce);
-                if (ca) setAssignments(ca);
-                if (cs) setSubmissions(cs);
-                if (ce && ca) {
-                    setStats(prev => ({ ...prev, courses: ce.length, dueSoon: ca.length }));
-                }
-            } else if (user.role === 'teacher') {
-                const [cc, cs] = await Promise.all([
-                    getCache<CourseDTO[]>('teacher_courses'),
-                    getCache<SubmissionDTO[]>('teacher_submissions')
-                ]);
-                if (cc) setCourses(cc);
-                if (cs) setSubmissions(cs);
-                if (cc && cs) {
-                    setStats(prev => ({ ...prev, courses: cc.length, pendingGrading: cs.length }));
-                }
-            }
-            // If we have cached data, we can skip network call
-            return;
-        }
-    }
-
-    if (!isOnline) {
-        if (user.role === 'student') {
-            const cachedEnrollments = await getCache<EnrollmentDTO[]>('my_enrollments');
-            const cachedAssignments = await getCache<AssignmentDTO[]>('active_assignments');
-            const cachedSubmissions = await getCache<SubmissionDTO[]>('my_submissions');
-            if (cachedEnrollments) setEnrollments(cachedEnrollments);
-            if (cachedAssignments) setAssignments(cachedAssignments);
-            if (cachedSubmissions) setSubmissions(cachedSubmissions);
-        } else if (user.role === 'teacher') {
-            const cachedCourses = await getCache<CourseDTO[]>('teacher_courses');
-            const cachedSubmissions = await getCache<SubmissionDTO[]>('teacher_submissions');
-            if (cachedCourses) setCourses(cachedCourses);
-            if (cachedSubmissions) setSubmissions(cachedSubmissions);
-        }
-        return;
-    }
-
-    const isConnected = await checkBackend();
-    if (!isConnected) return;
-
-    // Use functional update or ref to avoid depending on loadingStatus directly in useCallback
-    setLoadingStatus(prev => prev === 'ready' ? 'data' : prev);
-
-    try {
-      if (user.role === 'student') {
-          const [myEnrollments, allAssignments, mySubmissions] = await Promise.all([
-            actions.getEnrollments(user.id),
-            actions.getAssignments(),
-            actions.getSubmissions({ studentId: user.id })
-          ]);
-
-          setEnrollments(myEnrollments);
-          setSubmissions(mySubmissions);
-
-          const enrolledIds = myEnrollments.map((e: EnrollmentDTO) => e.course_id);
-          const pending = allAssignments.filter((a: AssignmentDTO) =>
-            enrolledIds.includes(a.course_id) &&
-            new Date(a.due_date) > new Date() &&
-            !mySubmissions.some((s: SubmissionDTO) => s.assignment_id === a.id)
-          );
-
-          setAssignments(pending);
-          setStats({
-            courses: myEnrollments.length,
-            dueSoon: pending.length
-          });
-
-          await Promise.all([
-              setCache('my_enrollments', myEnrollments),
-              setCache('active_assignments', pending),
-              setCache('my_submissions', mySubmissions),
-              setCache('last_dashboard_refresh', Date.now())
-          ]);
-      } else if (user.role === 'teacher') {
-          const [myCourses, pendingSubmissions, myLiveClasses] = await Promise.all([
-              actions.getCourses(user.id),
-              actions.getSubmissions({ status: 'submitted' }),
-              actions.getLiveClasses(undefined, user.id)
-          ]);
-
-          setCourses(myCourses);
-          setSubmissions(pendingSubmissions);
-          setStats({
-            courses: myCourses.length,
-            pendingGrading: pendingSubmissions.length,
-            liveClasses: myLiveClasses.length,
-            dueSoon: 0
-          });
-
-          await Promise.all([
-              setCache('teacher_courses', myCourses),
-              setCache('teacher_submissions', pendingSubmissions),
-              setCache('last_dashboard_refresh', Date.now())
-          ]);
-      } else if (user.role === 'admin') {
-          const [allUsers, systemStats] = await Promise.all([
-              actions.getUsers(),
-              actions.getSystemStats()
-          ]);
-
-          setStats({
-            courses: systemStats.courses ?? 0,
-            dueSoon: 0,
-            totalUsers: systemStats.users ?? allUsers.length,
-            activeCourses: systemStats.courses ?? 0,
-            flaggedUsers: allUsers.filter(u => u.flagged).length,
-            teachers: allUsers.filter(u => u.role === 'teacher').length,
-            students: allUsers.filter(u => u.role === 'student').length,
-            pendingResets: allUsers.filter(u => !!u.reset_request).length
-          });
-          await setCache('last_dashboard_refresh', Date.now());
-      }
-    } catch (err) {
-      console.error('Dashboard refresh error:', err);
-    } finally {
+    if (dashboard.isFetching && !dashboard.data.courses.length && !dashboard.data.enrollments.length) {
+      setLoadingStatus(prev => prev === 'ready' ? 'data' : prev);
+    } else {
       setLoadingStatus('ready');
     }
-  }, [user, isOnline, getCache, setCache, checkBackend]);
-
-  useEffect(() => {
-    if (user) {
-        refreshDashboardData();
-    }
-  }, [user, refreshDashboardData]);
+  }, [user, dashboard.isFetching, dashboard.data]);
 
   // Maintenance sync
   useEffect(() => {
@@ -447,11 +282,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     isSidebarOpen,
     isOnline,
     isBackendConnected,
-    stats,
-    enrollments,
-    courses,
-    assignments,
-    submissions,
+    stats: dashboard.data.stats,
+    enrollments: dashboard.data.enrollments,
+    courses: dashboard.data.courses,
+    assignments: dashboard.data.assignments,
+    submissions: dashboard.data.submissions,
     login,
     signup,
     logout,
@@ -460,7 +295,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     fetchNotifications,
     addToast,
     refreshDashboardData
-  }), [user, loadingStatus, maintenance, isCurrentlyInMaintenance, notifications, isSidebarOpen, isOnline, isBackendConnected, stats, enrollments, courses, assignments, submissions, login, signup, logout, updateProfile, toggleSidebar, fetchNotifications, addToast, refreshDashboardData]);
+  }), [user, loadingStatus, maintenance, isCurrentlyInMaintenance, notifications, isSidebarOpen, isOnline, isBackendConnected, dashboard.data, login, signup, logout, updateProfile, toggleSidebar, fetchNotifications, addToast, refreshDashboardData]);
 
   return (
     <AppContext.Provider value={value}>
