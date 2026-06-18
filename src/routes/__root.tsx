@@ -136,9 +136,9 @@ import { lazy, Suspense } from "react";
 const AppProviders = lazy(() => import("@/components/AppProviders"));
 
 function AppShell({ children }: { children: ReactNode }) {
-  if (typeof window === "undefined") {
-    return <>{children}</>;
-  }
+  // Render the same tree on SSR and client to avoid hydration mismatch.
+  // The lazy AppProviders chunk only resolves on the client; until then
+  // children render bare via the Suspense fallback.
   return (
     <Suspense fallback={<>{children}</>}>
       <AppProviders>{children}</AppProviders>
