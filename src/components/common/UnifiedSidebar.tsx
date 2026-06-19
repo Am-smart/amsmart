@@ -1,107 +1,58 @@
 import React from 'react';
-import { Sidebar, SidebarItem } from '../ui-legacy/Sidebar';
-import { UserRole } from '@/lib/types';
-import {
-  LayoutDashboard,
-  BookOpen,
-  Library,
-  FileText,
-  HelpCircle,
-  BarChart3,
-  MessageSquare,
-  Calendar,
-  FileCode,
-  Video,
-  ShieldCheck,
-  Settings,
-  CircleHelp,
-  BookMarked,
-  Users,
-  RefreshCw,
-  LineChart,
-  Activity,
-  Info
-} from 'lucide-react';
+import { Link } from '@tanstack/react-router';
+import type { UserRole } from '@/lib/types';
+import { useAuth } from '@/components/auth/AuthContext';
+import { visibleNavItems, ROLE_TITLES, navItemPath } from '@/config/navigation';
 
 interface UnifiedSidebarProps {
   role: UserRole;
   activePage: string;
-  onNavigate: (page: string) => void;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export const UnifiedSidebar: React.FC<UnifiedSidebarProps> = ({ role, activePage, onNavigate, isOpen, onClose }) => {
-  const normalizedActivePage = activePage === role ? 'dashboard' : activePage.split('/')[0];
-
-  const studentItems: SidebarItem[] = [
-    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-    { id: 'courses', label: 'Course Catalog', icon: <BookOpen size={20} /> },
-    { id: 'my-courses', label: 'My Courses', icon: <Library size={20} /> },
-    { id: 'assignments', label: 'Assignments', icon: <FileText size={20} /> },
-    { id: 'quizzes', label: 'Quizzes', icon: <HelpCircle size={20} /> },
-    { id: 'grades', label: 'Grades', icon: <BookMarked size={20} /> },
-    { id: 'analytics', label: 'Analytics', icon: <BarChart3 size={20} /> },
-    { id: 'discussions', label: 'Discussions', icon: <MessageSquare size={20} /> },
-    { id: 'calendar', label: 'Calendar', icon: <Calendar size={20} /> },
-    { id: 'materials', label: 'Materials', icon: <FileCode size={20} /> },
-    { id: 'planner', label: 'Planner', icon: <Calendar size={20} /> },
-    { id: 'live', label: 'Live Classes', icon: <Video size={20} /> },
-    { id: 'anti-cheat', label: 'Anti-Cheat', icon: <ShieldCheck size={20} /> },
-    { id: 'settings', label: 'Settings', icon: <Settings size={20} /> },
-    { id: 'help', label: 'Help', icon: <CircleHelp size={20} /> },
-  ];
-
-  const teacherItems: SidebarItem[] = [
-    { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-    { id: 'courses', label: 'Courses', icon: <BookOpen size={20} /> },
-    { id: 'materials', label: 'Materials', icon: <FileCode size={20} /> },
-    { id: 'assignments', label: 'Assignments', icon: <FileText size={20} /> },
-    { id: 'grading', label: 'Grading Queue', icon: <BarChart3 size={20} /> },
-    { id: 'gradebook', label: 'Grade Book', icon: <BookMarked size={20} /> },
-    { id: 'students', label: 'Students', icon: <Users size={20} /> },
-    { id: 'discussions', label: 'Discussions', icon: <MessageSquare size={20} /> },
-    { id: 'calendar', label: 'Calendar', icon: <Calendar size={20} /> },
-    { id: 'quizzes', label: 'Quizzes', icon: <HelpCircle size={20} /> },
-    { id: 'help', label: 'Help', icon: <CircleHelp size={20} /> },
-    { id: 'live', label: 'Live Classes', icon: <Video size={20} /> },
-    { id: 'anti-cheat', label: 'Anti-Cheat', icon: <ShieldCheck size={20} /> },
-    { id: 'settings', label: 'Settings', icon: <Settings size={20} /> },
-  ];
-
-  const adminItems: SidebarItem[] = [
-    { id: 'dashboard', label: 'Dashboard', icon: <BarChart3 size={20} /> },
-    { id: 'resets', label: 'Password Resets', icon: <RefreshCw size={20} /> },
-    { id: 'users', label: 'Users', icon: <Users size={20} /> },
-    { id: 'analytics', label: 'Analytics', icon: <LineChart size={20} /> },
-    { id: 'maintenance', label: 'System & Admin Control', icon: <ShieldCheck size={20} /> },
-    { id: 'health', label: 'System Health', icon: <Activity size={20} /> },
-    { id: 'management', label: 'System Management', icon: <Settings size={20} /> },
-    { id: 'settings', label: 'Admin Settings', icon: <Settings size={20} /> },
-    { id: 'help', label: 'Help', icon: <CircleHelp size={20} /> },
-    { id: 'system', label: 'System Info', icon: <Info size={20} /> },
-  ];
-
-  let items: SidebarItem[] = [];
-  let title = 'SmartLMS';
-
-  if (role === 'admin') {
-    items = adminItems;
-    title = 'SmartLMS Admin';
-  } else if (role === 'teacher') {
-    items = teacherItems;
-  } else {
-    items = studentItems;
-  }
+/**
+ * Config-driven sidebar. Items come from `src/config/navigation.ts`,
+ * filtered by RBAC against the current user. Links use native TanStack
+ * `<Link>` for preloading, active-state styling, and middle-click support.
+ */
+export const UnifiedSidebar: React.FC<UnifiedSidebarProps> = ({
+  role, activePage, isOpen, onClose,
+}) => {
+  const { user } = useAuth();
+  const items = visibleNavItems(role, user);
+  const title = ROLE_TITLES[role] ?? 'SmartLMS';
+  const normalizedActive = !activePage || activePage === role ? 'dashboard' : activePage;
 
   return (
-    <Sidebar
-      title={title}
-      activePage={normalizedActivePage}
-      onNavigate={onNavigate}
-      isOpen={isOpen}
-      onClose={onClose}
-      items={items}
-    />
+    <>
+      <div
+        className={`fixed inset-0 bg-black/50 z-[1000] md:hidden transition-opacity duration-300 ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
+        onClick={onClose}
+      />
+      <aside className={`fixed left-0 top-0 bottom-0 w-[240px] max-w-[85vw] bg-[#1e293b] text-white p-4 sm:p-6 z-[1001] overflow-y-auto transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}`}>
+        <div className="flex justify-between items-center mb-6 sm:mb-8">
+          <div className="text-xl font-black text-[#3b82f6] tracking-tighter truncate pr-4">{title}</div>
+          <button onClick={onClose} className="lg:hidden p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors" aria-label="Close sidebar">✕</button>
+        </div>
+        <nav className="space-y-1">
+          {items.map((item) => {
+            const isActive = normalizedActive === item.id;
+            return (
+              <Link
+                key={item.id}
+                to={navItemPath(role, item.id) as string}
+                onClick={onClose}
+                preload="intent"
+                className={`w-full text-left p-3 rounded-xl flex items-center gap-3 transition-all duration-200 group ${isActive ? 'bg-[#3b82f6] text-white shadow-lg shadow-blue-500/20' : 'text-[#94a3b8] hover:bg-[#334155] hover:text-white'}`}
+              >
+                <span className={`w-5 h-5 flex items-center justify-center transition-transform duration-200 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}>{item.icon}</span>
+                <span className="font-semibold text-sm">{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+      </aside>
+    </>
   );
 };
