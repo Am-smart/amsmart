@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useEffect } from 'react';
+import { useNavigate, useRouterState } from '@tanstack/react-router';
 import { useAuth } from '@/components/auth/AuthContext';
 import { UnifiedSidebar } from "@/components/common/UnifiedSidebar"
 import { UserRole, User } from "@/lib/types";
 import { ForcePasswordChange } from "@/components/auth/ForcePasswordChange";
-import { useRouter, usePathname } from '@/lib/next-compat';
 import { useAppContext } from '../AppContext';
 import { MaintenanceOverlay } from './MaintenanceOverlay';
 
@@ -32,8 +32,8 @@ export const BaseDashboardLayout: React.FC<BaseDashboardLayoutProps> = ({
 }) => {
   const { user, role, logout, updateProfile } = useAuth();
   const { isSidebarOpen, toggleSidebar, maintenance, loadingStatus } = useAppContext();
-  const router = useRouter();
-  const pathname = usePathname();
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   // Redirect only after initialization is complete and if authentication fails
   const isInitializing = loadingStatus === 'idle' || loadingStatus === 'auth';
@@ -41,16 +41,18 @@ export const BaseDashboardLayout: React.FC<BaseDashboardLayoutProps> = ({
 
   useEffect(() => {
     if (!isInitializing && !isAuthenticated) {
-      router.push('/');
+      navigate({ to: '/' });
     }
-  }, [isInitializing, isAuthenticated, router]);
+  }, [isInitializing, isAuthenticated, navigate]);
 
   const handleLogout = async () => {
     await logout();
-    router.push('/');
+    navigate({ to: '/' });
   };
 
-  const activePage = pathname.split('/').pop() || 'dashboard';
+  // Derive active leaf from /<role>/<leaf>. Empty leaf = dashboard.
+  const segments = pathname.split('/').filter(Boolean);
+  const activePage = segments.length <= 1 ? 'dashboard' : segments[1];
 
   // Only show the full-screen loading state during initial app boot
   // Subsequent dashboard navigations will use background loading to keep UI responsive
@@ -75,9 +77,9 @@ export const BaseDashboardLayout: React.FC<BaseDashboardLayoutProps> = ({
       )}
 
       <div className="flex">
-        <UnifiedSidebar role={role as UserRole}
-          activePage={activePage === requiredRole ? 'dashboard' : activePage}
-          onNavigate={(page) => router.push(`/${requiredRole}/${page === 'dashboard' ? '' : page}`)}
+        <UnifiedSidebar
+          role={role as UserRole}
+          activePage={activePage}
           isOpen={isSidebarOpen}
           onClose={toggleSidebar}
         />
