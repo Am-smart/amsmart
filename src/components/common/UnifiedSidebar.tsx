@@ -41,7 +41,7 @@ export const UnifiedSidebar: React.FC<UnifiedSidebarProps> = ({
             return (
               <Link
                 key={item.id}
-                to={navItemPath(role, item.id)}
+                to={navItemPath(role, item.id) as string}
                 onClick={onClose}
                 preload="intent"
                 className={`w-full text-left p-3 rounded-xl flex items-center gap-3 transition-all duration-200 group ${isActive ? 'bg-[#3b82f6] text-white shadow-lg shadow-blue-500/20' : 'text-[#94a3b8] hover:bg-[#334155] hover:text-white'}`}
