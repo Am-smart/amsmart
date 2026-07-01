@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useEffect } from 'react';
-import { useNavigate, useRouterState } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 import { useAuth } from '@/components/auth/AuthContext';
-import { UnifiedSidebar } from "@/components/common/UnifiedSidebar"
+import { UnifiedSidebar } from "@/components/common/UnifiedSidebar";
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { UserRole, User } from "@/lib/types";
 import { ForcePasswordChange } from "@/components/auth/ForcePasswordChange";
 import { useAppContext } from '../AppContext';
@@ -33,7 +34,6 @@ export const BaseDashboardLayout: React.FC<BaseDashboardLayoutProps> = ({
   const { user, role, logout, updateProfile } = useAuth();
   const { isSidebarOpen, toggleSidebar, maintenance, loadingStatus } = useAppContext();
   const navigate = useNavigate();
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   // Redirect only after initialization is complete and if authentication fails
   const isInitializing = loadingStatus === 'idle' || loadingStatus === 'auth';
@@ -50,10 +50,6 @@ export const BaseDashboardLayout: React.FC<BaseDashboardLayoutProps> = ({
     navigate({ to: '/' });
   };
 
-  // Derive active leaf from /<role>/<leaf>. Empty leaf = dashboard.
-  const segments = pathname.split('/').filter(Boolean);
-  const activePage = segments.length <= 1 ? 'dashboard' : segments[1];
-
   // Only show the full-screen loading state during initial app boot
   // Subsequent dashboard navigations will use background loading to keep UI responsive
   if ((isInitializing && !user) || !isAuthenticated) {
@@ -64,7 +60,11 @@ export const BaseDashboardLayout: React.FC<BaseDashboardLayoutProps> = ({
   const isResetApproved = resetStatus === 'approved' || resetStatus === 'approved_used';
 
   return (
-    <div className={`${requiredRole}-dashboard`}>
+    <SidebarProvider
+      open={isSidebarOpen}
+      onOpenChange={(next) => { if (next !== isSidebarOpen) toggleSidebar(); }}
+      className={`${requiredRole}-dashboard`}
+    >
       {maintenance.enabled && role !== 'admin' && (
           <MaintenanceOverlay
             message={maintenance.message}
@@ -76,29 +76,21 @@ export const BaseDashboardLayout: React.FC<BaseDashboardLayoutProps> = ({
           <ForcePasswordChange onSuccess={() => updateProfile({ reset_request: null })} />
       )}
 
-      <div className="flex">
-        <UnifiedSidebar
-          role={role as UserRole}
-          activePage={activePage}
-          isOpen={isSidebarOpen}
-          onClose={toggleSidebar}
+      <UnifiedSidebar role={role as UserRole} />
+      <SidebarInset className="bg-[#f8fafc]">
+        <HeaderComponent
+          {...headerProps}
+          user={user}
+          onLogout={handleLogout}
+          onMenuClick={toggleSidebar}
         />
-        <main className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'lg:ml-[240px]' : 'lg:ml-0'} w-full overflow-x-hidden`}>
-          <HeaderComponent
-            className={`${isSidebarOpen ? 'lg:left-[240px]' : 'lg:left-0'}`}
-            {...headerProps}
-            user={user}
-            onLogout={handleLogout}
-            onMenuClick={toggleSidebar}
-          />
-
-          <div className="content-area p-3 sm:p-4 md:p-8 pt-[75px] md:pt-[90px] bg-[#f8fafc] min-h-screen overflow-x-hidden">
-            <div className="max-w-[1600px] mx-auto">
-              {children}
-            </div>
+        <div className="content-area p-3 sm:p-4 md:p-8 pt-[75px] md:pt-[90px] min-h-screen overflow-x-hidden">
+          <div className="mx-auto flex max-w-[1600px] items-start gap-2">
+            <SidebarTrigger className="hidden md:inline-flex text-slate-600" />
+            <div className="flex-1 min-w-0">{children}</div>
           </div>
-        </main>
-      </div>
-    </div>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 };

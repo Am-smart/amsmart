@@ -1,6 +1,6 @@
-import { withSession, supabase } from '../supabase';
+import { withSession, supabase } from '../supabase.server';
 import { Assignment, Quiz, Submission, QuizSubmission } from '../types';
-import { dbUtils } from './db-utils';
+import { dbUtils } from './db-utils.server';
 
 export const assessmentDb = {
   // Assignment Operations
