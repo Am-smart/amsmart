@@ -1,4 +1,4 @@
-import { learningDb } from '../database/learning.db';
+import { learningDb } from '../database/learning.db.server';
 import { Course, Lesson, Material, LessonCompletion, User } from '../types';
 import { CourseDomain } from '../domain/course.domain';
 import { LearningDomain } from '../domain/learning.domain';

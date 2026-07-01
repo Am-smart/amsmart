@@ -1,4 +1,4 @@
-import { assessmentDb } from '../database/assessment.db';
+import { assessmentDb } from '../database/assessment.db.server';
 import { Assignment, Quiz, Submission, QuizSubmission, QuizQuestion, User } from '../types';
 import { AssessmentDomain } from '../domain/assessment.domain';
 import { SUBMISSION_STATUS } from '../constants';

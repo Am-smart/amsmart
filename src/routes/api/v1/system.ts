@@ -197,7 +197,7 @@ const POST = withHandler(async (user, request) => {
       return { filePath };
     }
     case "register-push": {
-      const { systemDb } = await import("@/lib/database/system.db");
+      const { systemDb } = await import("@/lib/database/system.db.server");
       const saved = await systemDb.upsertPushSubscription({
         user_id: user.id, endpoint: data.endpoint,
         p256dh: data.keys.p256dh, auth: data.keys.auth,
@@ -205,7 +205,7 @@ const POST = withHandler(async (user, request) => {
       return SystemMapper.toPushSubscriptionDTO(saved);
     }
     case "unregister-push": {
-      const { systemDb } = await import("@/lib/database/system.db");
+      const { systemDb } = await import("@/lib/database/system.db.server");
       await systemDb.deletePushSubscription(data.endpoint, user.sessionId!);
       return { success: true };
     }

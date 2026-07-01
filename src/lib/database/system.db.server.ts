@@ -1,7 +1,7 @@
 import { withSession, supabase } from '../supabase.server';
 import { adminClient } from '../supabase-admin.server';
 import { User, LiveClass, Notification, Broadcast, Discussion, PlannerItem, Maintenance, Setting, SystemLog, Attendance, SupportTicket, AntiCheatLog, PushSubscription } from '../types';
-import { dbUtils } from './db-utils';
+import { dbUtils } from './db-utils.server';
 
 export const systemDb = {
   // User Operations

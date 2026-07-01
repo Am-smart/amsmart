@@ -1,7 +1,7 @@
 import { withSession, supabase } from '../supabase.server';
 import { adminClient } from '../supabase-admin.server';
 import { Session, User, DatabaseResponse, DatabaseError, Invite } from '../types';
-import { dbUtils } from './db-utils';
+import { dbUtils } from './db-utils.server';
 
 export const authDb = {
   async register(data: { full_name: string; email: string; password?: string; phone?: string; role: string; active?: boolean }): Promise<DatabaseResponse<User>> {

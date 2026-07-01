@@ -1,5 +1,5 @@
-import { systemDb } from '../database/system.db';
-import { learningDb } from '../database/learning.db';
+import { systemDb } from '../database/system.db.server';
+import { learningDb } from '../database/learning.db.server';
 import { SystemLog, Maintenance, PlannerItem, User, Setting, Enrollment, Discussion, Notification, LiveClass, Broadcast, Attendance, SupportTicket, AntiCheatLog } from '../types';
 import { UserDomain } from '../domain/user.domain';
 import { EnrollmentDomain } from '../domain/enrollment.domain';

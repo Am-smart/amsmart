@@ -1,5 +1,5 @@
-import { authDb } from '../database/auth.db';
-import { systemDb } from '../database/system.db';
+import { authDb } from '../database/auth.db.server';
+import { systemDb } from '../database/system.db.server';
 import { User, UserRole, Invite } from '../types';
 import { UserDomain } from '../domain/user.domain';
 import { validatePassword } from '../validation';

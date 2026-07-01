@@ -1,6 +1,6 @@
 import { withSession, supabase } from '../supabase.server';
 import { Course, Lesson, Material, Enrollment } from '../types';
-import { dbUtils } from './db-utils';
+import { dbUtils } from './db-utils.server';
 
 export const learningDb = {
   // Course Operations
