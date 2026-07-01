@@ -1,4 +1,4 @@
-import { withSession, supabase } from '../supabase';
+import { withSession, supabase } from '../supabase.server';
 import { Assignment, Quiz, Submission, QuizSubmission } from '../types';
 import { dbUtils } from './db-utils';
 

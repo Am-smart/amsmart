@@ -1,5 +1,5 @@
 import { DatabaseError, DatabaseResponse } from '../types';
-import { withSession } from '../supabase';
+import { withSession } from '../supabase.server';
 
 export const dbUtils = {
   /**

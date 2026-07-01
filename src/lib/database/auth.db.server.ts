@@ -1,5 +1,5 @@
-import { withSession, supabase } from '../supabase';
-import { adminClient } from '../supabase-admin';
+import { withSession, supabase } from '../supabase.server';
+import { adminClient } from '../supabase-admin.server';
 import { Session, User, DatabaseResponse, DatabaseError, Invite } from '../types';
 import { dbUtils } from './db-utils';
 
