@@ -1,7 +1,6 @@
 export * from './Card';
 export * from './Button';
 export * from './FileUpload';
-export * from './Sidebar';
 export * from './Toast';
 export * from './StatCard';
 export * from './Modal';
