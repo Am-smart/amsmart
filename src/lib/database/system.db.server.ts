@@ -171,20 +171,27 @@ export const systemDb = {
     return count || 0;
   },
 
-  async markNotificationAsRead(id: string, sessionId: string): Promise<void> {
-    const { error } = await withSession(supabase.from('notifications'), sessionId).update({ is_read: true }).eq('id', id);
+  async markNotificationAsRead(id: string, sessionId: string, ownerId: string): Promise<void> {
+    const { error } = await withSession(supabase.from('notifications'), sessionId)
+      .update({ is_read: true })
+      .eq('id', id)
+      .eq('user_id', ownerId);
     if (error) throw error;
   },
 
-  async updateNotification(id: string, updates: Partial<Notification>, sessionId: string): Promise<void> {
-    const { error } = await withSession(supabase.from('notifications'), sessionId).update(updates).eq('id', id);
+  async updateNotification(id: string, updates: Partial<Notification>, sessionId: string, ownerId: string): Promise<void> {
+    const { error } = await withSession(supabase.from('notifications'), sessionId)
+      .update(updates)
+      .eq('id', id)
+      .eq('user_id', ownerId);
     if (error) dbUtils.handleError(error);
   },
 
-  async updateMultipleNotifications(ids: string[], updates: Partial<Notification>, sessionId: string): Promise<void> {
+  async updateMultipleNotifications(ids: string[], updates: Partial<Notification>, sessionId: string, ownerId: string): Promise<void> {
       const { error } = await withSession(supabase.from('notifications'), sessionId)
         .update(updates)
-        .in('id', ids);
+        .in('id', ids)
+        .eq('user_id', ownerId);
       if (error) dbUtils.handleError(error);
   },
 
@@ -467,11 +474,13 @@ export const systemDb = {
     if (error) throw error;
   },
 
-  getPublicUrl(filePath: string): string {
-    const { data: { publicUrl } } = supabase.storage
+  async getSignedUrl(filePath: string, expiresInSeconds = 3600): Promise<string> {
+    const client = adminClient || supabase;
+    const { data, error } = await client.storage
       .from('lms-files')
-      .getPublicUrl(filePath);
-    return publicUrl;
+      .createSignedUrl(filePath, expiresInSeconds);
+    if (error) throw error;
+    return data.signedUrl;
   },
 
   async upsertSupportTicket(ticket: Partial<SupportTicket>, sessionId: string): Promise<SupportTicket> {
