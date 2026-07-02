@@ -22,16 +22,33 @@ export const supabaseServer = supabase;
  * raw object — both shapes are honored.
  */
 export function withSession<T>(query: T, sessionId?: string): T {
-  if (!sessionId) return query;
+  if (!sessionId || !query || typeof query !== "object") return query;
 
-  const qHeaders = query as unknown as { headers?: (h: Record<string, string>) => T };
-  if (qHeaders && typeof qHeaders.headers === "function") {
-    return qHeaders.headers({ "x-session-id": sessionId });
+  // postgrest-js v2 (Supabase JS v2.107+): builders expose `.setHeader(name, value)`
+  // and store headers as a `Headers` instance. Prefer the public API.
+  const withSetHeader = query as unknown as {
+    setHeader?: (name: string, value: string) => T;
+  };
+  if (typeof withSetHeader.setHeader === "function") {
+    return withSetHeader.setHeader("x-session-id", sessionId);
   }
 
-  const q = query as unknown as { headers?: Record<string, string> };
-  if (q && typeof q === "object") {
-    q.headers = { ...(q.headers ?? {}), "x-session-id": sessionId };
+  // Older postgrest-js: `.headers` may be a Headers instance or a plain
+  // record; mutate in place so we never replace the type the builder expects.
+  const withHeaders = query as unknown as {
+    headers?: Headers | Record<string, string> | ((h: Record<string, string>) => T);
+  };
+  const h = withHeaders.headers;
+  if (typeof h === "function") {
+    // Legacy fluent form: `.headers({...})` returns a new builder.
+    return (h as (hh: Record<string, string>) => T)({ "x-session-id": sessionId });
+  }
+  if (h && typeof (h as Headers).set === "function") {
+    (h as Headers).set("x-session-id", sessionId);
+  } else if (h && typeof h === "object") {
+    (h as Record<string, string>)["x-session-id"] = sessionId;
+  } else {
+    (withHeaders as { headers: Record<string, string> }).headers = { "x-session-id": sessionId };
   }
   return query;
 }
