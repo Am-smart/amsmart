@@ -305,14 +305,14 @@ export class SystemService {
   }
 
   async getNotifications(userId: string, sessionId: string, currentUser?: User, options: { limit?: number; offset?: number } = {}): Promise<Notification[]> {
-    if (currentUser && currentUser.role === 'student' && currentUser.id !== userId) {
+    if (currentUser && currentUser.id !== userId && currentUser.role !== 'admin') {
         throw new ForbiddenError('Unauthorized: You can only view your own notifications');
     }
     return systemDb.findNotificationsByUserId(userId, sessionId, options);
   }
 
   async getUnreadCount(userId: string, sessionId: string, currentUser?: User): Promise<number> {
-    if (currentUser && currentUser.role === 'student' && currentUser.id !== userId) {
+    if (currentUser && currentUser.id !== userId && currentUser.role !== 'admin') {
         throw new ForbiddenError('Unauthorized: You can only access your own notifications');
     }
     return systemDb.getUnreadNotificationCount(userId, sessionId);
