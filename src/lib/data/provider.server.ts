@@ -7,9 +7,13 @@
  *   2. Swap the imports below.
  *
  * Server-only: never import this module from client code. Call from inside
- * `createServerFn` handlers or server routes.
+ * `createServerFn` handlers or server routes. The `server-only` import
+ * below is a runtime guard that throws if this module is ever evaluated in
+ * a browser environment (defense-in-depth on top of the `.server.ts`
+ * filename boundary).
  */
 
+import "@/lib/server-only";
 import type { Database } from "./database";
 import type { Storage } from "./storage";
 import { supabaseDatabase, supabaseStorage } from "./adapters/supabase.server";
