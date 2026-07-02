@@ -323,7 +323,7 @@ export class SystemService {
   }
 
   async markAllNotificationsAsRead(userId: string, sessionId: string, currentUser?: User): Promise<void> {
-    if (currentUser && currentUser.role === 'student' && currentUser.id !== userId) {
+    if (currentUser && currentUser.id !== userId && currentUser.role !== 'admin') {
         throw new ForbiddenError('Unauthorized: You can only manage your own notifications');
     }
     // "Clear All" should dismiss all notifications for the user
