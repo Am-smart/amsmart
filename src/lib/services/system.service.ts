@@ -305,50 +305,45 @@ export class SystemService {
   }
 
   async getNotifications(userId: string, sessionId: string, currentUser?: User, options: { limit?: number; offset?: number } = {}): Promise<Notification[]> {
-    if (currentUser && currentUser.role === 'student' && currentUser.id !== userId) {
+    if (currentUser && currentUser.id !== userId && currentUser.role !== 'admin') {
         throw new ForbiddenError('Unauthorized: You can only view your own notifications');
     }
     return systemDb.findNotificationsByUserId(userId, sessionId, options);
   }
 
   async getUnreadCount(userId: string, sessionId: string, currentUser?: User): Promise<number> {
-    if (currentUser && currentUser.role === 'student' && currentUser.id !== userId) {
+    if (currentUser && currentUser.id !== userId && currentUser.role !== 'admin') {
         throw new ForbiddenError('Unauthorized: You can only access your own notifications');
     }
     return systemDb.getUnreadNotificationCount(userId, sessionId);
   }
 
-  async markNotificationAsRead(id: string, sessionId: string): Promise<void> {
-    // Note: The systemDb operation uses sessionId for RLS if configured,
-    // but we might want to check ownership if possible here too.
-    // For now, RLS handles individual record access.
-    await systemDb.markNotificationAsRead(id, sessionId);
+  async markNotificationAsRead(id: string, sessionId: string, currentUser: User): Promise<void> {
+    await systemDb.markNotificationAsRead(id, sessionId, currentUser.id);
   }
 
   async markAllNotificationsAsRead(userId: string, sessionId: string, currentUser?: User): Promise<void> {
-    if (currentUser && currentUser.role === 'student' && currentUser.id !== userId) {
+    if (currentUser && currentUser.id !== userId && currentUser.role !== 'admin') {
         throw new ForbiddenError('Unauthorized: You can only manage your own notifications');
     }
     // "Clear All" should dismiss all notifications for the user
     await systemDb.updateNotificationsForUser(userId, { dismissed_at: new Date().toISOString(), is_read: true }, sessionId);
   }
 
-  async dismissNotification(id: string, sessionId: string): Promise<void> {
-      await systemDb.updateNotification(id, { dismissed_at: new Date().toISOString() }, sessionId);
+  async dismissNotification(id: string, sessionId: string, currentUser: User): Promise<void> {
+      await systemDb.updateNotification(id, { dismissed_at: new Date().toISOString() }, sessionId, currentUser.id);
   }
 
-  async acknowledgeNotification(id: string, sessionId: string): Promise<void> {
-      await systemDb.updateNotification(id, { acknowledged_at: new Date().toISOString(), is_read: true }, sessionId);
+  async acknowledgeNotification(id: string, sessionId: string, currentUser: User): Promise<void> {
+      await systemDb.updateNotification(id, { acknowledged_at: new Date().toISOString(), is_read: true }, sessionId, currentUser.id);
   }
 
-  async markNotificationAsViewed(id: string, sessionId: string): Promise<void> {
-      await systemDb.updateNotification(id, { viewed_at: new Date().toISOString() }, sessionId);
+  async markNotificationAsViewed(id: string, sessionId: string, currentUser: User): Promise<void> {
+      await systemDb.updateNotification(id, { viewed_at: new Date().toISOString() }, sessionId, currentUser.id);
   }
 
-  async markNotificationsAsViewed(ids: string[], sessionId: string): Promise<void> {
-      // For bulk update, we can use a custom psql function or loop if the adapter doesn't support bulk.
-      // Since systemDb.updateNotification is per-id, let's add a bulk helper to systemDb.
-      await systemDb.updateMultipleNotifications(ids, { viewed_at: new Date().toISOString() }, sessionId);
+  async markNotificationsAsViewed(ids: string[], sessionId: string, currentUser: User): Promise<void> {
+      await systemDb.updateMultipleNotifications(ids, { viewed_at: new Date().toISOString() }, sessionId, currentUser.id);
   }
 
   async notifyUser(params: { target_id: string, n_title: string, n_msg: string, n_link?: string, n_type?: string, expires_at?: string, metadata?: Record<string, string | number | boolean> }, sessionId: string): Promise<void> {
@@ -810,7 +805,9 @@ export class SystemService {
 
     await systemDb.uploadFile(filePath, buffer, file.type, sessionId);
 
-    const publicUrl = systemDb.getPublicUrl(filePath);
+    // Return a short-lived signed URL; the bucket is private, so ownership/enrollment
+    // checks in higher-level services gate re-issuing signed URLs on subsequent reads.
+    const publicUrl = await systemDb.getSignedUrl(filePath, 60 * 60);
 
     await this.createLogAsync({
         level: 'info',

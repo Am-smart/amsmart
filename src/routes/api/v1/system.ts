@@ -287,13 +287,13 @@ const PATCH = withHandler(async (user, request) => {
         if (!userId) throw new BadRequestError("userId required");
         await systemService.markAllNotificationsAsRead(userId, user.sessionId!, user);
       } else if (subAction === "view" && Array.isArray(data.ids)) {
-        await systemService.markNotificationsAsViewed(data.ids, user.sessionId!);
+        await systemService.markNotificationsAsViewed(data.ids, user.sessionId!, user);
       } else {
         if (!id) throw new BadRequestError("id required");
-        if (subAction === "dismiss") await systemService.dismissNotification(id, user.sessionId!);
-        else if (subAction === "acknowledge") await systemService.acknowledgeNotification(id, user.sessionId!);
-        else if (subAction === "view") await systemService.markNotificationAsViewed(id, user.sessionId!);
-        else await systemService.markNotificationAsRead(id, user.sessionId!);
+        if (subAction === "dismiss") await systemService.dismissNotification(id, user.sessionId!, user);
+        else if (subAction === "acknowledge") await systemService.acknowledgeNotification(id, user.sessionId!, user);
+        else if (subAction === "view") await systemService.markNotificationAsViewed(id, user.sessionId!, user);
+        else await systemService.markNotificationAsRead(id, user.sessionId!, user);
       }
       return { success: true };
     }
