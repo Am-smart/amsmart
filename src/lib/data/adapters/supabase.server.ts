@@ -6,6 +6,7 @@
  * `createServerFn` handlers or server routes.
  */
 
+import "@/lib/server-only";
 import { supabaseAdmin as typedAdmin } from "@/integrations/supabase/client.server";
 import type { Database, QueryOptions, Where } from "../database";
 import type { Storage, UploadOptions, SignedUrlOptions } from "../storage";
