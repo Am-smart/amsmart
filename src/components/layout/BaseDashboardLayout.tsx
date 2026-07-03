@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useAuth } from '@/components/auth/AuthContext';
 import { UnifiedSidebar } from "@/components/common/UnifiedSidebar";
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarInset, useSidebar } from "@/components/ui/sidebar";
 import { UserRole, User } from "@/lib/types";
 import { ForcePasswordChange } from "@/components/auth/ForcePasswordChange";
 import { useAppContext } from '../AppContext';
@@ -78,19 +78,46 @@ export const BaseDashboardLayout: React.FC<BaseDashboardLayoutProps> = ({
 
       <UnifiedSidebar role={role as UserRole} />
       <SidebarInset className="bg-[#f8fafc]">
-        <HeaderComponent
-          {...headerProps}
+        <DashboardShell
+          HeaderComponent={HeaderComponent}
+          headerProps={headerProps}
           user={user}
           onLogout={handleLogout}
-          onMenuClick={toggleSidebar}
-        />
-        <div className="content-area p-3 sm:p-4 md:p-8 pt-[75px] md:pt-[90px] min-h-screen overflow-x-hidden">
-          <div className="mx-auto flex max-w-[1600px] items-start gap-2">
-            <SidebarTrigger className="hidden md:inline-flex text-slate-600" />
-            <div className="flex-1 min-w-0">{children}</div>
-          </div>
-        </div>
+        >
+          {children}
+        </DashboardShell>
       </SidebarInset>
     </SidebarProvider>
+  );
+};
+
+interface DashboardShellProps {
+  HeaderComponent: React.ComponentType<HeaderComponentProps>;
+  headerProps: Record<string, unknown>;
+  user: User | null;
+  onLogout: () => Promise<void>;
+  children: React.ReactNode;
+}
+
+const DashboardShell: React.FC<DashboardShellProps> = ({
+  HeaderComponent,
+  headerProps,
+  user,
+  onLogout,
+  children,
+}) => {
+  const { toggleSidebar } = useSidebar();
+  return (
+    <>
+      <HeaderComponent
+        {...headerProps}
+        user={user}
+        onLogout={onLogout}
+        onMenuClick={toggleSidebar}
+      />
+        <div className="content-area p-3 sm:p-4 md:p-8 pt-[75px] md:pt-[90px] min-h-screen overflow-x-hidden">
+          <div className="mx-auto max-w-[1600px] min-w-0">{children}</div>
+        </div>
+    </>
   );
 };
