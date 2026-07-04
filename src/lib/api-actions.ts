@@ -269,9 +269,10 @@ export async function getSubmissions(filters: { assignmentId?: string; studentId
     return apiClient.get<SubmissionDTO[]>(url);
 }
 
-export async function gradeSubmission(id: string, gradeData: Partial<Submission>): Promise<ActionResponse> {
+export async function gradeSubmission(id: string, gradeData: Partial<Submission>, options: { draft?: boolean } = {}): Promise<ActionResponse> {
     try {
-        await apiClient.patch(`/api/v1/assessment?action=grade-submission&id=${id}`, gradeData);
+        const suffix = options.draft ? '&draft=true' : '';
+        await apiClient.patch(`/api/v1/assessment?action=grade-submission&id=${id}${suffix}`, gradeData);
         return { success: true };
     } catch (error: unknown) {
         return { success: false, error: (error as Error).message };
