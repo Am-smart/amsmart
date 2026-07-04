@@ -251,7 +251,7 @@ export class AssessmentService {
     return assessmentDb.upsertSubmission(submissionToSave, sessionId);
   }
 
-  async gradeSubmission(submissionId: string, gradeData: Partial<Submission>, sessionId: string, performingUserId?: string, performingUserRole?: string): Promise<Submission> {
+  async gradeSubmission(submissionId: string, gradeData: Partial<Submission>, sessionId: string, performingUserId?: string, performingUserRole?: string, options: { draft?: boolean } = {}): Promise<Submission> {
     // Backend Grade Protection: Ensure students cannot modify grades
     if (performingUserRole === 'student') {
         throw new ForbiddenError('Students are not authorized to modify grades');
@@ -261,7 +261,7 @@ export class AssessmentService {
     if (!submission) throw new NotFoundError('Submission not found');
 
     // Prevent re-grading if already graded with same score to ensure atomicity and avoid redundant notifications
-    if (submission.status === SUBMISSION_STATUS.GRADED && submission.grade === gradeData.grade && !gradeData.feedback) {
+    if (!options.draft && submission.status === SUBMISSION_STATUS.GRADED && submission.grade === gradeData.grade && !gradeData.feedback) {
         return submission;
     }
 
@@ -312,12 +312,13 @@ export class AssessmentService {
       grade: rawGrade,
       late_penalty_applied: latePenaltyApplied,
       final_grade: finalGrade,
-      status: SUBMISSION_STATUS.GRADED,
-      graded_at: new Date().toISOString(),
+      ...(options.draft
+        ? { status: submission.status }
+        : { status: SUBMISSION_STATUS.GRADED, graded_at: new Date().toISOString() }),
     } as Partial<Submission>, sessionId);
 
-    // Trigger Notification (Migrated from tr_submission_graded)
-    if (submission.status !== SUBMISSION_STATUS.GRADED) {
+    // Trigger Notification only on real grading, not draft saves
+    if (!options.draft && submission.status !== SUBMISSION_STATUS.GRADED) {
         const { serviceRegistry } = await import('./service-registry');
         await serviceRegistry.systemService.notifyUser({
             target_id: updated.student_id,
