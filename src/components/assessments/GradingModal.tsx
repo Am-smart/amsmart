@@ -22,55 +22,98 @@ export const GradingModal: React.FC<GradingModalProps> = ({ submission, onSave, 
         return { dueDate: dDate, submittedAt: sAt, isLate: late, daysLate: dLate, calculatedPenalty: penalty };
     }, [submission]);
 
+    const questions = submission.assignment?.questions || [];
+
+    // Local string state so users can freely clear/type in score inputs
+    // without values snapping back to 0 mid-edit.
+    const [scoreInputs, setScoreInputs] = useState<Record<string, string>>(() => {
+        const initial: Record<string, string> = {};
+        questions.forEach((q) => {
+            const v = submission.question_scores?.[q.id];
+            initial[q.id] = v === undefined || v === null ? '' : String(v);
+        });
+        return initial;
+    });
     const [formData, setFormData] = useState({
         feedback: submission.feedback || '',
         regrade_feedback: '',
         response_feedback: submission.response_feedback || {},
-        question_scores: submission.question_scores || {}
     });
     const [isSaving, setIsSaving] = useState(false);
+    const [savingMode, setSavingMode] = useState<'draft' | 'final' | null>(null);
     const [regradeStatus, setRegradeStatus] = useState<'pending' | 'resolved'>(submission.regrade_request ? 'pending' : 'resolved');
 
     const pointsPossible = submission.assignment?.points_possible || 100;
 
-    const { rawGrade, rawPercentage, finalGrade } = useMemo(() => {
-        const raw = Object.values(formData.question_scores).reduce((a: number, b) => a + (b as number), 0);
-        const rawPerc = Math.round((raw / pointsPossible) * 100);
-        const final = Math.max(0, rawPerc - calculatedPenalty);
-        return { rawGrade: raw, rawPercentage: rawPerc, finalGrade: final };
-    }, [formData.question_scores, pointsPossible, calculatedPenalty]);
+    // Numeric map of scores actually entered for CURRENT questions only.
+    const questionScores = useMemo(() => {
+        const map: Record<string, number> = {};
+        questions.forEach((q) => {
+            const raw = scoreInputs[q.id];
+            if (raw === undefined || raw === '') return;
+            const n = Number(raw);
+            if (!Number.isFinite(n)) return;
+            map[q.id] = n;
+        });
+        return map;
+    }, [scoreInputs, questions]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const { rawGrade, rawPercentage, finalGrade, allScored } = useMemo(() => {
+        const raw = Object.values(questionScores).reduce((a, b) => a + b, 0);
+        const rawPerc = pointsPossible > 0 ? Math.round((raw / pointsPossible) * 100) : 0;
+        const final = Math.max(0, rawPerc - calculatedPenalty);
+        const scored = questions.length === 0 || questions.every((q) => scoreInputs[q.id] !== undefined && scoreInputs[q.id] !== '');
+        return { rawGrade: raw, rawPercentage: rawPerc, finalGrade: final, allScored: scored };
+    }, [questionScores, pointsPossible, calculatedPenalty, questions, scoreInputs]);
+
+    const persist = async (mode: 'draft' | 'final') => {
         setIsSaving(true);
+        setSavingMode(mode);
         try {
+            // Prune empty response feedback entries
+            const responseFeedback: Record<string, string> = {};
+            Object.entries(formData.response_feedback).forEach(([k, v]) => {
+                if (typeof v === 'string' && v.trim() !== '') responseFeedback[k] = v;
+            });
+
             const gradeData: Partial<SubmissionDTO> = {
                 grade: rawGrade,
                 feedback: formData.feedback,
-                response_feedback: formData.response_feedback,
-                question_scores: formData.question_scores
+                response_feedback: responseFeedback,
+                question_scores: questionScores,
             };
 
-            if (submission.regrade_request && regradeStatus === 'resolved') {
+            if (mode === 'final' && questions.length > 0 && !allScored) {
+                addToast('Please score every question before submitting the final grade.', 'error');
+                return;
+            }
+
+            if (mode === 'final' && submission.regrade_request && regradeStatus === 'resolved') {
                 if (!formData.regrade_feedback.trim()) {
                     addToast('Please provide a regrade response explanation.', 'error');
-                    setIsSaving(false);
                     return;
                 }
                 gradeData.regrade_request = null;
                 gradeData.feedback = `${formData.feedback}\n\n[Regrade Response]: ${formData.regrade_feedback}`;
             }
 
-            await gradeSubmission(submission.id, gradeData);
+            const res = await gradeSubmission(submission.id, gradeData, { draft: mode === 'draft' });
+            if (!res.success) throw new Error(res.error || 'Failed to save');
 
-            addToast('Grade saved successfully!', 'success');
+            addToast(mode === 'draft' ? 'Draft saved.' : 'Grade saved successfully!', 'success');
             onSave();
         } catch (err) {
             console.error('Grading failed:', err);
-            addToast('Failed to save grade.', 'error');
+            addToast(mode === 'draft' ? 'Failed to save draft.' : 'Failed to save grade.', 'error');
         } finally {
             setIsSaving(false);
+            setSavingMode(null);
         }
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        void persist('final');
     };
 
     return (
@@ -81,9 +124,12 @@ export const GradingModal: React.FC<GradingModalProps> = ({ submission, onSave, 
             onSubmit={handleSubmit}
             footer={
                 <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4 w-full">
-                    <button type="button" onClick={onCancel} className="btn-secondary w-full sm:flex-1 py-3 sm:py-4 text-sm">Discard</button>
+                    <button type="button" onClick={onCancel} disabled={isSaving} className="btn-secondary w-full sm:flex-1 py-3 sm:py-4 text-sm">Discard</button>
+                    <button type="button" onClick={() => void persist('draft')} disabled={isSaving} className="btn-secondary w-full sm:flex-1 py-3 sm:py-4 text-sm">
+                        {savingMode === 'draft' ? 'Saving Draft...' : 'Save Draft'}
+                    </button>
                     <button type="submit" disabled={isSaving} className="btn-primary w-full sm:flex-1 py-3 sm:py-4 text-sm">
-                        {isSaving ? 'Saving Grade...' : 'Save Grade & Return'}
+                        {savingMode === 'final' ? 'Saving Grade...' : 'Save Grade & Return'}
                     </button>
                 </div>
             }
