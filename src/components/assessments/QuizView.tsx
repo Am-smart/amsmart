@@ -183,26 +183,32 @@ export const QuizView: React.FC<QuizViewProps> = ({ quiz, user, onComplete, onCa
   }
 
   return (
-    <div className="fixed inset-0 bg-white z-50 overflow-y-auto" aria-busy={isSubmitting}>
-      <div className="max-w-3xl mx-auto p-4 md:p-8">
-        <header className="flex flex-col md:flex-row justify-between items-center mb-6 md:mb-8 pb-4 border-b gap-2 md:gap-4 shrink-0">
-          <div>
-            <h1 className="text-xl md:text-2xl font-bold text-center md:text-left">{quiz.title}</h1>
-            <p className="text-slate-500 text-sm text-center md:text-left">{quiz.questions?.length || 0} Questions</p>
+    <div className="fixed inset-0 bg-white z-50 overflow-y-auto overscroll-contain" aria-busy={isSubmitting}>
+      <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-slate-100">
+        <div className="max-w-3xl mx-auto px-4 md:px-8 py-3 md:py-4 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 md:gap-4">
+          <div className="min-w-0">
+            <h1 className="text-base md:text-xl font-bold truncate">{quiz.title}</h1>
+            <p className="text-slate-500 text-[11px] md:text-sm">{quiz.questions?.length || 0} Questions</p>
           </div>
-          <div className="text-center md:text-right">
+          <div className="flex items-center gap-2 md:gap-4 shrink-0">
             {timeLeft !== null && (
-              <div className={`text-xl md:text-2xl font-mono font-bold flex items-center justify-center md:justify-end gap-2 ${timeLeft < 60 ? 'text-red-500 animate-pulse' : 'text-slate-700'}`}>
-                <Clock size={20} className="md:size-6" />
+              <div className={`text-base md:text-2xl font-mono font-bold flex items-center gap-1.5 tabular-nums ${timeLeft < 60 ? 'text-red-500 animate-pulse' : 'text-slate-700'}`}>
+                <Clock size={18} className="md:size-6 shrink-0" />
                 {formatTime(timeLeft)}
               </div>
             )}
-            <button onClick={onCancel} className="text-slate-400 hover:text-slate-600 text-xs font-bold uppercase mt-2 inline-flex items-center gap-1">
-              <X size={16} />
-              Cancel Quiz
+            <button
+              onClick={onCancel}
+              aria-label="Cancel quiz"
+              className="text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg p-2 inline-flex items-center gap-1 text-xs font-bold uppercase"
+            >
+              <X size={18} />
+              <span className="hidden sm:inline">Cancel</span>
             </button>
           </div>
-        </header>
+        </div>
+      </header>
+      <div className="max-w-3xl mx-auto p-4 md:p-8 pb-24 md:pb-16">
 
         {quiz.anti_cheat_enabled && (
             <div className={`mb-6 p-4 rounded-xl flex items-center gap-3 text-xs md:text-sm font-medium border ${violationCount > 0 ? 'bg-red-50 border-red-200 text-red-800' : 'bg-amber-50 border-amber-200 text-amber-800'}`}>
@@ -267,7 +273,10 @@ export const QuizView: React.FC<QuizViewProps> = ({ quiz, user, onComplete, onCa
           )}
         </div>
 
-        <div className="mt-12 pt-8 border-t flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="mt-10 pt-6 border-t flex flex-col-reverse sm:flex-row justify-between items-center gap-4">
+            <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">
+                Question {currentQuestionIndex + 1} of {questions.length}
+            </p>
             <div className="flex gap-3 w-full sm:w-auto">
                 <button
                     disabled={currentQuestionIndex === 0}
@@ -293,9 +302,6 @@ export const QuizView: React.FC<QuizViewProps> = ({ quiz, user, onComplete, onCa
                     </button>
                 )}
             </div>
-            <p className="text-slate-500 text-xs font-bold uppercase tracking-widest order-first sm:order-last">
-                Question {currentQuestionIndex + 1} of {questions.length}
-            </p>
         </div>
       </div>
     </div>
