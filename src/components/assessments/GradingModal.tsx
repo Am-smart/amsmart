@@ -171,20 +171,23 @@ export const GradingModal: React.FC<GradingModalProps> = ({ submission, onSave, 
                                                 <label className="text-[8px] sm:text-[10px] md:text-sm font-bold text-blue-400 uppercase tracking-widest block mb-1">Score</label>
                                                 <div className="flex items-center gap-1">
                                                     <input
-                                                        type="number"
-                                                        value={formData.question_scores[q.id] ?? ''}
-                                                        onChange={(e) => {
-                                                            let val = e.target.value === '' ? 0 : Number(e.target.value);
-                                                            // Validation: 0 to q.points
-                                                            if (val < 0) val = 0;
-                                                            if (val > (q.points || 0)) val = q.points || 0;
-
-                                                            const newScores = { ...formData.question_scores, [q.id]: val };
-                                                            setFormData({
-                                                                ...formData,
-                                                                question_scores: newScores
-                                                            });
-                                                        }}
+                                                     type="number"
+                                                     inputMode="decimal"
+                                                     min={0}
+                                                     max={q.points ?? undefined}
+                                                     value={scoreInputs[q.id] ?? ''}
+                                                     onChange={(e) => {
+                                                         const raw = e.target.value;
+                                                         if (raw === '') {
+                                                             setScoreInputs((prev) => ({ ...prev, [q.id]: '' }));
+                                                             return;
+                                                         }
+                                                         const n = Number(raw);
+                                                         if (!Number.isFinite(n)) return;
+                                                         const max = q.points ?? Infinity;
+                                                         const clamped = Math.max(0, Math.min(max, n));
+                                                         setScoreInputs((prev) => ({ ...prev, [q.id]: String(clamped) }));
+                                                     }}
                                                         className="w-full bg-white/80 border-none rounded-lg p-2 text-xs focus:ring-1 focus:ring-blue-400 outline-none font-bold"
                                                         placeholder="0"
                                                     />
