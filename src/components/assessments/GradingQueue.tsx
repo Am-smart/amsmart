@@ -38,16 +38,90 @@ export const GradingQueue: React.FC<GradingQueueProps> = ({ submissions, onGrade
   // If onPageChange is provided, we assume submissions are already paginated by parent
   const displaySubmissions = onPageChange ? pending : pending.slice(startIndex, startIndex + itemsPerPage);
 
+  // Compact page window for mobile / many pages
+  const pageWindow = React.useMemo(() => {
+    const maxButtons = 5;
+    if (totalPages <= maxButtons) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    const start = Math.min(Math.max(1, currentPage - 2), totalPages - maxButtons + 1);
+    return Array.from({ length: maxButtons }, (_, i) => start + i);
+  }, [totalPages, currentPage]);
+
+  const courseLabel = (sub: SubmissionDTO) => {
+    const title = sub.assignment?.course?.title;
+    if (title) return title;
+    const id = sub.assignment?.course_id;
+    return id ? `Course ${id.substring(0, 8)}` : 'Unknown course';
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-slate-900">Grading Queue</h2>
-        <div className="bg-amber-100 text-amber-700 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-amber-200 shadow-sm">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 truncate">Grading Queue</h2>
+        <div className="bg-amber-100 text-amber-700 px-3 sm:px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-amber-200 shadow-sm shrink-0 whitespace-nowrap">
             {pending.length} Submissions Pending
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+      {/* Mobile: card list */}
+      <div className="md:hidden space-y-3">
+        {pending.length === 0 ? (
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 py-12 px-6 flex flex-col items-center gap-3 text-slate-400 italic font-medium">
+            <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center border-2 border-dashed border-slate-200">
+              <CheckCircle2 size={32} className="text-slate-200" />
+            </div>
+            <p className="text-center text-sm">Everything is caught up! No pending submissions.</p>
+          </div>
+        ) : (
+          displaySubmissions.map(sub => (
+            <div key={sub.id} className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 space-y-3">
+              <div className="flex items-start gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 shrink-0">
+                  <User size={20} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="font-bold text-slate-900 truncate">{sub.student?.full_name || 'Anonymous Student'}</div>
+                  <div className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">
+                    {new Date(sub.submitted_at).toLocaleString()}
+                  </div>
+                </div>
+                {sub.regrade_request ? (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-[9px] font-black uppercase tracking-widest border border-amber-200 shrink-0">
+                    <RotateCcw size={10} /> Regrade
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded-full text-[9px] font-black uppercase tracking-widest border border-blue-100 shrink-0">
+                    <Clock size={10} /> New
+                  </span>
+                )}
+              </div>
+              <div className="pl-13 min-w-0">
+                <div className="flex items-center gap-2 text-sm font-bold text-slate-700 min-w-0">
+                  <FileText size={14} className="text-slate-400 shrink-0" />
+                  <span className="truncate">{sub.assignment?.title || 'Unknown Assignment'}</span>
+                </div>
+                <div className="text-[10px] text-blue-600 font-bold uppercase tracking-widest mt-1 truncate">
+                  {courseLabel(sub)}
+                </div>
+                {sub.regrade_request && (
+                  <p className="text-xs text-slate-500 italic line-clamp-2 mt-2">&ldquo;{sub.regrade_request}&rdquo;</p>
+                )}
+              </div>
+              <button
+                onClick={() => onGrade(sub)}
+                className={`w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-black text-[11px] uppercase tracking-widest transition-all ${
+                  sub.regrade_request ? 'bg-amber-500 text-white hover:bg-amber-600' : 'bg-slate-900 text-white hover:bg-slate-800'
+                }`}
+              >
+                <CheckCircle2 size={16} />
+                Grade Now
+              </button>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop: table */}
+      <div className="hidden md:block bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
         <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200">
             <table className="w-full text-left border-collapse min-w-[800px]">
                 <thead>
@@ -89,8 +163,8 @@ export const GradingQueue: React.FC<GradingQueueProps> = ({ submissions, onGrade
                                         <FileText size={14} className="text-slate-400 shrink-0" />
                                         {sub.assignment?.title || 'Unknown Assignment'}
                                     </div>
-                                    <div className="text-[10px] text-blue-600 font-black uppercase tracking-widest mt-1 italic">
-                                        Course ID: {sub.assignment?.course_id.substring(0, 8)}...
+                                    <div className="text-[10px] text-blue-600 font-black uppercase tracking-widest mt-1 truncate max-w-[280px]">
+                                        {courseLabel(sub)}
                                     </div>
                                 </td>
                                 <td className="px-8 py-6">
@@ -99,7 +173,7 @@ export const GradingQueue: React.FC<GradingQueueProps> = ({ submissions, onGrade
                                             <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-[9px] font-black uppercase tracking-widest w-fit border border-amber-200">
                                                 <RotateCcw size={12} /> Regrade Request
                                             </span>
-                                            <p className="text-[10px] text-slate-500 italic line-clamp-1 max-w-[200px]">&ldquo;{sub.regrade_request}&rdquo;</p>
+                                            <p className="text-[11px] text-slate-500 italic line-clamp-2 max-w-[240px]" title={sub.regrade_request}>&ldquo;{sub.regrade_request}&rdquo;</p>
                                         </div>
                                     ) : (
                                         <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[9px] font-black uppercase tracking-widest w-fit border border-blue-100">
@@ -127,34 +201,37 @@ export const GradingQueue: React.FC<GradingQueueProps> = ({ submissions, onGrade
       </div>
 
       {totalPages > 1 && (
-        <div className="flex justify-between items-center bg-white px-8 py-4 rounded-2xl shadow-sm border border-slate-100">
-            <div className="text-xs font-bold text-slate-500">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-3 bg-white px-4 sm:px-8 py-4 rounded-2xl shadow-sm border border-slate-100">
+            <div className="text-xs font-bold text-slate-500 text-center sm:text-left">
                 Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, pending.length)} of {pending.length} results
             </div>
             <div className="flex items-center gap-2">
                 <button
                     onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
                     disabled={currentPage === 1}
+                    aria-label="Previous page"
                     className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
                     <ChevronLeft size={20} />
                 </button>
                 <div className="flex items-center gap-1">
-                    {[...Array(totalPages)].map((_, i) => (
+                    {pageWindow.map((n) => (
                         <button
-                            key={i}
-                            onClick={() => handlePageChange(i + 1)}
+                            key={n}
+                            onClick={() => handlePageChange(n)}
+                            aria-current={currentPage === n ? 'page' : undefined}
                             className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${
-                                currentPage === i + 1 ? 'bg-slate-900 text-white' : 'hover:bg-slate-100 text-slate-500'
+                                currentPage === n ? 'bg-slate-900 text-white' : 'hover:bg-slate-100 text-slate-500'
                             }`}
                         >
-                            {i + 1}
+                            {n}
                         </button>
                     ))}
                 </div>
                 <button
                     onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
                     disabled={currentPage === totalPages}
+                    aria-label="Next page"
                     className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
                     <ChevronRight size={20} />
