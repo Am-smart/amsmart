@@ -4,6 +4,12 @@ import { useAppContext } from '@/components/AppContext';
 import { gradeSubmission } from '@/lib/api-actions';
 import { Modal } from '@/components/ui-legacy/Modal';
 
+type RawAnswer = string | number | boolean | { mode: 'essay' | 'file' | 'link'; value: string } | undefined;
+const normalizeAnswer = (a: RawAnswer, fallbackType?: string): { mode: string; value: string } => {
+    if (a && typeof a === 'object' && 'mode' in a) return { mode: a.mode, value: a.value };
+    return { mode: fallbackType || 'essay', value: a === undefined || a === null ? '' : String(a) };
+};
+
 interface GradingModalProps {
     submission: SubmissionDTO;
     onSave: () => void;
@@ -140,15 +146,23 @@ export const GradingModal: React.FC<GradingModalProps> = ({ submission, onSave, 
 
                         {(submission).answers && Object.keys((submission).answers as Record<string, unknown>).length > 0 ? (
                             <div className="space-y-4">
-                                {submission.assignment?.questions.map((q: QuestionDTO, idx: number) => (
+                                {submission.assignment?.questions.map((q: QuestionDTO, idx: number) => {
+                                    const raw = (submission).answers?.[q.id] as RawAnswer;
+                                    const { mode, value } = normalizeAnswer(raw, q.type);
+                                    return (
                                     <div key={q.id || idx} className="bg-white p-3 sm:p-5 rounded-2xl shadow-sm border border-blue-100/50 space-y-4">
                                         <div>
-                                            <div className="text-[8px] sm:text-[10px] md:text-sm font-black text-blue-500 uppercase tracking-widest mb-2">Step {idx + 1}: {(q).text}</div>
+                                            <div className="text-[8px] sm:text-[10px] md:text-sm font-black text-blue-500 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                                <span>Step {idx + 1}: {(q).text}</span>
+                                                <span className="text-[8px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full normal-case tracking-normal">{mode}</span>
+                                            </div>
                                             <div className="text-xs sm:text-sm text-slate-800">
-                                                {(q).type === 'file' ? (
-                                                    <a href={(submission).answers?.[q.id] as string} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-bold">View Uploaded File</a>
+                                                {mode === 'file' ? (
+                                                    value ? <a href={value} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-bold">View Uploaded File</a> : <span className="italic text-slate-400">No response</span>
+                                                ) : mode === 'link' ? (
+                                                    value ? <a href={value} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-bold break-all">{value}</a> : <span className="italic text-slate-400">No response</span>
                                                 ) : (
-                                                    ((submission).answers?.[q.id] as string) || <span className="italic text-slate-400">No response</span>
+                                                    <div className="whitespace-pre-line">{value || <span className="italic text-slate-400">No response</span>}</div>
                                                 )}
                                             </div>
                                         </div>
@@ -196,7 +210,8 @@ export const GradingModal: React.FC<GradingModalProps> = ({ submission, onSave, 
                                             </div>
                                         </div>
                                     </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         ) : (
                             <div className="text-sm text-blue-900 leading-relaxed whitespace-pre-line">{submission.submission_text || 'No text provided.'}</div>
