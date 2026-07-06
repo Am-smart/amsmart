@@ -14,10 +14,26 @@ interface AssignmentFormProps {
   onCancel: () => void;
 }
 
+type AnswerMode = 'essay' | 'file' | 'link';
+type AnswerValue = { mode: AnswerMode; value: string };
+
+const getAllowedModes = (q: { type?: string; types?: string[] }): AnswerMode[] => {
+    const raw = (q.types && q.types.length > 0) ? q.types : (q.type ? [q.type] : ['essay']);
+    return raw.filter((m): m is AnswerMode => m === 'essay' || m === 'file' || m === 'link');
+};
+
 export const AssignmentForm: React.FC<AssignmentFormProps> = ({ assignment, user, onComplete, onCancel }) => {
   const { addToast } = useAppContext();
   const [submissionText, setSubmissionText] = useState('');
-  const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [answers, setAnswers] = useState<Record<string, AnswerValue>>({});
+  const [activeMode, setActiveMode] = useState<Record<string, AnswerMode>>(() => {
+      const initial: Record<string, AnswerMode> = {};
+      (assignment.questions || []).forEach((q) => {
+          const modes = getAllowedModes(q);
+          initial[q.id] = modes[0];
+      });
+      return initial;
+  });
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { addToQueue, isOnline } = useIndexedDB();
@@ -154,35 +170,60 @@ export const AssignmentForm: React.FC<AssignmentFormProps> = ({ assignment, user
                     <h4 className="text-sm font-bold text-slate-800">Step {idx + 1}: {q.text}</h4>
                     <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-md uppercase shrink-0">{q.points} Points</span>
                   </div>
+                  {(() => {
+                      const modes = getAllowedModes(q);
+                      const mode = activeMode[q.id] || modes[0];
+                      const current = answers[q.id];
+                      const value = current && current.mode === mode ? current.value : '';
+                      const setValue = (v: string) => setAnswers((prev) => ({ ...prev, [q.id]: { mode, value: v } }));
+                      return (
+                          <>
+                              {modes.length > 1 && (
+                                  <div className="flex flex-wrap gap-2">
+                                      {modes.map((m) => (
+                                          <button
+                                              key={m}
+                                              type="button"
+                                              onClick={() => setActiveMode((prev) => ({ ...prev, [q.id]: m }))}
+                                              className={`px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wide border-2 transition-all ${mode === m ? 'border-blue-500 bg-blue-500 text-white' : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300'}`}
+                                          >
+                                              {m === 'essay' ? 'Written' : m === 'file' ? 'File Upload' : 'Link'}
+                                          </button>
+                                      ))}
+                                  </div>
+                              )}
 
-                  {q.type === 'essay' && (
-                    <textarea
-                      placeholder="Type your response here..."
-                      className="w-full h-24 md:h-32 p-3 md:p-4 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none transition-all resize-none text-sm"
-                      value={answers[idx] || ''}
-                      onChange={(e) => setAnswers({ ...answers, [idx]: e.target.value })}
-                    />
-                  )}
+                              {mode === 'essay' && (
+                                  <textarea
+                                      placeholder="Type your response here..."
+                                      className="w-full h-24 md:h-32 p-3 md:p-4 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none transition-all resize-none text-sm"
+                                      value={value}
+                                      onChange={(e) => setValue(e.target.value)}
+                                  />
+                              )}
 
-                  {q.type === 'file' && (
-                    <FileUpload
-                      category="submissions"
-                      uploadFn={performUpload}
-                      onUploadComplete={(url) => setAnswers({ ...answers, [idx]: url })}
-                      label="Upload Evidence"
-                      acceptedTypes={q.extensions ? q.extensions.split(',').map(e => e.trim()) : undefined}
-                    />
-                  )}
+                              {mode === 'file' && (
+                                  <FileUpload
+                                      category="submissions"
+                                      uploadFn={performUpload}
+                                      onUploadComplete={(url) => setValue(url)}
+                                      label="Upload Evidence"
+                                      acceptedTypes={q.extensions ? q.extensions.split(',').map((e) => e.trim()) : undefined}
+                                  />
+                              )}
 
-                  {q.type === 'link' && (
-                    <input
-                      type="url"
-                      placeholder="https://example.com"
-                      className="w-full p-3 md:p-4 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none transition-all text-sm"
-                      value={answers[idx] || ''}
-                      onChange={(e) => setAnswers({ ...answers, [idx]: e.target.value })}
-                    />
-                  )}
+                              {mode === 'link' && (
+                                  <input
+                                      type="url"
+                                      placeholder="https://example.com"
+                                      className="w-full p-3 md:p-4 rounded-xl border-2 border-slate-200 focus:border-blue-500 outline-none transition-all text-sm"
+                                      value={value}
+                                      onChange={(e) => setValue(e.target.value)}
+                                  />
+                              )}
+                          </>
+                      );
+                  })()}
                 </div>
               ))}
 
