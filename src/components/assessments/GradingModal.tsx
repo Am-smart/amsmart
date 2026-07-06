@@ -5,9 +5,25 @@ import { gradeSubmission } from '@/lib/api-actions';
 import { Modal } from '@/components/ui-legacy/Modal';
 
 type RawAnswer = string | number | boolean | { mode: 'essay' | 'file' | 'link'; value: string } | undefined;
+
 const normalizeAnswer = (a: RawAnswer, fallbackType?: string): { mode: string; value: string } => {
     if (a && typeof a === 'object' && 'mode' in a) return { mode: a.mode, value: a.value };
     return { mode: fallbackType || 'essay', value: a === undefined || a === null ? '' : String(a) };
+};
+
+// Validate URL format for link submissions
+const isValidUrl = (url: string): boolean => {
+    try {
+        new URL(url);
+        return true;
+    } catch {
+        return false;
+    }
+};
+
+// Check if a value is a valid file URL (should start with http/https or be a data URL)
+const isFileUrl = (value: string): boolean => {
+    return /^(https?:|data:)/.test(value);
 };
 
 interface GradingModalProps {
@@ -76,17 +92,26 @@ export const GradingModal: React.FC<GradingModalProps> = ({ submission, onSave, 
         setIsSaving(true);
         setSavingMode(mode);
         try {
-            // Prune empty response feedback entries
+            // Prune empty response feedback entries - preserve only non-empty per-question feedback
             const responseFeedback: Record<string, string> = {};
             Object.entries(formData.response_feedback).forEach(([k, v]) => {
                 if (typeof v === 'string' && v.trim() !== '') responseFeedback[k] = v;
+            });
+
+            // Ensure only scored questions are in the final question_scores object
+            const finalQuestionScores: Record<string, number> = {};
+            questions.forEach((q) => {
+                const score = questionScores[q.id];
+                if (score !== undefined && !isNaN(score)) {
+                    finalQuestionScores[q.id] = score;
+                }
             });
 
             const gradeData: Partial<SubmissionDTO> = {
                 grade: rawGrade,
                 feedback: formData.feedback,
                 response_feedback: responseFeedback,
-                question_scores: questionScores,
+                question_scores: finalQuestionScores,
             };
 
             if (mode === 'final' && questions.length > 0 && !allScored) {
@@ -150,7 +175,7 @@ export const GradingModal: React.FC<GradingModalProps> = ({ submission, onSave, 
                                     const raw = (submission).answers?.[q.id] as RawAnswer;
                                     const { mode, value } = normalizeAnswer(raw, q.type);
                                     return (
-                                    <div key={q.id || idx} className="bg-white p-3 sm:p-5 rounded-2xl shadow-sm border border-blue-100/50 space-y-4">
+                                    <div key={`question-${q.id}`} className="bg-white p-3 sm:p-5 rounded-2xl shadow-sm border border-blue-100/50 space-y-4">
                                         <div>
                                             <div className="text-[8px] sm:text-[10px] md:text-sm font-black text-blue-500 uppercase tracking-widest mb-2 flex items-center gap-2">
                                                 <span>Step {idx + 1}: {(q).text}</span>
@@ -158,18 +183,34 @@ export const GradingModal: React.FC<GradingModalProps> = ({ submission, onSave, 
                                             </div>
                                             <div className="text-xs sm:text-sm text-slate-800">
                                                 {mode === 'file' ? (
-                                                    value ? <a href={value} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-bold">View Uploaded File</a> : <span className="italic text-slate-400">No response</span>
+                                                    value && isFileUrl(value) ? (
+                                                        <div className="flex items-center gap-2">
+                                                            <a href={value} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-bold flex-1 break-all">View Uploaded File</a>
+                                                            <span className="text-[9px] text-slate-400 font-medium">File</span>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="italic text-slate-400">No file uploaded</span>
+                                                    )
                                                 ) : mode === 'link' ? (
-                                                    value ? <a href={value} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-bold break-all">{value}</a> : <span className="italic text-slate-400">No response</span>
+                                                    value && isValidUrl(value) ? (
+                                                        <div className="flex items-center gap-2">
+                                                            <a href={value} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-bold flex-1 break-all">{value}</a>
+                                                            <span className="text-[9px] text-slate-400 font-medium">Link</span>
+                                                        </div>
+                                                    ) : value ? (
+                                                        <span className="text-red-600 font-bold">Invalid URL: {value}</span>
+                                                    ) : (
+                                                        <span className="italic text-slate-400">No link provided</span>
+                                                    )
                                                 ) : (
                                                     <div className="whitespace-pre-line">{value || <span className="italic text-slate-400">No response</span>}</div>
                                                 )}
                                             </div>
                                         </div>
 
-                                        <div className="pt-2 border-t border-blue-100/50 flex flex-col sm:flex-row gap-4">
-                                            <div className="flex-1">
-                                                <label className="text-[8px] sm:text-[10px] md:text-sm font-bold text-blue-400 uppercase tracking-widest block mb-1">Response Feedback</label>
+                                        <div className="pt-2 border-t border-blue-100/50 space-y-3">
+                                            <div>
+                                                <label className="text-[8px] sm:text-[10px] md:text-sm font-bold text-blue-400 uppercase tracking-widest block mb-1">Per-Question Feedback</label>
                                                 <input
                                                     type="text"
                                                     value={formData.response_feedback[q.id] || ''}
@@ -177,13 +218,13 @@ export const GradingModal: React.FC<GradingModalProps> = ({ submission, onSave, 
                                                         ...formData,
                                                         response_feedback: { ...formData.response_feedback, [q.id]: e.target.value }
                                                     })}
-                                                    placeholder="Provide feedback on this specific response..."
+                                                    placeholder="Provide specific feedback on this response..."
                                                     className="w-full bg-white/80 border-none rounded-lg p-2 text-xs focus:ring-1 focus:ring-blue-400 outline-none"
                                                 />
                                             </div>
-                                            <div className="w-full sm:w-24">
-                                                <label className="text-[8px] sm:text-[10px] md:text-sm font-bold text-blue-400 uppercase tracking-widest block mb-1">Score</label>
-                                                <div className="flex items-center gap-1">
+                                            <div>
+                                                <label className="text-[8px] sm:text-[10px] md:text-sm font-bold text-blue-400 uppercase tracking-widest block mb-1">Points Earned</label>
+                                                <div className="flex items-center gap-2">
                                                     <input
                                                      type="number"
                                                      inputMode="decimal"
@@ -202,10 +243,10 @@ export const GradingModal: React.FC<GradingModalProps> = ({ submission, onSave, 
                                                          const clamped = Math.max(0, Math.min(max, n));
                                                          setScoreInputs((prev) => ({ ...prev, [q.id]: String(clamped) }));
                                                      }}
-                                                        className="w-full bg-white/80 border-none rounded-lg p-2 text-xs focus:ring-1 focus:ring-blue-400 outline-none font-bold"
+                                                        className="flex-1 bg-white/80 border-none rounded-lg p-2 text-xs focus:ring-1 focus:ring-blue-400 outline-none font-bold"
                                                         placeholder="0"
                                                     />
-                                                    <span className="text-[10px] font-bold text-slate-400">/ {q.points}</span>
+                                                    <span className="text-[10px] font-bold text-slate-400 whitespace-nowrap">out of {q.points}</span>
                                                 </div>
                                             </div>
                                         </div>

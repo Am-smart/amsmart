@@ -22,6 +22,20 @@ const getAllowedModes = (q: { type?: string; types?: string[] }): AnswerMode[] =
     return raw.filter((m): m is AnswerMode => m === 'essay' || m === 'file' || m === 'link');
 };
 
+// Validate that all answers conform to allowed modes for each question
+const validateAnswerModes = (answers: Record<string, AnswerValue>, questions: any[]): string | null => {
+    for (const question of questions) {
+        const answer = answers[question.id];
+        if (!answer) continue;
+        
+        const allowed = getAllowedModes(question);
+        if (!allowed.includes(answer.mode)) {
+            return `Invalid submission mode "${answer.mode}" for "${question.text}". Allowed: ${allowed.join(', ')}`;
+        }
+    }
+    return null;
+};
+
 export const AssignmentForm: React.FC<AssignmentFormProps> = ({ assignment, user, onComplete, onCancel }) => {
   const { addToast } = useAppContext();
   const [submissionText, setSubmissionText] = useState('');
@@ -96,6 +110,16 @@ export const AssignmentForm: React.FC<AssignmentFormProps> = ({ assignment, user
     setIsSubmitting(true);
 
     try {
+        // Validate answer modes before submission
+        if (assignment.questions && assignment.questions.length > 0) {
+            const modeValidationError = validateAnswerModes(answers, assignment.questions);
+            if (modeValidationError) {
+                addToast(modeValidationError, 'error');
+                setIsSubmitting(false);
+                return;
+            }
+        }
+
         const payload = {
             assignment_id: assignment.id,
             student_id: user.id,
@@ -266,8 +290,9 @@ export const AssignmentForm: React.FC<AssignmentFormProps> = ({ assignment, user
             <button onClick={onCancel} className="btn-secondary w-full sm:w-auto px-6 md:px-8 py-3 text-sm order-2 sm:order-1">Cancel</button>
             <button
                 onClick={handleSubmit}
-                disabled={isSubmitting || (!submissionText && !fileUrl && Object.keys(answers).length === 0)}
+                disabled={isSubmitting || (!submissionText && !fileUrl && (assignment.questions ? assignment.questions.length === 0 : true) && Object.keys(answers).length === 0)}
                 className="btn-primary w-full sm:w-auto px-8 md:px-10 py-3 text-sm disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2"
+                title={isSubmitting ? 'Submitting...' : 'Submit Assignment'}
             >
                 {isSubmitting ? 'Submitting...' : 'Submit Assignment'}
             </button>

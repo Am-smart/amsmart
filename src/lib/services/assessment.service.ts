@@ -300,11 +300,21 @@ export class AssessmentService {
         : (gradeData.grade ?? submission.grade ?? 0);
 
     const pointsPossible = assignment?.points_possible || 100;
-    const rawPercentage = Math.round((rawGrade / pointsPossible) * 100);
+    const rawPercentage = pointsPossible > 0 ? Math.round((rawGrade / pointsPossible) * 100) : 0;
     const finalGrade = Math.max(0, rawPercentage - latePenaltyApplied);
 
     const sanitized = AssessmentDomain.sanitizeEntity(gradeData);
     const { assignments: _assignments, users: _users, ...rest } = sanitized as Record<string, unknown>;
+
+    // Preserve only non-empty response_feedback entries
+    const preservedResponseFeedback: Record<string, string> = {};
+    if (gradeData.response_feedback) {
+        Object.entries(gradeData.response_feedback).forEach(([k, v]) => {
+            if (typeof v === 'string' && v.trim() !== '') {
+                preservedResponseFeedback[k] = v;
+            }
+        });
+    }
 
     const updated = await assessmentDb.upsertSubmission({
       ...rest,
@@ -312,6 +322,7 @@ export class AssessmentService {
       grade: rawGrade,
       late_penalty_applied: latePenaltyApplied,
       final_grade: finalGrade,
+      response_feedback: Object.keys(preservedResponseFeedback).length > 0 ? preservedResponseFeedback : undefined,
       ...(options.draft
         ? { status: submission.status }
         : { status: SUBMISSION_STATUS.GRADED, graded_at: new Date().toISOString() }),

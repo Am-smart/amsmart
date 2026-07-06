@@ -4,7 +4,7 @@ import React, { useState, useCallback } from 'react';
 import { Upload, X, FileText, CheckCircle, AlertCircle } from 'lucide-react';
 
 interface FileUploadProps {
-  onUploadComplete: (url: string, fileName: string) => void;
+  onUploadComplete: (url: string, fileName?: string) => void;
   onUploadError?: (error: Error) => void;
   category: 'materials' | 'submissions' | 'thumbnails';
   acceptedTypes?: string[];
@@ -73,7 +73,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       setProgress(100);
 
       setUploadedFile({ name: file.name, url: result.url });
-      onUploadComplete(result.url, file.name);
+      // Call with just the URL, fileName is optional
+      onUploadComplete(result.url);
     } catch (err) {
       if (progressInterval) clearInterval(progressInterval);
       const errorMsg = err instanceof Error ? err.message : 'Upload failed';
@@ -169,28 +170,33 @@ export const FileUpload: React.FC<FileUploadProps> = ({
           </div>
         </label>
       ) : (
-        <div className="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-2xl shadow-sm">
-          <div className="flex items-center gap-3 min-w-0">
+        <div className="flex items-center justify-between p-4 bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
             <div className="p-2 bg-green-100 text-green-600 rounded-lg shrink-0">
               <CheckCircle size={20} />
             </div>
-            <div className="min-w-0">
-              <p className="text-sm font-bold text-slate-900 truncate">{uploadedFile.name}</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-bold text-slate-900 truncate" title={uploadedFile.name}>{uploadedFile.name}</p>
               <p className="text-[10px] text-slate-500 font-medium uppercase">Upload Complete</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <a
-              href={uploadedFile.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-            >
-              <FileText size={18} />
-            </a>
+          <div className="flex items-center gap-2 shrink-0">
+            {uploadedFile.url && (
+              <a
+                href={uploadedFile.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                title="Open file in new tab"
+              >
+                <FileText size={18} />
+              </a>
+            )}
             <button
               onClick={clearUpload}
               className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+              title="Remove file"
+              type="button"
             >
               <X size={18} />
             </button>
