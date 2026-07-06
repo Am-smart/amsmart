@@ -287,7 +287,7 @@ export interface Submission {
   updated_at?: string;
   submission_text?: string;
   file_url?: string;
-  answers?: Record<string, string | number | boolean>;
+  answers?: Record<string, string | number | boolean | { mode: 'essay' | 'file' | 'link'; value: string }>;
   question_scores?: Record<string, number>;
   response_feedback?: Record<string, string>;
   late_penalty_applied?: number;
@@ -322,7 +322,7 @@ export interface SubmissionDTO {
   regrade_request?: string | null;
   submission_text?: string;
   file_url?: string;
-  answers?: Record<string, string | number | boolean>;
+  answers?: Record<string, string | number | boolean | { mode: 'essay' | 'file' | 'link'; value: string }>;
   question_scores?: Record<string, number>;
   response_feedback?: Record<string, string>;
   violation_count?: number;
