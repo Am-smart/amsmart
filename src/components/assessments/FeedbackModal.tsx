@@ -2,6 +2,12 @@ import React, { useState } from 'react';
 import { AssignmentDTO, SubmissionDTO, QuestionDTO } from '@/lib/types';
 import { X, MessageCircle, FileText, CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
 
+type RawAnswer = string | number | boolean | { mode: 'essay' | 'file' | 'link'; value: string } | undefined;
+const normalizeAnswer = (a: RawAnswer, fallbackType?: string): { mode: string; value: string } => {
+    if (a && typeof a === 'object' && 'mode' in a) return { mode: a.mode, value: a.value };
+    return { mode: fallbackType || 'essay', value: a === undefined || a === null ? '' : String(a) };
+};
+
 interface FeedbackModalProps {
     assignment: AssignmentDTO;
     submission: SubmissionDTO;
@@ -13,10 +19,10 @@ const QuestionAccordionItem: React.FC<{
     idx: number;
     isOpen: boolean;
     onToggle: () => void;
-    answer: string | number | boolean | undefined;
+    answer: RawAnswer;
     feedback: string | undefined
 }> = ({ q, idx, isOpen, onToggle, answer, feedback }) => {
-
+    const { mode, value } = normalizeAnswer(answer, q.type);
     return (
         <div className="border border-slate-100 rounded-2xl overflow-hidden hover:border-slate-200 transition-colors">
             <button
@@ -37,12 +43,14 @@ const QuestionAccordionItem: React.FC<{
                 <div className="px-6 pb-6 space-y-4 animate-in slide-in-from-top-2 duration-200">
                     <div className="bg-slate-50 rounded-xl p-4">
                         <div className="text-[10px] font-black text-slate-400 uppercase mb-2">Your Response</div>
-                        {q.type === 'file' ? (
-                            <a href={answer as string} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-blue-600 hover:underline text-sm font-bold">
+                        {mode === 'file' ? (
+                            <a href={value} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-blue-600 hover:underline text-sm font-bold">
                                 <FileText size={16} /> View Uploaded File
                             </a>
+                        ) : mode === 'link' ? (
+                            <a href={value} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm font-bold break-all">{value || <span className="italic text-slate-400 text-xs">No response provided</span>}</a>
                         ) : (
-                            <div className="text-sm text-slate-700">{answer as string || <span className="italic text-slate-400 text-xs">No response provided</span>}</div>
+                            <div className="text-sm text-slate-700 whitespace-pre-line">{value || <span className="italic text-slate-400 text-xs">No response provided</span>}</div>
                         )}
                     </div>
 
