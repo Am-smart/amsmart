@@ -184,7 +184,7 @@ export const QuizView: React.FC<QuizViewProps> = ({ quiz, user, onComplete, onCa
 
   return (
     <div className="fixed inset-0 bg-white z-50 overflow-y-auto overscroll-contain" aria-busy={isSubmitting}>
-      <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-slate-100">
+      <header className="sticky top-0 z-[9999] bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-md">
         <div className="max-w-3xl mx-auto px-4 md:px-8 py-3 md:py-4 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 md:gap-4">
           <div className="min-w-0">
             <h1 className="text-base md:text-xl font-bold truncate">{quiz.title}</h1>
