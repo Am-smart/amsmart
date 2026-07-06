@@ -47,8 +47,13 @@ export class AssessmentDomain {
             if (!q.text || q.text.trim().length === 0) {
                 throw new Error(`Question ${idx + 1} text is required`);
             }
-            if (!['essay', 'file', 'link'].includes(q.type)) {
-                throw new Error(`Invalid type for assignment question ${idx + 1}`);
+            const allowedModes: Array<'essay' | 'file' | 'link'> = ['essay', 'file', 'link'];
+            const modes = (q.types && q.types.length > 0) ? q.types : (q.type ? [q.type] : []);
+            if (modes.length === 0) {
+                throw new Error(`Question ${idx + 1} must allow at least one submission type`);
+            }
+            if (modes.some((m) => !allowedModes.includes(m))) {
+                throw new Error(`Invalid submission type for question ${idx + 1}`);
             }
             totalPoints += q.points || 0;
         });
