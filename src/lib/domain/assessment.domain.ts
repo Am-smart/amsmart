@@ -179,8 +179,11 @@ export class AssessmentDomain {
     const questions = assignment.questions as { id: string; text: string; points: number }[];
     if (gradeData.question_scores && questions) {
         let calculatedTotal = 0;
+        const questionScoresMap = gradeData.question_scores || {};
+        
+        // Validate each question score independently
         questions.forEach((q) => {
-            const score = gradeData.question_scores?.[q.id];
+            const score = questionScoresMap[q.id];
             if (score !== undefined) {
                 if (score < 0) {
                     throw new Error(`Score for question "${q.text}" cannot be negative.`);
@@ -192,6 +195,8 @@ export class AssessmentDomain {
             }
         });
 
+        // If grade is provided, validate it matches the calculated total
+        // If grade is not provided, backend will calculate it from question_scores
         if (gradeData.grade !== undefined && Math.abs(Number(gradeData.grade) - calculatedTotal) > 0.01) {
             throw new Error(`Total grade (${gradeData.grade}) does not match the sum of question scores (${calculatedTotal}).`);
         }

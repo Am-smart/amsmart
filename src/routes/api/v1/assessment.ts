@@ -121,8 +121,13 @@ const PATCH = withHandler(async (user, request) => {
   switch (action) {
     case "grade-submission": {
       if (!rbac.can(user, "assignment:grade")) throw new UnauthorizedError();
+      // Validate grade if provided (not required when using question_scores)
       if (data.grade !== undefined && (data.grade < 0 || data.grade > 100)) {
         throw new BadRequestError("Grade must be between 0 and 100");
+      }
+      // Validate that at least question_scores or grade is provided
+      if (data.grade === undefined && (!data.question_scores || Object.keys(data.question_scores).length === 0)) {
+        throw new BadRequestError("Either grade or question_scores must be provided");
       }
       const draft = searchParams.get("draft") === "true";
       await assessmentService.gradeSubmission(id, data, user.sessionId!, user.id, user.role, { draft });
