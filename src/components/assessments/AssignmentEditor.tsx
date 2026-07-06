@@ -89,7 +89,7 @@ export const AssignmentEditor: React.FC<AssignmentEditorProps> = ({ teacherId, a
     const addStep = () => {
         setFormData({
             ...formData,
-            questions: [...formData.questions, { id: crypto.randomUUID(), text: '', type: 'essay', points: 10 }]
+            questions: [...formData.questions, { id: crypto.randomUUID(), text: '', type: 'essay', types: ['essay'], points: 10 }]
         });
     };
 
@@ -307,31 +307,53 @@ export const AssignmentEditor: React.FC<AssignmentEditorProps> = ({ teacherId, a
                         </div>
                         {formData.questions.map((q, index) => (
                             <div key={index} className="p-6 bg-slate-50 rounded-2xl border-2 border-slate-100 space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <select
-                                        value={q.type}
-                                        onChange={e => {
-                                            const updated = [...formData.questions];
-                                            updated[index].type = e.target.value as 'essay' | 'file' | 'link';
-                                            setFormData({ ...formData, questions: updated });
-                                        }}
-                                        className="p-3 rounded-xl border border-slate-200 bg-white text-sm"
-                                    >
-                                        <option value="essay">Written Response</option>
-                                        <option value="file">File Upload</option>
-                                        <option value="link">Link Submission</option>
-                                    </select>
-                                    <input
-                                        type="number"
-                                        value={q.points}
-                                        onChange={e => {
-                                            const updated = [...formData.questions];
-                                            updated[index].points = Number(e.target.value);
-                                            setFormData({ ...formData, questions: updated });
-                                        }}
-                                        className="p-3 rounded-xl border border-slate-200 bg-white text-sm"
-                                        placeholder="Points"
-                                    />
+                                <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-4">
+                                    <div>
+                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Allowed Submission Types</div>
+                                        <div className="flex flex-wrap gap-2">
+                                            {([
+                                                { key: 'essay', label: 'Written' },
+                                                { key: 'file', label: 'File Upload' },
+                                                { key: 'link', label: 'Link' },
+                                            ] as const).map(opt => {
+                                                const current = (q.types && q.types.length > 0 ? q.types : [q.type]).filter(Boolean) as Array<'essay' | 'file' | 'link'>;
+                                                const checked = current.includes(opt.key);
+                                                return (
+                                                    <label key={opt.key} className={`flex items-center gap-2 px-3 py-2 rounded-xl border-2 cursor-pointer text-sm font-semibold transition-all ${checked ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}>
+                                                        <input
+                                                            type="checkbox"
+                                                            className="w-4 h-4"
+                                                            checked={checked}
+                                                            onChange={e => {
+                                                                const updated = [...formData.questions];
+                                                                let next = new Set(current);
+                                                                if (e.target.checked) next.add(opt.key); else next.delete(opt.key);
+                                                                if (next.size === 0) next = new Set([opt.key]); // must keep at least one
+                                                                const arr = Array.from(next);
+                                                                updated[index] = { ...updated[index], types: arr, type: arr[0] };
+                                                                setFormData({ ...formData, questions: updated });
+                                                            }}
+                                                        />
+                                                        {opt.label}
+                                                    </label>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Points</div>
+                                        <input
+                                            type="number"
+                                            value={q.points}
+                                            onChange={e => {
+                                                const updated = [...formData.questions];
+                                                updated[index].points = Number(e.target.value);
+                                                setFormData({ ...formData, questions: updated });
+                                            }}
+                                            className="w-full sm:w-32 p-3 rounded-xl border border-slate-200 bg-white text-sm"
+                                            placeholder="Points"
+                                        />
+                                    </div>
                                 </div>
                                 <textarea
                                     value={q.text}
