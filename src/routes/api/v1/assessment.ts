@@ -61,6 +61,14 @@ const POST = withHandler(async (user, request) => {
       const { assignmentId, ...content } = data;
       if (!assignmentId) throw new BadRequestError("assignmentId is required");
       AssessmentDomain.validateSubmission(content);
+      
+      // Fetch assignment to validate answer modes against allowed submission types
+      const { assessmentDb } = await import('@/lib/database/assessment.db.server');
+      const assignment = await assessmentDb.findAssignmentById(assignmentId, user.sessionId!);
+      if (assignment?.questions && content.answers) {
+        AssessmentDomain.validateAnswerModes(content.answers, assignment.questions);
+      }
+      
       const sub = await assessmentService.submitAssignment(user.id, assignmentId, content, user.sessionId!);
       return AssessmentMapper.toSubmissionDTO(sub);
     }

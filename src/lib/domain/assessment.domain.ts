@@ -23,8 +23,31 @@ export class AssessmentDomain {
   }
 
   static validateSubmission(submission: Partial<Submission>) {
-    if (!submission.submission_text && !submission.file_url) {
-      throw new Error('Submission must include either text or a file');
+    if (!submission.submission_text && !submission.file_url && (!submission.answers || Object.keys(submission.answers).length === 0)) {
+      throw new Error('Submission must include either text, a file, or at least one answer');
+    }
+  }
+
+  /**
+   * Validates that each answer's mode matches the question's allowed types.
+   * Used server-side to enforce submission mode constraints.
+   */
+  static validateAnswerModes(answers: Record<string, any>, questions: { id: string; type?: string; types?: string[] }[]): void {
+    const allowedModes = new Set<string>(['essay', 'file', 'link']);
+
+    for (const question of questions) {
+      const answer = answers[question.id];
+      if (!answer) continue;
+
+      // If answer is already in {mode, value} shape, validate the mode
+      if (answer && typeof answer === 'object' && 'mode' in answer && 'value' in answer) {
+        const questionModes = (question.types && question.types.length > 0) ? question.types : (question.type ? [question.type] : ['essay']);
+        const validModes = questionModes.filter((m): m is 'essay' | 'file' | 'link' => allowedModes.has(m));
+        
+        if (!validModes.includes(answer.mode)) {
+          throw new Error(`Invalid submission mode "${answer.mode}" for question "${question.id}". Allowed: ${validModes.join(', ')}`);
+        }
+      }
     }
   }
 
@@ -199,12 +222,28 @@ export class AssessmentDomain {
 
   static prepareSubmission(studentId: string, assignmentId: string, content: Partial<Submission>): Partial<Submission> {
     const rest = this.sanitizeEntity(content);
+    
+    // Normalize answers to ensure consistent {mode, value} shape
+    const normalizedAnswers: Record<string, any> = {};
+    if (rest.answers && typeof rest.answers === 'object') {
+        Object.entries(rest.answers).forEach(([key, answer]) => {
+            if (answer && typeof answer === 'object' && 'mode' in answer && 'value' in answer) {
+                // Already in {mode, value} shape
+                normalizedAnswers[key] = answer;
+            } else if (typeof answer === 'string' || typeof answer === 'number') {
+                // Convert primitive to {mode, value} with default essay mode
+                normalizedAnswers[key] = { mode: 'essay', value: String(answer) };
+            }
+        });
+    }
+    
     return {
       ...rest,
       assignment_id: assignmentId,
       student_id: studentId,
       submitted_at: new Date().toISOString(),
-      status: SUBMISSION_STATUS.SUBMITTED
+      status: SUBMISSION_STATUS.SUBMITTED,
+      answers: Object.keys(normalizedAnswers).length > 0 ? normalizedAnswers : rest.answers
     };
   }
 

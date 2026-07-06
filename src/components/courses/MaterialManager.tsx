@@ -95,7 +95,7 @@ export const MaterialManager: React.FC<MaterialManagerProps> = ({ initialMateria
                                 <FileUpload
                                     category="materials"
                                     uploadFn={performUpload}
-                                    onUploadComplete={(url, name) => handleUploadComplete(url, name)}
+                                    onUploadComplete={(url) => handleUploadComplete(url, 'Uploaded Material')}
                                     label="Upload Material"
                                     className="!min-h-0"
                                 />
