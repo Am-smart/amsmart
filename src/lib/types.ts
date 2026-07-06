@@ -175,6 +175,8 @@ export interface QuestionDTO {
   id: string;
   text: string;
   type: 'mcq' | 'tf' | 'short' | 'essay' | 'file' | 'link';
+  /** Assignment-only: allowed submission modes when multiple are permitted. */
+  types?: ('essay' | 'file' | 'link')[];
   points: number;
   options?: string[];
   correct_answer?: string | number;
@@ -211,7 +213,10 @@ export interface AssignmentDTO {
 export interface AssignmentQuestion {
   id: string;
   text: string;
+  /** Legacy single-mode field. Prefer `types` for new questions. */
   type: 'essay' | 'file' | 'link';
+  /** Allowed submission modes. If set and length > 1, students may choose. */
+  types?: ('essay' | 'file' | 'link')[];
   points: number;
   correct_answer?: string | number;
   extensions?: string;
