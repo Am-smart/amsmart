@@ -46,11 +46,27 @@ export const GradingModal: React.FC<GradingModalProps> = ({ submission, onSave, 
 
     const questions = submission.assignment?.questions || [];
 
+    // Validate question IDs are unique and present
+    if (questions.length > 0) {
+        const questionIds = questions.map(q => q.id);
+        const uniqueIds = new Set(questionIds);
+        if (uniqueIds.size !== questionIds.length) {
+            console.error('[v0] Duplicate question IDs detected:', questionIds);
+        }
+        if (questionIds.some(id => !id || typeof id !== 'string')) {
+            console.error('[v0] Invalid question IDs found:', questionIds);
+        }
+    }
+
     // Local string state so users can freely clear/type in score inputs
     // without values snapping back to 0 mid-edit.
     const [scoreInputs, setScoreInputs] = useState<Record<string, string>>(() => {
         const initial: Record<string, string> = {};
         questions.forEach((q) => {
+            if (!q.id) {
+                console.error('[v0] Question missing ID:', q);
+                return;
+            }
             const v = submission.question_scores?.[q.id];
             initial[q.id] = v === undefined || v === null ? '' : String(v);
         });
@@ -107,12 +123,18 @@ export const GradingModal: React.FC<GradingModalProps> = ({ submission, onSave, 
                 }
             });
 
+            // When using per-question scoring, don't send grade - let backend calculate from question_scores
+            // This prevents mismatch errors when question IDs change or questions are reordered
             const gradeData: Partial<SubmissionDTO> = {
-                grade: rawGrade,
                 feedback: formData.feedback,
                 response_feedback: responseFeedback,
                 question_scores: finalQuestionScores,
             };
+            
+            // Only include grade if not using question_scores or if using draft mode
+            if (Object.keys(finalQuestionScores).length === 0) {
+                gradeData.grade = rawGrade;
+            }
 
             if (mode === 'final' && questions.length > 0 && !allScored) {
                 addToast('Please score every question before submitting the final grade.', 'error');
