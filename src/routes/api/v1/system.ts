@@ -94,7 +94,7 @@ const GET = withHandler(async (user, request) => {
     }
     case "lesson-completions": {
       const userId = searchParams.get("userId") || user.id;
-      return learningService.getLessonCompletions(userId, user.sessionId!);
+      return learningService.getLessonCompletions(userId, user.sessionId!, user);
     }
     case "stats":
       if (!rbac.can(user, "system:manage")) throw new UnauthorizedError();
