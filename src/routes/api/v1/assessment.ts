@@ -38,26 +38,14 @@ const GET = withHandler(async (user, request) => {
       const courseId = searchParams.get("courseId") || undefined;
       const subs = await assessmentService.getSubmissions(assignmentId, studentId, user.sessionId!, limit, offset, user.id, user.role, status, courseId);
       const dtos = subs.map(AssessmentMapper.toSubmissionDTO);
-      // Hide in-progress/draft grades and teacher feedback from students until finalized
-      if (user.role === "student") {
-        return dtos.map((d: any) => {
-          if (d && d.status !== "graded") {
-            const {
-              grade: _g,
-              final_grade: _fg,
-              late_penalty_applied: _lp,
-              feedback: _fb,
-              response_feedback: _rfb,
-              question_scores: _qs,
-              graded_at: _ga,
-              ...safe
-            } = d;
-            return safe;
-          }
-          return d;
-        });
-      }
-      return dtos;
+      // Hide draft grades, teacher feedback, and per-question scores from any
+      // viewer without grading authority until the submission is finalized.
+      // Admins always see grading data; teachers see it only for submissions
+      // scoped to assignments they own (already enforced upstream in
+      // assessmentService.getSubmissions, so their view is safe).
+      const canSeeDraftGrading = user.role === "admin" || user.role === "teacher";
+      if (canSeeDraftGrading) return dtos;
+      return dtos.map((d) => AssessmentMapper.stripUnfinalizedGrading(d));
     }
     default:
       throw new BadRequestError("Invalid GET action");
@@ -90,7 +78,11 @@ const POST = withHandler(async (user, request) => {
       }
       
       const sub = await assessmentService.submitAssignment(user.id, assignmentId, content, user.sessionId!);
-      return AssessmentMapper.toSubmissionDTO(sub);
+      // Never echo grading fields back on a fresh student submission —
+      // if a legacy draft record carried them, strip before returning.
+      return AssessmentMapper.stripUnfinalizedGrading(
+        AssessmentMapper.toSubmissionDTO(sub)
+      );
     }
     case "save-quiz": {
       if (!rbac.can(user, "quiz:manage")) throw new UnauthorizedError();

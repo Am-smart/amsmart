@@ -113,6 +113,29 @@ export class AssessmentMapper {
     };
   }
 
+  /**
+   * Strip draft/unfinalized grading fields from a submission DTO.
+   * Use for any viewer without grading authority over the submission
+   * (students, non-owning teachers, other roles) whenever the submission
+   * is not in a finalized "graded" state.
+   */
+  static stripUnfinalizedGrading<T extends Partial<SubmissionDTO> | null | undefined>(dto: T): T {
+    if (!dto || dto.status === 'graded') return dto;
+    const {
+      grade: _g,
+      final_grade: _fg,
+      late_penalty_applied: _lp,
+      feedback: _fb,
+      response_feedback: _rfb,
+      question_scores: _qs,
+      graded_at: _ga,
+      graded_by: _gb,
+      ...safe
+    } = dto as Record<string, unknown>;
+    return safe as T;
+  }
+
+
   static toQuizSubmissionDTO(submission: QuizSubmission): QuizSubmissionDTO {
     return {
       ...toCleanDTO<QuizSubmissionDTO>(submission),
