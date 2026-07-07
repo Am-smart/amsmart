@@ -135,12 +135,6 @@ export class AssessmentMapper {
     return safe as T;
   }
 
-  static toQuizSubmissionSafeDTO(submission: QuizSubmission): QuizSubmissionDTO {
-    const dto = AssessmentMapper.toQuizSubmissionDTO(submission);
-    if (dto.status === 'graded') return dto;
-    const { score: _s, total_points: _tp, ...safe } = dto as Record<string, unknown>;
-    return safe as QuizSubmissionDTO;
-  }
 
   static toQuizSubmissionDTO(submission: QuizSubmission): QuizSubmissionDTO {
     return {
