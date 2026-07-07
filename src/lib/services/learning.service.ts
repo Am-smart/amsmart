@@ -213,7 +213,13 @@ export class LearningService {
     return { success: true };
   }
 
-  async getLessonCompletions(studentId: string, sessionId: string): Promise<LessonCompletion[]> {
+  async getLessonCompletions(studentId: string, sessionId: string, currentUser?: User): Promise<LessonCompletion[]> {
+    if (currentUser && currentUser.id !== studentId) {
+      // Only admins/teachers may view another user's lesson completion history
+      if (currentUser.role !== 'admin' && currentUser.role !== 'teacher') {
+        throw new ForbiddenError('Unauthorized: You can only view your own lesson completions');
+      }
+    }
     return (await learningDb.getLessonCompletions(studentId, sessionId)) as LessonCompletion[];
   }
 }
