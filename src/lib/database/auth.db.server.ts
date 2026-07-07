@@ -76,7 +76,8 @@ export const authDb = {
   async findAllSessions(sessionId: string, userId?: string): Promise<Session[]> {
     // Prefer RLS-enforced client
     const client = (sessionId && adminClient) ? supabase : (adminClient || supabase);
-    let query = client.from('sessions').select('*');
+    // Explicitly omit sensitive columns (token_hash, ip_address) from client-facing reads
+    let query = client.from('sessions').select('id, user_id, created_at, expires_at, user_agent');
     if (sessionId) query = withSession(query, sessionId);
     if (userId) query = query.eq('user_id', userId);
     const { data, error } = await query;
