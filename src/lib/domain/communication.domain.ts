@@ -17,9 +17,10 @@ export class CommunicationDomain {
   }
 
   static prepareDiscussion(post: Partial<Discussion>, userId: string): Partial<Discussion> {
+    // Never trust client-supplied user_id — always use the authenticated user's id
     return {
       ...post,
-      user_id: post.user_id || userId
+      user_id: userId,
     };
   }
 

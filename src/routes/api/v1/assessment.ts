@@ -37,7 +37,27 @@ const GET = withHandler(async (user, request) => {
       const status = searchParams.get("status") || undefined;
       const courseId = searchParams.get("courseId") || undefined;
       const subs = await assessmentService.getSubmissions(assignmentId, studentId, user.sessionId!, limit, offset, user.id, user.role, status, courseId);
-      return subs.map(AssessmentMapper.toSubmissionDTO);
+      const dtos = subs.map(AssessmentMapper.toSubmissionDTO);
+      // Hide in-progress/draft grades and teacher feedback from students until finalized
+      if (user.role === "student") {
+        return dtos.map((d: any) => {
+          if (d && d.status !== "graded") {
+            const {
+              grade: _g,
+              final_grade: _fg,
+              late_penalty_applied: _lp,
+              feedback: _fb,
+              response_feedback: _rfb,
+              question_scores: _qs,
+              graded_at: _ga,
+              ...safe
+            } = d;
+            return safe;
+          }
+          return d;
+        });
+      }
+      return dtos;
     }
     default:
       throw new BadRequestError("Invalid GET action");
