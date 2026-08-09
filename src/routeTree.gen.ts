@@ -32,6 +32,7 @@ import { Route as TeacherAssignmentsRouteImport } from './routes/teacher/assignm
 import { Route as TeacherAntiCheatRouteImport } from './routes/teacher/anti-cheat'
 import { Route as StudentSettingsRouteImport } from './routes/student/settings'
 import { Route as StudentQuizzesRouteImport } from './routes/student/quizzes'
+import { Route as StudentProgressRouteImport } from './routes/student/progress'
 import { Route as StudentPlannerRouteImport } from './routes/student/planner'
 import { Route as StudentMyCoursesRouteImport } from './routes/student/my-courses'
 import { Route as StudentMaterialsRouteImport } from './routes/student/materials'
@@ -40,6 +41,7 @@ import { Route as StudentHelpRouteImport } from './routes/student/help'
 import { Route as StudentGradesRouteImport } from './routes/student/grades'
 import { Route as StudentDiscussionsRouteImport } from './routes/student/discussions'
 import { Route as StudentCoursesRouteImport } from './routes/student/courses'
+import { Route as StudentCertificatesRouteImport } from './routes/student/certificates'
 import { Route as StudentCalendarRouteImport } from './routes/student/calendar'
 import { Route as StudentAssignmentsRouteImport } from './routes/student/assignments'
 import { Route as StudentAntiCheatRouteImport } from './routes/student/anti-cheat'
@@ -178,6 +180,11 @@ const StudentQuizzesRoute = StudentQuizzesRouteImport.update({
   path: '/quizzes',
   getParentRoute: () => StudentRouteRoute,
 } as any)
+const StudentProgressRoute = StudentProgressRouteImport.update({
+  id: '/progress',
+  path: '/progress',
+  getParentRoute: () => StudentRouteRoute,
+} as any)
 const StudentPlannerRoute = StudentPlannerRouteImport.update({
   id: '/planner',
   path: '/planner',
@@ -216,6 +223,11 @@ const StudentDiscussionsRoute = StudentDiscussionsRouteImport.update({
 const StudentCoursesRoute = StudentCoursesRouteImport.update({
   id: '/courses',
   path: '/courses',
+  getParentRoute: () => StudentRouteRoute,
+} as any)
+const StudentCertificatesRoute = StudentCertificatesRouteImport.update({
+  id: '/certificates',
+  path: '/certificates',
   getParentRoute: () => StudentRouteRoute,
 } as any)
 const StudentCalendarRoute = StudentCalendarRouteImport.update({
@@ -350,6 +362,7 @@ export interface FileRoutesByFullPath {
   '/student/anti-cheat': typeof StudentAntiCheatRoute
   '/student/assignments': typeof StudentAssignmentsRoute
   '/student/calendar': typeof StudentCalendarRoute
+  '/student/certificates': typeof StudentCertificatesRoute
   '/student/courses': typeof StudentCoursesRoute
   '/student/discussions': typeof StudentDiscussionsRoute
   '/student/grades': typeof StudentGradesRoute
@@ -358,6 +371,7 @@ export interface FileRoutesByFullPath {
   '/student/materials': typeof StudentMaterialsRoute
   '/student/my-courses': typeof StudentMyCoursesRoute
   '/student/planner': typeof StudentPlannerRoute
+  '/student/progress': typeof StudentProgressRoute
   '/student/quizzes': typeof StudentQuizzesRoute
   '/student/settings': typeof StudentSettingsRoute
   '/teacher/anti-cheat': typeof TeacherAntiCheatRoute
@@ -402,6 +416,7 @@ export interface FileRoutesByTo {
   '/student/anti-cheat': typeof StudentAntiCheatRoute
   '/student/assignments': typeof StudentAssignmentsRoute
   '/student/calendar': typeof StudentCalendarRoute
+  '/student/certificates': typeof StudentCertificatesRoute
   '/student/courses': typeof StudentCoursesRoute
   '/student/discussions': typeof StudentDiscussionsRoute
   '/student/grades': typeof StudentGradesRoute
@@ -410,6 +425,7 @@ export interface FileRoutesByTo {
   '/student/materials': typeof StudentMaterialsRoute
   '/student/my-courses': typeof StudentMyCoursesRoute
   '/student/planner': typeof StudentPlannerRoute
+  '/student/progress': typeof StudentProgressRoute
   '/student/quizzes': typeof StudentQuizzesRoute
   '/student/settings': typeof StudentSettingsRoute
   '/teacher/anti-cheat': typeof TeacherAntiCheatRoute
@@ -458,6 +474,7 @@ export interface FileRoutesById {
   '/student/anti-cheat': typeof StudentAntiCheatRoute
   '/student/assignments': typeof StudentAssignmentsRoute
   '/student/calendar': typeof StudentCalendarRoute
+  '/student/certificates': typeof StudentCertificatesRoute
   '/student/courses': typeof StudentCoursesRoute
   '/student/discussions': typeof StudentDiscussionsRoute
   '/student/grades': typeof StudentGradesRoute
@@ -466,6 +483,7 @@ export interface FileRoutesById {
   '/student/materials': typeof StudentMaterialsRoute
   '/student/my-courses': typeof StudentMyCoursesRoute
   '/student/planner': typeof StudentPlannerRoute
+  '/student/progress': typeof StudentProgressRoute
   '/student/quizzes': typeof StudentQuizzesRoute
   '/student/settings': typeof StudentSettingsRoute
   '/teacher/anti-cheat': typeof TeacherAntiCheatRoute
@@ -515,6 +533,7 @@ export interface FileRouteTypes {
     | '/student/anti-cheat'
     | '/student/assignments'
     | '/student/calendar'
+    | '/student/certificates'
     | '/student/courses'
     | '/student/discussions'
     | '/student/grades'
@@ -523,6 +542,7 @@ export interface FileRouteTypes {
     | '/student/materials'
     | '/student/my-courses'
     | '/student/planner'
+    | '/student/progress'
     | '/student/quizzes'
     | '/student/settings'
     | '/teacher/anti-cheat'
@@ -567,6 +587,7 @@ export interface FileRouteTypes {
     | '/student/anti-cheat'
     | '/student/assignments'
     | '/student/calendar'
+    | '/student/certificates'
     | '/student/courses'
     | '/student/discussions'
     | '/student/grades'
@@ -575,6 +596,7 @@ export interface FileRouteTypes {
     | '/student/materials'
     | '/student/my-courses'
     | '/student/planner'
+    | '/student/progress'
     | '/student/quizzes'
     | '/student/settings'
     | '/teacher/anti-cheat'
@@ -622,6 +644,7 @@ export interface FileRouteTypes {
     | '/student/anti-cheat'
     | '/student/assignments'
     | '/student/calendar'
+    | '/student/certificates'
     | '/student/courses'
     | '/student/discussions'
     | '/student/grades'
@@ -630,6 +653,7 @@ export interface FileRouteTypes {
     | '/student/materials'
     | '/student/my-courses'
     | '/student/planner'
+    | '/student/progress'
     | '/student/quizzes'
     | '/student/settings'
     | '/teacher/anti-cheat'
@@ -837,6 +861,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentQuizzesRouteImport
       parentRoute: typeof StudentRouteRoute
     }
+    '/student/progress': {
+      id: '/student/progress'
+      path: '/progress'
+      fullPath: '/student/progress'
+      preLoaderRoute: typeof StudentProgressRouteImport
+      parentRoute: typeof StudentRouteRoute
+    }
     '/student/planner': {
       id: '/student/planner'
       path: '/planner'
@@ -891,6 +922,13 @@ declare module '@tanstack/react-router' {
       path: '/courses'
       fullPath: '/student/courses'
       preLoaderRoute: typeof StudentCoursesRouteImport
+      parentRoute: typeof StudentRouteRoute
+    }
+    '/student/certificates': {
+      id: '/student/certificates'
+      path: '/certificates'
+      fullPath: '/student/certificates'
+      preLoaderRoute: typeof StudentCertificatesRouteImport
       parentRoute: typeof StudentRouteRoute
     }
     '/student/calendar': {
@@ -1085,6 +1123,7 @@ interface StudentRouteRouteChildren {
   StudentAntiCheatRoute: typeof StudentAntiCheatRoute
   StudentAssignmentsRoute: typeof StudentAssignmentsRoute
   StudentCalendarRoute: typeof StudentCalendarRoute
+  StudentCertificatesRoute: typeof StudentCertificatesRoute
   StudentCoursesRoute: typeof StudentCoursesRoute
   StudentDiscussionsRoute: typeof StudentDiscussionsRoute
   StudentGradesRoute: typeof StudentGradesRoute
@@ -1093,6 +1132,7 @@ interface StudentRouteRouteChildren {
   StudentMaterialsRoute: typeof StudentMaterialsRoute
   StudentMyCoursesRoute: typeof StudentMyCoursesRoute
   StudentPlannerRoute: typeof StudentPlannerRoute
+  StudentProgressRoute: typeof StudentProgressRoute
   StudentQuizzesRoute: typeof StudentQuizzesRoute
   StudentSettingsRoute: typeof StudentSettingsRoute
   StudentIndexRoute: typeof StudentIndexRoute
@@ -1103,6 +1143,7 @@ const StudentRouteRouteChildren: StudentRouteRouteChildren = {
   StudentAntiCheatRoute: StudentAntiCheatRoute,
   StudentAssignmentsRoute: StudentAssignmentsRoute,
   StudentCalendarRoute: StudentCalendarRoute,
+  StudentCertificatesRoute: StudentCertificatesRoute,
   StudentCoursesRoute: StudentCoursesRoute,
   StudentDiscussionsRoute: StudentDiscussionsRoute,
   StudentGradesRoute: StudentGradesRoute,
@@ -1111,6 +1152,7 @@ const StudentRouteRouteChildren: StudentRouteRouteChildren = {
   StudentMaterialsRoute: StudentMaterialsRoute,
   StudentMyCoursesRoute: StudentMyCoursesRoute,
   StudentPlannerRoute: StudentPlannerRoute,
+  StudentProgressRoute: StudentProgressRoute,
   StudentQuizzesRoute: StudentQuizzesRoute,
   StudentSettingsRoute: StudentSettingsRoute,
   StudentIndexRoute: StudentIndexRoute,
