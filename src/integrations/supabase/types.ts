@@ -241,6 +241,88 @@ export type Database = {
           },
         ]
       }
+      certificates: {
+        Row: {
+          code: string
+          course_id: string
+          course_title: string | null
+          created_at: string
+          final_grade: number | null
+          id: string
+          issued_at: string
+          issued_by: string | null
+          metadata: Json
+          pdf_url: string | null
+          recipient_name: string | null
+          revoked_at: string | null
+          revoked_reason: string | null
+          template: string
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          code: string
+          course_id: string
+          course_title?: string | null
+          created_at?: string
+          final_grade?: number | null
+          id?: string
+          issued_at?: string
+          issued_by?: string | null
+          metadata?: Json
+          pdf_url?: string | null
+          recipient_name?: string | null
+          revoked_at?: string | null
+          revoked_reason?: string | null
+          template?: string
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          course_id?: string
+          course_title?: string | null
+          created_at?: string
+          final_grade?: number | null
+          id?: string
+          issued_at?: string
+          issued_by?: string | null
+          metadata?: Json
+          pdf_url?: string | null
+          recipient_name?: string | null
+          revoked_at?: string | null
+          revoked_reason?: string | null
+          template?: string
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificates_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "certificates_issued_by_fkey"
+            columns: ["issued_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "certificates_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courses: {
         Row: {
           created_at: string | null
@@ -291,6 +373,39 @@ export type Database = {
           {
             foreignKeyName: "courses_teacher_id_fkey"
             columns: ["teacher_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      discussion_views: {
+        Row: {
+          discussion_id: string
+          last_viewed_at: string
+          user_id: string
+        }
+        Insert: {
+          discussion_id: string
+          last_viewed_at?: string
+          user_id: string
+        }
+        Update: {
+          discussion_id?: string
+          last_viewed_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "discussion_views_discussion_id_fkey"
+            columns: ["discussion_id"]
+            isOneToOne: false
+            referencedRelation: "discussions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "discussion_views_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
@@ -482,6 +597,7 @@ export type Database = {
           id: string
           order_index: number | null
           title: string
+          topic_id: string | null
           updated_at: string | null
           version: number | null
           video_url: string | null
@@ -493,6 +609,7 @@ export type Database = {
           id?: string
           order_index?: number | null
           title: string
+          topic_id?: string | null
           updated_at?: string | null
           version?: number | null
           video_url?: string | null
@@ -504,6 +621,7 @@ export type Database = {
           id?: string
           order_index?: number | null
           title?: string
+          topic_id?: string | null
           updated_at?: string | null
           version?: number | null
           video_url?: string | null
@@ -514,6 +632,13 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lessons_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
             referencedColumns: ["id"]
           },
         ]
@@ -1034,6 +1159,70 @@ export type Database = {
         }
         Relationships: []
       }
+      study_sessions: {
+        Row: {
+          course_id: string | null
+          created_at: string
+          ended_at: string | null
+          focus_seconds: number
+          id: string
+          idle_seconds: number
+          label: string | null
+          lesson_id: string | null
+          started_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string
+          ended_at?: string | null
+          focus_seconds?: number
+          id?: string
+          idle_seconds?: number
+          label?: string | null
+          lesson_id?: string | null
+          started_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string
+          ended_at?: string | null
+          focus_seconds?: number
+          id?: string
+          idle_seconds?: number
+          label?: string | null
+          lesson_id?: string | null
+          started_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_sessions_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "study_sessions_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "study_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       submissions: {
         Row: {
           answers: Json | null
@@ -1232,6 +1421,44 @@ export type Database = {
           },
         ]
       }
+      topics: {
+        Row: {
+          course_id: string
+          created_at: string
+          description: string | null
+          id: string
+          order_index: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          order_index?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          order_index?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "topics_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           active: boolean | null
@@ -1295,6 +1522,65 @@ export type Database = {
         }
         Relationships: []
       }
+      violations: {
+        Row: {
+          assessment_id: string | null
+          assessment_title: string | null
+          assessment_type: string
+          created_at: string
+          evidence_url: string | null
+          id: string
+          kind: string
+          message: string | null
+          payload: Json
+          session_id: string
+          severity: string
+          timestamp: string
+          user_email: string | null
+          user_id: string | null
+        }
+        Insert: {
+          assessment_id?: string | null
+          assessment_title?: string | null
+          assessment_type?: string
+          created_at?: string
+          evidence_url?: string | null
+          id?: string
+          kind: string
+          message?: string | null
+          payload?: Json
+          session_id: string
+          severity?: string
+          timestamp?: string
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          assessment_id?: string | null
+          assessment_title?: string | null
+          assessment_type?: string
+          created_at?: string
+          evidence_url?: string | null
+          id?: string
+          kind?: string
+          message?: string | null
+          payload?: Json
+          session_id?: string
+          severity?: string
+          timestamp?: string
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "violations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -1302,6 +1588,24 @@ export type Database = {
     Functions: {
       current_app_role: { Args: never; Returns: string }
       current_app_user: { Args: never; Returns: string }
+      get_active_proctored_sessions: {
+        Args: never
+        Returns: {
+          assessment_id: string
+          assessment_title: string
+          assessment_type: string
+          full_name: string
+          high_severity_count: number
+          is_online: boolean
+          last_activity: string
+          session_id: string
+          started_at: string
+          status: string
+          user_email: string
+          user_id: string
+          violation_count: number
+        }[]
+      }
       get_user_role: { Args: { p_user_id: string }; Returns: string }
       is_admin: { Args: { p_user_id: string }; Returns: boolean }
       is_assignment_teacher: {
