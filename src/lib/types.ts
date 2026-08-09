@@ -808,3 +808,155 @@ export function isQuizDTO(obj: unknown): obj is QuizDTO {
     return (obj as QuizDTO)?.questions !== undefined &&
            (obj as QuizDTO)?.attempts_allowed !== undefined;
 }
+
+// ============================================================================
+// Certificates
+// ============================================================================
+export interface Certificate {
+  id: string;
+  user_id: string;
+  course_id: string;
+  code: string;
+  title?: string | null;
+  recipient_name?: string | null;
+  course_title?: string | null;
+  final_grade?: number | null;
+  template: string;
+  pdf_url?: string | null;
+  issued_by?: string | null;
+  issued_at: string;
+  revoked_at?: string | null;
+  revoked_reason?: string | null;
+  metadata?: Record<string, unknown>;
+  created_at?: string;
+  updated_at?: string;
+  users?: { full_name: string; email: string };
+  courses?: { title: string };
+}
+
+export interface CertificateDTO {
+  id: string;
+  user_id: string;
+  course_id: string;
+  code: string;
+  title: string;
+  recipient_name: string;
+  course_title: string;
+  final_grade: number | null;
+  template: string;
+  pdf_url: string | null;
+  issued_at: string;
+  revoked: boolean;
+  revoked_reason: string | null;
+}
+
+// ============================================================================
+// Proctoring violations
+// ============================================================================
+export type ViolationSeverity = 'INFO' | 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+
+export interface Violation {
+  id?: string;
+  session_id: string;
+  user_id?: string | null;
+  user_email?: string | null;
+  assessment_id?: string | null;
+  assessment_type: string;
+  assessment_title?: string | null;
+  kind: string;
+  severity: ViolationSeverity;
+  message?: string | null;
+  payload?: Record<string, unknown>;
+  evidence_url?: string | null;
+  timestamp: string;
+  created_at?: string;
+  users?: { full_name: string; email: string };
+}
+
+export interface ViolationDTO {
+  id: string;
+  session_id: string;
+  user_id: string | null;
+  user_name: string;
+  assessment_id: string | null;
+  assessment_type: string;
+  assessment_title: string;
+  kind: string;
+  severity: ViolationSeverity;
+  message: string;
+  timestamp: string;
+}
+
+export interface ProctoredSessionDTO {
+  session_id: string;
+  user_id: string | null;
+  user_name: string;
+  user_email: string;
+  assessment_id: string | null;
+  assessment_title: string;
+  assessment_type: string;
+  started_at: string;
+  last_activity: string;
+  violation_count: number;
+  high_severity_count: number;
+  status: 'clean' | 'warning' | 'flagged';
+  is_online: boolean;
+}
+
+// ============================================================================
+// Study sessions / progress
+// ============================================================================
+export interface StudySession {
+  id?: string;
+  user_id: string;
+  course_id?: string | null;
+  lesson_id?: string | null;
+  label?: string | null;
+  started_at: string;
+  ended_at?: string | null;
+  focus_seconds: number;
+  idle_seconds: number;
+  created_at?: string;
+  updated_at?: string;
+  courses?: { title: string };
+}
+
+export interface StudySessionDTO {
+  id: string;
+  course_id: string | null;
+  course_title: string;
+  label: string;
+  started_at: string;
+  ended_at: string | null;
+  focus_seconds: number;
+  idle_seconds: number;
+}
+
+export interface StudyProgressSummaryDTO {
+  total_focus_seconds: number;
+  total_sessions: number;
+  streak_days: number;
+  daily: Array<{ date: string; focus_seconds: number }>;
+  per_course: Array<{ course_id: string; course_title: string; focus_seconds: number }>;
+}
+
+// ============================================================================
+// Topics (curriculum grouping)
+// ============================================================================
+export interface Topic {
+  id: string;
+  course_id: string;
+  title: string;
+  description?: string | null;
+  order_index: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface TopicDTO {
+  id: string;
+  course_id: string;
+  title: string;
+  description: string;
+  order_index: number;
+}
