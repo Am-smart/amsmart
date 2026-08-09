@@ -3,6 +3,8 @@ import {
   LayoutDashboard, BookOpen, Library, FileText, HelpCircle, BarChart3,
   MessageSquare, Calendar, FileCode, Video, ShieldCheck, Settings,
   CircleHelp, BookMarked, Users, RefreshCw, LineChart, Activity, Info,
+  Award, TrendingUp, Megaphone, LifeBuoy, MailPlus, Radio, AlertTriangle,
+  ClipboardList,
 } from 'lucide-react';
 import React from 'react';
 import type { UserRole, User } from '@/lib/types';
