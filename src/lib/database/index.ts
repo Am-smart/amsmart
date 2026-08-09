@@ -2,3 +2,8 @@ export * from './auth.db.server';
 export * from './learning.db.server';
 export * from './assessment.db.server';
 export * from './system.db.server';
+export * from './certificate.db.server';
+export * from './proctoring.db.server';
+export * from './study.db.server';
+export * from './curriculum.db.server';
+export * from './discussion-views.db.server';
