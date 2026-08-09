@@ -55,10 +55,12 @@ import { Route as AdminHealthRouteImport } from './routes/admin/health'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
 import { Route as ApiV1SystemRouteImport } from './routes/api/v1/system'
 import { Route as ApiV1LearningRouteImport } from './routes/api/v1/learning'
+import { Route as ApiV1FeaturesRouteImport } from './routes/api/v1/features'
 import { Route as ApiV1AuthRouteImport } from './routes/api/v1/auth'
 import { Route as ApiV1AssessmentRouteImport } from './routes/api/v1/assessment'
 import { Route as ApiV1SystemUploadRouteImport } from './routes/api/v1/system/upload'
 import { Route as ApiV1AuthInviteRouteImport } from './routes/api/v1/auth/invite'
+import { Route as ApiPublicV1CertificatesVerifyRouteImport } from './routes/api/public/v1/certificates/verify'
 import { Route as ApiPublicV1AuthInviteAcceptRouteImport } from './routes/api/public/v1/auth/invite/accept'
 
 const HelpRoute = HelpRouteImport.update({
@@ -291,6 +293,11 @@ const ApiV1LearningRoute = ApiV1LearningRouteImport.update({
   path: '/api/v1/learning',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1FeaturesRoute = ApiV1FeaturesRouteImport.update({
+  id: '/api/v1/features',
+  path: '/api/v1/features',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiV1AuthRoute = ApiV1AuthRouteImport.update({
   id: '/api/v1/auth',
   path: '/api/v1/auth',
@@ -311,6 +318,12 @@ const ApiV1AuthInviteRoute = ApiV1AuthInviteRouteImport.update({
   path: '/invite',
   getParentRoute: () => ApiV1AuthRoute,
 } as any)
+const ApiPublicV1CertificatesVerifyRoute =
+  ApiPublicV1CertificatesVerifyRouteImport.update({
+    id: '/api/public/v1/certificates/verify',
+    path: '/api/public/v1/certificates/verify',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicV1AuthInviteAcceptRoute =
   ApiPublicV1AuthInviteAcceptRouteImport.update({
     id: '/api/public/v1/auth/invite/accept',
@@ -365,10 +378,12 @@ export interface FileRoutesByFullPath {
   '/teacher/': typeof TeacherIndexRoute
   '/api/v1/assessment': typeof ApiV1AssessmentRoute
   '/api/v1/auth': typeof ApiV1AuthRouteWithChildren
+  '/api/v1/features': typeof ApiV1FeaturesRoute
   '/api/v1/learning': typeof ApiV1LearningRoute
   '/api/v1/system': typeof ApiV1SystemRouteWithChildren
   '/api/v1/auth/invite': typeof ApiV1AuthInviteRoute
   '/api/v1/system/upload': typeof ApiV1SystemUploadRoute
+  '/api/public/v1/certificates/verify': typeof ApiPublicV1CertificatesVerifyRoute
   '/api/public/v1/auth/invite/accept': typeof ApiPublicV1AuthInviteAcceptRoute
 }
 export interface FileRoutesByTo {
@@ -415,10 +430,12 @@ export interface FileRoutesByTo {
   '/teacher': typeof TeacherIndexRoute
   '/api/v1/assessment': typeof ApiV1AssessmentRoute
   '/api/v1/auth': typeof ApiV1AuthRouteWithChildren
+  '/api/v1/features': typeof ApiV1FeaturesRoute
   '/api/v1/learning': typeof ApiV1LearningRoute
   '/api/v1/system': typeof ApiV1SystemRouteWithChildren
   '/api/v1/auth/invite': typeof ApiV1AuthInviteRoute
   '/api/v1/system/upload': typeof ApiV1SystemUploadRoute
+  '/api/public/v1/certificates/verify': typeof ApiPublicV1CertificatesVerifyRoute
   '/api/public/v1/auth/invite/accept': typeof ApiPublicV1AuthInviteAcceptRoute
 }
 export interface FileRoutesById {
@@ -469,10 +486,12 @@ export interface FileRoutesById {
   '/teacher/': typeof TeacherIndexRoute
   '/api/v1/assessment': typeof ApiV1AssessmentRoute
   '/api/v1/auth': typeof ApiV1AuthRouteWithChildren
+  '/api/v1/features': typeof ApiV1FeaturesRoute
   '/api/v1/learning': typeof ApiV1LearningRoute
   '/api/v1/system': typeof ApiV1SystemRouteWithChildren
   '/api/v1/auth/invite': typeof ApiV1AuthInviteRoute
   '/api/v1/system/upload': typeof ApiV1SystemUploadRoute
+  '/api/public/v1/certificates/verify': typeof ApiPublicV1CertificatesVerifyRoute
   '/api/public/v1/auth/invite/accept': typeof ApiPublicV1AuthInviteAcceptRoute
 }
 export interface FileRouteTypes {
@@ -524,10 +543,12 @@ export interface FileRouteTypes {
     | '/teacher/'
     | '/api/v1/assessment'
     | '/api/v1/auth'
+    | '/api/v1/features'
     | '/api/v1/learning'
     | '/api/v1/system'
     | '/api/v1/auth/invite'
     | '/api/v1/system/upload'
+    | '/api/public/v1/certificates/verify'
     | '/api/public/v1/auth/invite/accept'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -574,10 +595,12 @@ export interface FileRouteTypes {
     | '/teacher'
     | '/api/v1/assessment'
     | '/api/v1/auth'
+    | '/api/v1/features'
     | '/api/v1/learning'
     | '/api/v1/system'
     | '/api/v1/auth/invite'
     | '/api/v1/system/upload'
+    | '/api/public/v1/certificates/verify'
     | '/api/public/v1/auth/invite/accept'
   id:
     | '__root__'
@@ -627,10 +650,12 @@ export interface FileRouteTypes {
     | '/teacher/'
     | '/api/v1/assessment'
     | '/api/v1/auth'
+    | '/api/v1/features'
     | '/api/v1/learning'
     | '/api/v1/system'
     | '/api/v1/auth/invite'
     | '/api/v1/system/upload'
+    | '/api/public/v1/certificates/verify'
     | '/api/public/v1/auth/invite/accept'
   fileRoutesById: FileRoutesById
 }
@@ -642,8 +667,10 @@ export interface RootRouteChildren {
   HelpRoute: typeof HelpRoute
   ApiV1AssessmentRoute: typeof ApiV1AssessmentRoute
   ApiV1AuthRoute: typeof ApiV1AuthRouteWithChildren
+  ApiV1FeaturesRoute: typeof ApiV1FeaturesRoute
   ApiV1LearningRoute: typeof ApiV1LearningRoute
   ApiV1SystemRoute: typeof ApiV1SystemRouteWithChildren
+  ApiPublicV1CertificatesVerifyRoute: typeof ApiPublicV1CertificatesVerifyRoute
   ApiPublicV1AuthInviteAcceptRoute: typeof ApiPublicV1AuthInviteAcceptRoute
 }
 
@@ -971,6 +998,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1LearningRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/features': {
+      id: '/api/v1/features'
+      path: '/api/v1/features'
+      fullPath: '/api/v1/features'
+      preLoaderRoute: typeof ApiV1FeaturesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/v1/auth': {
       id: '/api/v1/auth'
       path: '/api/v1/auth'
@@ -998,6 +1032,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/v1/auth/invite'
       preLoaderRoute: typeof ApiV1AuthInviteRouteImport
       parentRoute: typeof ApiV1AuthRoute
+    }
+    '/api/public/v1/certificates/verify': {
+      id: '/api/public/v1/certificates/verify'
+      path: '/api/public/v1/certificates/verify'
+      fullPath: '/api/public/v1/certificates/verify'
+      preLoaderRoute: typeof ApiPublicV1CertificatesVerifyRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/v1/auth/invite/accept': {
       id: '/api/public/v1/auth/invite/accept'
@@ -1149,20 +1190,12 @@ const rootRouteChildren: RootRouteChildren = {
   HelpRoute: HelpRoute,
   ApiV1AssessmentRoute: ApiV1AssessmentRoute,
   ApiV1AuthRoute: ApiV1AuthRouteWithChildren,
+  ApiV1FeaturesRoute: ApiV1FeaturesRoute,
   ApiV1LearningRoute: ApiV1LearningRoute,
   ApiV1SystemRoute: ApiV1SystemRouteWithChildren,
+  ApiPublicV1CertificatesVerifyRoute: ApiPublicV1CertificatesVerifyRoute,
   ApiPublicV1AuthInviteAcceptRoute: ApiPublicV1AuthInviteAcceptRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
