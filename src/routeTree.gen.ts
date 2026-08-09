@@ -27,6 +27,7 @@ import { Route as TeacherGradingRouteImport } from './routes/teacher/grading'
 import { Route as TeacherGradebookRouteImport } from './routes/teacher/gradebook'
 import { Route as TeacherDiscussionsRouteImport } from './routes/teacher/discussions'
 import { Route as TeacherCoursesRouteImport } from './routes/teacher/courses'
+import { Route as TeacherCertificatesRouteImport } from './routes/teacher/certificates'
 import { Route as TeacherCalendarRouteImport } from './routes/teacher/calendar'
 import { Route as TeacherAssignmentsRouteImport } from './routes/teacher/assignments'
 import { Route as TeacherAntiCheatRouteImport } from './routes/teacher/anti-cheat'
@@ -153,6 +154,11 @@ const TeacherDiscussionsRoute = TeacherDiscussionsRouteImport.update({
 const TeacherCoursesRoute = TeacherCoursesRouteImport.update({
   id: '/courses',
   path: '/courses',
+  getParentRoute: () => TeacherRouteRoute,
+} as any)
+const TeacherCertificatesRoute = TeacherCertificatesRouteImport.update({
+  id: '/certificates',
+  path: '/certificates',
   getParentRoute: () => TeacherRouteRoute,
 } as any)
 const TeacherCalendarRoute = TeacherCalendarRouteImport.update({
@@ -377,6 +383,7 @@ export interface FileRoutesByFullPath {
   '/teacher/anti-cheat': typeof TeacherAntiCheatRoute
   '/teacher/assignments': typeof TeacherAssignmentsRoute
   '/teacher/calendar': typeof TeacherCalendarRoute
+  '/teacher/certificates': typeof TeacherCertificatesRoute
   '/teacher/courses': typeof TeacherCoursesRoute
   '/teacher/discussions': typeof TeacherDiscussionsRoute
   '/teacher/gradebook': typeof TeacherGradebookRoute
@@ -431,6 +438,7 @@ export interface FileRoutesByTo {
   '/teacher/anti-cheat': typeof TeacherAntiCheatRoute
   '/teacher/assignments': typeof TeacherAssignmentsRoute
   '/teacher/calendar': typeof TeacherCalendarRoute
+  '/teacher/certificates': typeof TeacherCertificatesRoute
   '/teacher/courses': typeof TeacherCoursesRoute
   '/teacher/discussions': typeof TeacherDiscussionsRoute
   '/teacher/gradebook': typeof TeacherGradebookRoute
@@ -489,6 +497,7 @@ export interface FileRoutesById {
   '/teacher/anti-cheat': typeof TeacherAntiCheatRoute
   '/teacher/assignments': typeof TeacherAssignmentsRoute
   '/teacher/calendar': typeof TeacherCalendarRoute
+  '/teacher/certificates': typeof TeacherCertificatesRoute
   '/teacher/courses': typeof TeacherCoursesRoute
   '/teacher/discussions': typeof TeacherDiscussionsRoute
   '/teacher/gradebook': typeof TeacherGradebookRoute
@@ -548,6 +557,7 @@ export interface FileRouteTypes {
     | '/teacher/anti-cheat'
     | '/teacher/assignments'
     | '/teacher/calendar'
+    | '/teacher/certificates'
     | '/teacher/courses'
     | '/teacher/discussions'
     | '/teacher/gradebook'
@@ -602,6 +612,7 @@ export interface FileRouteTypes {
     | '/teacher/anti-cheat'
     | '/teacher/assignments'
     | '/teacher/calendar'
+    | '/teacher/certificates'
     | '/teacher/courses'
     | '/teacher/discussions'
     | '/teacher/gradebook'
@@ -659,6 +670,7 @@ export interface FileRouteTypes {
     | '/teacher/anti-cheat'
     | '/teacher/assignments'
     | '/teacher/calendar'
+    | '/teacher/certificates'
     | '/teacher/courses'
     | '/teacher/discussions'
     | '/teacher/gradebook'
@@ -824,6 +836,13 @@ declare module '@tanstack/react-router' {
       path: '/courses'
       fullPath: '/teacher/courses'
       preLoaderRoute: typeof TeacherCoursesRouteImport
+      parentRoute: typeof TeacherRouteRoute
+    }
+    '/teacher/certificates': {
+      id: '/teacher/certificates'
+      path: '/certificates'
+      fullPath: '/teacher/certificates'
+      preLoaderRoute: typeof TeacherCertificatesRouteImport
       parentRoute: typeof TeacherRouteRoute
     }
     '/teacher/calendar': {
@@ -1166,6 +1185,7 @@ interface TeacherRouteRouteChildren {
   TeacherAntiCheatRoute: typeof TeacherAntiCheatRoute
   TeacherAssignmentsRoute: typeof TeacherAssignmentsRoute
   TeacherCalendarRoute: typeof TeacherCalendarRoute
+  TeacherCertificatesRoute: typeof TeacherCertificatesRoute
   TeacherCoursesRoute: typeof TeacherCoursesRoute
   TeacherDiscussionsRoute: typeof TeacherDiscussionsRoute
   TeacherGradebookRoute: typeof TeacherGradebookRoute
@@ -1183,6 +1203,7 @@ const TeacherRouteRouteChildren: TeacherRouteRouteChildren = {
   TeacherAntiCheatRoute: TeacherAntiCheatRoute,
   TeacherAssignmentsRoute: TeacherAssignmentsRoute,
   TeacherCalendarRoute: TeacherCalendarRoute,
+  TeacherCertificatesRoute: TeacherCertificatesRoute,
   TeacherCoursesRoute: TeacherCoursesRoute,
   TeacherDiscussionsRoute: TeacherDiscussionsRoute,
   TeacherGradebookRoute: TeacherGradebookRoute,

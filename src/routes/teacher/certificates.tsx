@@ -31,7 +31,7 @@ function TeacherCertificatesPage() {
     if (!user) return;
     setIsLoading(true);
     setError(null);
-    Promise.all([getCertificates({}), getUsers({ role: 'student' })])
+    Promise.all([getCertificates({}), getUsers()])
       .then(([certs, list]) => {
         setCertificates(certs);
         setStudents(list);
@@ -44,13 +44,13 @@ function TeacherCertificatesPage() {
 
   useEffect(() => {
     if (!courseId) { setEnrollments([]); return; }
-    getEnrollments(courseId).then(setEnrollments).catch(() => setEnrollments([]));
+    getEnrollments(undefined, [courseId]).then(setEnrollments).catch(() => setEnrollments([]));
   }, [courseId]);
 
   const eligibleStudents = useMemo(() => {
     if (!courseId) return [];
     const enrolledIds = new Set(enrollments.map((e) => e.student_id));
-    return students.filter((s) => enrolledIds.has(s.id));
+    return students.filter((s) => s.role === 'student' && enrolledIds.has(s.id));
   }, [courseId, enrollments, students]);
 
   const handleIssue = async (e: React.FormEvent) => {
