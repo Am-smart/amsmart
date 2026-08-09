@@ -144,5 +144,10 @@ const POST = withHandler(async (user, request) => {
 });
 
 export const Route = createFileRoute("/api/v1/features")({
-  server: { handlers: { GET, POST } },
+  server: {
+    handlers: {
+      GET: ({ request }) => GET(request),
+      POST: ({ request }) => POST(request),
+    },
+  },
 });
