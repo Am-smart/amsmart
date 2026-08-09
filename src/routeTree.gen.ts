@@ -27,11 +27,13 @@ import { Route as TeacherGradingRouteImport } from './routes/teacher/grading'
 import { Route as TeacherGradebookRouteImport } from './routes/teacher/gradebook'
 import { Route as TeacherDiscussionsRouteImport } from './routes/teacher/discussions'
 import { Route as TeacherCoursesRouteImport } from './routes/teacher/courses'
+import { Route as TeacherCertificatesRouteImport } from './routes/teacher/certificates'
 import { Route as TeacherCalendarRouteImport } from './routes/teacher/calendar'
 import { Route as TeacherAssignmentsRouteImport } from './routes/teacher/assignments'
 import { Route as TeacherAntiCheatRouteImport } from './routes/teacher/anti-cheat'
 import { Route as StudentSettingsRouteImport } from './routes/student/settings'
 import { Route as StudentQuizzesRouteImport } from './routes/student/quizzes'
+import { Route as StudentProgressRouteImport } from './routes/student/progress'
 import { Route as StudentPlannerRouteImport } from './routes/student/planner'
 import { Route as StudentMyCoursesRouteImport } from './routes/student/my-courses'
 import { Route as StudentMaterialsRouteImport } from './routes/student/materials'
@@ -40,6 +42,7 @@ import { Route as StudentHelpRouteImport } from './routes/student/help'
 import { Route as StudentGradesRouteImport } from './routes/student/grades'
 import { Route as StudentDiscussionsRouteImport } from './routes/student/discussions'
 import { Route as StudentCoursesRouteImport } from './routes/student/courses'
+import { Route as StudentCertificatesRouteImport } from './routes/student/certificates'
 import { Route as StudentCalendarRouteImport } from './routes/student/calendar'
 import { Route as StudentAssignmentsRouteImport } from './routes/student/assignments'
 import { Route as StudentAntiCheatRouteImport } from './routes/student/anti-cheat'
@@ -55,10 +58,12 @@ import { Route as AdminHealthRouteImport } from './routes/admin/health'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
 import { Route as ApiV1SystemRouteImport } from './routes/api/v1/system'
 import { Route as ApiV1LearningRouteImport } from './routes/api/v1/learning'
+import { Route as ApiV1FeaturesRouteImport } from './routes/api/v1/features'
 import { Route as ApiV1AuthRouteImport } from './routes/api/v1/auth'
 import { Route as ApiV1AssessmentRouteImport } from './routes/api/v1/assessment'
 import { Route as ApiV1SystemUploadRouteImport } from './routes/api/v1/system/upload'
 import { Route as ApiV1AuthInviteRouteImport } from './routes/api/v1/auth/invite'
+import { Route as ApiPublicV1CertificatesVerifyRouteImport } from './routes/api/public/v1/certificates/verify'
 import { Route as ApiPublicV1AuthInviteAcceptRouteImport } from './routes/api/public/v1/auth/invite/accept'
 
 const HelpRoute = HelpRouteImport.update({
@@ -151,6 +156,11 @@ const TeacherCoursesRoute = TeacherCoursesRouteImport.update({
   path: '/courses',
   getParentRoute: () => TeacherRouteRoute,
 } as any)
+const TeacherCertificatesRoute = TeacherCertificatesRouteImport.update({
+  id: '/certificates',
+  path: '/certificates',
+  getParentRoute: () => TeacherRouteRoute,
+} as any)
 const TeacherCalendarRoute = TeacherCalendarRouteImport.update({
   id: '/calendar',
   path: '/calendar',
@@ -174,6 +184,11 @@ const StudentSettingsRoute = StudentSettingsRouteImport.update({
 const StudentQuizzesRoute = StudentQuizzesRouteImport.update({
   id: '/quizzes',
   path: '/quizzes',
+  getParentRoute: () => StudentRouteRoute,
+} as any)
+const StudentProgressRoute = StudentProgressRouteImport.update({
+  id: '/progress',
+  path: '/progress',
   getParentRoute: () => StudentRouteRoute,
 } as any)
 const StudentPlannerRoute = StudentPlannerRouteImport.update({
@@ -214,6 +229,11 @@ const StudentDiscussionsRoute = StudentDiscussionsRouteImport.update({
 const StudentCoursesRoute = StudentCoursesRouteImport.update({
   id: '/courses',
   path: '/courses',
+  getParentRoute: () => StudentRouteRoute,
+} as any)
+const StudentCertificatesRoute = StudentCertificatesRouteImport.update({
+  id: '/certificates',
+  path: '/certificates',
   getParentRoute: () => StudentRouteRoute,
 } as any)
 const StudentCalendarRoute = StudentCalendarRouteImport.update({
@@ -291,6 +311,11 @@ const ApiV1LearningRoute = ApiV1LearningRouteImport.update({
   path: '/api/v1/learning',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1FeaturesRoute = ApiV1FeaturesRouteImport.update({
+  id: '/api/v1/features',
+  path: '/api/v1/features',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiV1AuthRoute = ApiV1AuthRouteImport.update({
   id: '/api/v1/auth',
   path: '/api/v1/auth',
@@ -311,6 +336,12 @@ const ApiV1AuthInviteRoute = ApiV1AuthInviteRouteImport.update({
   path: '/invite',
   getParentRoute: () => ApiV1AuthRoute,
 } as any)
+const ApiPublicV1CertificatesVerifyRoute =
+  ApiPublicV1CertificatesVerifyRouteImport.update({
+    id: '/api/public/v1/certificates/verify',
+    path: '/api/public/v1/certificates/verify',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicV1AuthInviteAcceptRoute =
   ApiPublicV1AuthInviteAcceptRouteImport.update({
     id: '/api/public/v1/auth/invite/accept',
@@ -337,6 +368,7 @@ export interface FileRoutesByFullPath {
   '/student/anti-cheat': typeof StudentAntiCheatRoute
   '/student/assignments': typeof StudentAssignmentsRoute
   '/student/calendar': typeof StudentCalendarRoute
+  '/student/certificates': typeof StudentCertificatesRoute
   '/student/courses': typeof StudentCoursesRoute
   '/student/discussions': typeof StudentDiscussionsRoute
   '/student/grades': typeof StudentGradesRoute
@@ -345,11 +377,13 @@ export interface FileRoutesByFullPath {
   '/student/materials': typeof StudentMaterialsRoute
   '/student/my-courses': typeof StudentMyCoursesRoute
   '/student/planner': typeof StudentPlannerRoute
+  '/student/progress': typeof StudentProgressRoute
   '/student/quizzes': typeof StudentQuizzesRoute
   '/student/settings': typeof StudentSettingsRoute
   '/teacher/anti-cheat': typeof TeacherAntiCheatRoute
   '/teacher/assignments': typeof TeacherAssignmentsRoute
   '/teacher/calendar': typeof TeacherCalendarRoute
+  '/teacher/certificates': typeof TeacherCertificatesRoute
   '/teacher/courses': typeof TeacherCoursesRoute
   '/teacher/discussions': typeof TeacherDiscussionsRoute
   '/teacher/gradebook': typeof TeacherGradebookRoute
@@ -365,10 +399,12 @@ export interface FileRoutesByFullPath {
   '/teacher/': typeof TeacherIndexRoute
   '/api/v1/assessment': typeof ApiV1AssessmentRoute
   '/api/v1/auth': typeof ApiV1AuthRouteWithChildren
+  '/api/v1/features': typeof ApiV1FeaturesRoute
   '/api/v1/learning': typeof ApiV1LearningRoute
   '/api/v1/system': typeof ApiV1SystemRouteWithChildren
   '/api/v1/auth/invite': typeof ApiV1AuthInviteRoute
   '/api/v1/system/upload': typeof ApiV1SystemUploadRoute
+  '/api/public/v1/certificates/verify': typeof ApiPublicV1CertificatesVerifyRoute
   '/api/public/v1/auth/invite/accept': typeof ApiPublicV1AuthInviteAcceptRoute
 }
 export interface FileRoutesByTo {
@@ -387,6 +423,7 @@ export interface FileRoutesByTo {
   '/student/anti-cheat': typeof StudentAntiCheatRoute
   '/student/assignments': typeof StudentAssignmentsRoute
   '/student/calendar': typeof StudentCalendarRoute
+  '/student/certificates': typeof StudentCertificatesRoute
   '/student/courses': typeof StudentCoursesRoute
   '/student/discussions': typeof StudentDiscussionsRoute
   '/student/grades': typeof StudentGradesRoute
@@ -395,11 +432,13 @@ export interface FileRoutesByTo {
   '/student/materials': typeof StudentMaterialsRoute
   '/student/my-courses': typeof StudentMyCoursesRoute
   '/student/planner': typeof StudentPlannerRoute
+  '/student/progress': typeof StudentProgressRoute
   '/student/quizzes': typeof StudentQuizzesRoute
   '/student/settings': typeof StudentSettingsRoute
   '/teacher/anti-cheat': typeof TeacherAntiCheatRoute
   '/teacher/assignments': typeof TeacherAssignmentsRoute
   '/teacher/calendar': typeof TeacherCalendarRoute
+  '/teacher/certificates': typeof TeacherCertificatesRoute
   '/teacher/courses': typeof TeacherCoursesRoute
   '/teacher/discussions': typeof TeacherDiscussionsRoute
   '/teacher/gradebook': typeof TeacherGradebookRoute
@@ -415,10 +454,12 @@ export interface FileRoutesByTo {
   '/teacher': typeof TeacherIndexRoute
   '/api/v1/assessment': typeof ApiV1AssessmentRoute
   '/api/v1/auth': typeof ApiV1AuthRouteWithChildren
+  '/api/v1/features': typeof ApiV1FeaturesRoute
   '/api/v1/learning': typeof ApiV1LearningRoute
   '/api/v1/system': typeof ApiV1SystemRouteWithChildren
   '/api/v1/auth/invite': typeof ApiV1AuthInviteRoute
   '/api/v1/system/upload': typeof ApiV1SystemUploadRoute
+  '/api/public/v1/certificates/verify': typeof ApiPublicV1CertificatesVerifyRoute
   '/api/public/v1/auth/invite/accept': typeof ApiPublicV1AuthInviteAcceptRoute
 }
 export interface FileRoutesById {
@@ -441,6 +482,7 @@ export interface FileRoutesById {
   '/student/anti-cheat': typeof StudentAntiCheatRoute
   '/student/assignments': typeof StudentAssignmentsRoute
   '/student/calendar': typeof StudentCalendarRoute
+  '/student/certificates': typeof StudentCertificatesRoute
   '/student/courses': typeof StudentCoursesRoute
   '/student/discussions': typeof StudentDiscussionsRoute
   '/student/grades': typeof StudentGradesRoute
@@ -449,11 +491,13 @@ export interface FileRoutesById {
   '/student/materials': typeof StudentMaterialsRoute
   '/student/my-courses': typeof StudentMyCoursesRoute
   '/student/planner': typeof StudentPlannerRoute
+  '/student/progress': typeof StudentProgressRoute
   '/student/quizzes': typeof StudentQuizzesRoute
   '/student/settings': typeof StudentSettingsRoute
   '/teacher/anti-cheat': typeof TeacherAntiCheatRoute
   '/teacher/assignments': typeof TeacherAssignmentsRoute
   '/teacher/calendar': typeof TeacherCalendarRoute
+  '/teacher/certificates': typeof TeacherCertificatesRoute
   '/teacher/courses': typeof TeacherCoursesRoute
   '/teacher/discussions': typeof TeacherDiscussionsRoute
   '/teacher/gradebook': typeof TeacherGradebookRoute
@@ -469,10 +513,12 @@ export interface FileRoutesById {
   '/teacher/': typeof TeacherIndexRoute
   '/api/v1/assessment': typeof ApiV1AssessmentRoute
   '/api/v1/auth': typeof ApiV1AuthRouteWithChildren
+  '/api/v1/features': typeof ApiV1FeaturesRoute
   '/api/v1/learning': typeof ApiV1LearningRoute
   '/api/v1/system': typeof ApiV1SystemRouteWithChildren
   '/api/v1/auth/invite': typeof ApiV1AuthInviteRoute
   '/api/v1/system/upload': typeof ApiV1SystemUploadRoute
+  '/api/public/v1/certificates/verify': typeof ApiPublicV1CertificatesVerifyRoute
   '/api/public/v1/auth/invite/accept': typeof ApiPublicV1AuthInviteAcceptRoute
 }
 export interface FileRouteTypes {
@@ -496,6 +542,7 @@ export interface FileRouteTypes {
     | '/student/anti-cheat'
     | '/student/assignments'
     | '/student/calendar'
+    | '/student/certificates'
     | '/student/courses'
     | '/student/discussions'
     | '/student/grades'
@@ -504,11 +551,13 @@ export interface FileRouteTypes {
     | '/student/materials'
     | '/student/my-courses'
     | '/student/planner'
+    | '/student/progress'
     | '/student/quizzes'
     | '/student/settings'
     | '/teacher/anti-cheat'
     | '/teacher/assignments'
     | '/teacher/calendar'
+    | '/teacher/certificates'
     | '/teacher/courses'
     | '/teacher/discussions'
     | '/teacher/gradebook'
@@ -524,10 +573,12 @@ export interface FileRouteTypes {
     | '/teacher/'
     | '/api/v1/assessment'
     | '/api/v1/auth'
+    | '/api/v1/features'
     | '/api/v1/learning'
     | '/api/v1/system'
     | '/api/v1/auth/invite'
     | '/api/v1/system/upload'
+    | '/api/public/v1/certificates/verify'
     | '/api/public/v1/auth/invite/accept'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -546,6 +597,7 @@ export interface FileRouteTypes {
     | '/student/anti-cheat'
     | '/student/assignments'
     | '/student/calendar'
+    | '/student/certificates'
     | '/student/courses'
     | '/student/discussions'
     | '/student/grades'
@@ -554,11 +606,13 @@ export interface FileRouteTypes {
     | '/student/materials'
     | '/student/my-courses'
     | '/student/planner'
+    | '/student/progress'
     | '/student/quizzes'
     | '/student/settings'
     | '/teacher/anti-cheat'
     | '/teacher/assignments'
     | '/teacher/calendar'
+    | '/teacher/certificates'
     | '/teacher/courses'
     | '/teacher/discussions'
     | '/teacher/gradebook'
@@ -574,10 +628,12 @@ export interface FileRouteTypes {
     | '/teacher'
     | '/api/v1/assessment'
     | '/api/v1/auth'
+    | '/api/v1/features'
     | '/api/v1/learning'
     | '/api/v1/system'
     | '/api/v1/auth/invite'
     | '/api/v1/system/upload'
+    | '/api/public/v1/certificates/verify'
     | '/api/public/v1/auth/invite/accept'
   id:
     | '__root__'
@@ -599,6 +655,7 @@ export interface FileRouteTypes {
     | '/student/anti-cheat'
     | '/student/assignments'
     | '/student/calendar'
+    | '/student/certificates'
     | '/student/courses'
     | '/student/discussions'
     | '/student/grades'
@@ -607,11 +664,13 @@ export interface FileRouteTypes {
     | '/student/materials'
     | '/student/my-courses'
     | '/student/planner'
+    | '/student/progress'
     | '/student/quizzes'
     | '/student/settings'
     | '/teacher/anti-cheat'
     | '/teacher/assignments'
     | '/teacher/calendar'
+    | '/teacher/certificates'
     | '/teacher/courses'
     | '/teacher/discussions'
     | '/teacher/gradebook'
@@ -627,10 +686,12 @@ export interface FileRouteTypes {
     | '/teacher/'
     | '/api/v1/assessment'
     | '/api/v1/auth'
+    | '/api/v1/features'
     | '/api/v1/learning'
     | '/api/v1/system'
     | '/api/v1/auth/invite'
     | '/api/v1/system/upload'
+    | '/api/public/v1/certificates/verify'
     | '/api/public/v1/auth/invite/accept'
   fileRoutesById: FileRoutesById
 }
@@ -642,8 +703,10 @@ export interface RootRouteChildren {
   HelpRoute: typeof HelpRoute
   ApiV1AssessmentRoute: typeof ApiV1AssessmentRoute
   ApiV1AuthRoute: typeof ApiV1AuthRouteWithChildren
+  ApiV1FeaturesRoute: typeof ApiV1FeaturesRoute
   ApiV1LearningRoute: typeof ApiV1LearningRoute
   ApiV1SystemRoute: typeof ApiV1SystemRouteWithChildren
+  ApiPublicV1CertificatesVerifyRoute: typeof ApiPublicV1CertificatesVerifyRoute
   ApiPublicV1AuthInviteAcceptRoute: typeof ApiPublicV1AuthInviteAcceptRoute
 }
 
@@ -775,6 +838,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TeacherCoursesRouteImport
       parentRoute: typeof TeacherRouteRoute
     }
+    '/teacher/certificates': {
+      id: '/teacher/certificates'
+      path: '/certificates'
+      fullPath: '/teacher/certificates'
+      preLoaderRoute: typeof TeacherCertificatesRouteImport
+      parentRoute: typeof TeacherRouteRoute
+    }
     '/teacher/calendar': {
       id: '/teacher/calendar'
       path: '/calendar'
@@ -808,6 +878,13 @@ declare module '@tanstack/react-router' {
       path: '/quizzes'
       fullPath: '/student/quizzes'
       preLoaderRoute: typeof StudentQuizzesRouteImport
+      parentRoute: typeof StudentRouteRoute
+    }
+    '/student/progress': {
+      id: '/student/progress'
+      path: '/progress'
+      fullPath: '/student/progress'
+      preLoaderRoute: typeof StudentProgressRouteImport
       parentRoute: typeof StudentRouteRoute
     }
     '/student/planner': {
@@ -864,6 +941,13 @@ declare module '@tanstack/react-router' {
       path: '/courses'
       fullPath: '/student/courses'
       preLoaderRoute: typeof StudentCoursesRouteImport
+      parentRoute: typeof StudentRouteRoute
+    }
+    '/student/certificates': {
+      id: '/student/certificates'
+      path: '/certificates'
+      fullPath: '/student/certificates'
+      preLoaderRoute: typeof StudentCertificatesRouteImport
       parentRoute: typeof StudentRouteRoute
     }
     '/student/calendar': {
@@ -971,6 +1055,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1LearningRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/features': {
+      id: '/api/v1/features'
+      path: '/api/v1/features'
+      fullPath: '/api/v1/features'
+      preLoaderRoute: typeof ApiV1FeaturesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/v1/auth': {
       id: '/api/v1/auth'
       path: '/api/v1/auth'
@@ -998,6 +1089,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/v1/auth/invite'
       preLoaderRoute: typeof ApiV1AuthInviteRouteImport
       parentRoute: typeof ApiV1AuthRoute
+    }
+    '/api/public/v1/certificates/verify': {
+      id: '/api/public/v1/certificates/verify'
+      path: '/api/public/v1/certificates/verify'
+      fullPath: '/api/public/v1/certificates/verify'
+      preLoaderRoute: typeof ApiPublicV1CertificatesVerifyRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/v1/auth/invite/accept': {
       id: '/api/public/v1/auth/invite/accept'
@@ -1044,6 +1142,7 @@ interface StudentRouteRouteChildren {
   StudentAntiCheatRoute: typeof StudentAntiCheatRoute
   StudentAssignmentsRoute: typeof StudentAssignmentsRoute
   StudentCalendarRoute: typeof StudentCalendarRoute
+  StudentCertificatesRoute: typeof StudentCertificatesRoute
   StudentCoursesRoute: typeof StudentCoursesRoute
   StudentDiscussionsRoute: typeof StudentDiscussionsRoute
   StudentGradesRoute: typeof StudentGradesRoute
@@ -1052,6 +1151,7 @@ interface StudentRouteRouteChildren {
   StudentMaterialsRoute: typeof StudentMaterialsRoute
   StudentMyCoursesRoute: typeof StudentMyCoursesRoute
   StudentPlannerRoute: typeof StudentPlannerRoute
+  StudentProgressRoute: typeof StudentProgressRoute
   StudentQuizzesRoute: typeof StudentQuizzesRoute
   StudentSettingsRoute: typeof StudentSettingsRoute
   StudentIndexRoute: typeof StudentIndexRoute
@@ -1062,6 +1162,7 @@ const StudentRouteRouteChildren: StudentRouteRouteChildren = {
   StudentAntiCheatRoute: StudentAntiCheatRoute,
   StudentAssignmentsRoute: StudentAssignmentsRoute,
   StudentCalendarRoute: StudentCalendarRoute,
+  StudentCertificatesRoute: StudentCertificatesRoute,
   StudentCoursesRoute: StudentCoursesRoute,
   StudentDiscussionsRoute: StudentDiscussionsRoute,
   StudentGradesRoute: StudentGradesRoute,
@@ -1070,6 +1171,7 @@ const StudentRouteRouteChildren: StudentRouteRouteChildren = {
   StudentMaterialsRoute: StudentMaterialsRoute,
   StudentMyCoursesRoute: StudentMyCoursesRoute,
   StudentPlannerRoute: StudentPlannerRoute,
+  StudentProgressRoute: StudentProgressRoute,
   StudentQuizzesRoute: StudentQuizzesRoute,
   StudentSettingsRoute: StudentSettingsRoute,
   StudentIndexRoute: StudentIndexRoute,
@@ -1083,6 +1185,7 @@ interface TeacherRouteRouteChildren {
   TeacherAntiCheatRoute: typeof TeacherAntiCheatRoute
   TeacherAssignmentsRoute: typeof TeacherAssignmentsRoute
   TeacherCalendarRoute: typeof TeacherCalendarRoute
+  TeacherCertificatesRoute: typeof TeacherCertificatesRoute
   TeacherCoursesRoute: typeof TeacherCoursesRoute
   TeacherDiscussionsRoute: typeof TeacherDiscussionsRoute
   TeacherGradebookRoute: typeof TeacherGradebookRoute
@@ -1100,6 +1203,7 @@ const TeacherRouteRouteChildren: TeacherRouteRouteChildren = {
   TeacherAntiCheatRoute: TeacherAntiCheatRoute,
   TeacherAssignmentsRoute: TeacherAssignmentsRoute,
   TeacherCalendarRoute: TeacherCalendarRoute,
+  TeacherCertificatesRoute: TeacherCertificatesRoute,
   TeacherCoursesRoute: TeacherCoursesRoute,
   TeacherDiscussionsRoute: TeacherDiscussionsRoute,
   TeacherGradebookRoute: TeacherGradebookRoute,
@@ -1149,20 +1253,12 @@ const rootRouteChildren: RootRouteChildren = {
   HelpRoute: HelpRoute,
   ApiV1AssessmentRoute: ApiV1AssessmentRoute,
   ApiV1AuthRoute: ApiV1AuthRouteWithChildren,
+  ApiV1FeaturesRoute: ApiV1FeaturesRoute,
   ApiV1LearningRoute: ApiV1LearningRoute,
   ApiV1SystemRoute: ApiV1SystemRouteWithChildren,
+  ApiPublicV1CertificatesVerifyRoute: ApiPublicV1CertificatesVerifyRoute,
   ApiPublicV1AuthInviteAcceptRoute: ApiPublicV1AuthInviteAcceptRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

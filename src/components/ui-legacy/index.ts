@@ -8,3 +8,4 @@ export * from './Header';
 export * from './EmptyState';
 export * from './CalendarView';
 export * from './Countdown';
+export * from './Skeleton';

@@ -30,7 +30,13 @@ import {
   AntiCheatLogDTO,
   SupportTicket,
   SupportTicketDTO,
-  SignupRequestDTO
+  SignupRequestDTO,
+  CertificateDTO,
+  ViolationDTO,
+  ProctoredSessionDTO,
+  StudySessionDTO,
+  StudyProgressSummaryDTO,
+  TopicDTO
 } from './types';
 
 // Standardized Response types
@@ -665,4 +671,194 @@ export async function createSystemLog(data: { level: string; category: string; m
     } catch (error: unknown) {
         return { success: false, error: error instanceof Error ? (error as Error).message : 'Unknown error' };
     }
+}
+
+// ============================================================================
+// Certificates
+// ============================================================================
+export async function getCertificates(
+  filters: { userId?: string; courseId?: string; limit?: number; offset?: number } = {}
+): Promise<CertificateDTO[]> {
+  const params = new URLSearchParams({ action: 'certificates' });
+  if (filters.userId) params.set('userId', filters.userId);
+  if (filters.courseId) params.set('courseId', filters.courseId);
+  if (filters.limit !== undefined) params.set('limit', String(filters.limit));
+  if (filters.offset !== undefined) params.set('offset', String(filters.offset));
+  return apiClient.get<CertificateDTO[]>(`/api/v1/features?${params.toString()}`);
+}
+
+export async function issueCertificate(payload: {
+  user_id: string;
+  course_id: string;
+  final_grade?: number | null;
+  template?: string;
+  title?: string;
+}): Promise<ActionResponse<CertificateDTO>> {
+  try {
+    const data = await apiClient.post<CertificateDTO>('/api/v1/features', { action: 'issue-certificate', ...payload });
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to issue certificate' };
+  }
+}
+
+export async function revokeCertificate(id: string, reason?: string): Promise<ActionResponse<CertificateDTO>> {
+  try {
+    const data = await apiClient.post<CertificateDTO>('/api/v1/features', { action: 'revoke-certificate', id, reason });
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to revoke certificate' };
+  }
+}
+
+export async function deleteCertificate(id: string): Promise<ActionResponse> {
+  try {
+    await apiClient.post('/api/v1/features', { action: 'delete-certificate', id });
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to delete certificate' };
+  }
+}
+
+export async function verifyCertificate(code: string): Promise<{
+  found: boolean;
+  valid?: boolean;
+  code?: string;
+  title?: string;
+  recipient_name?: string;
+  course_title?: string;
+  issued_at?: string | null;
+  revoked?: boolean;
+}> {
+  const res = await fetch(`/api/public/v1/certificates/verify?code=${encodeURIComponent(code)}`, {
+    headers: { 'Cache-Control': 'no-cache' },
+  });
+  const payload = await res.json().catch(() => ({}));
+  if (!res.ok || !payload?.success) throw new Error(payload?.error || 'Verification failed');
+  return payload.data;
+}
+
+// ============================================================================
+// Proctoring
+// ============================================================================
+export async function getViolations(
+  filters: {
+    userId?: string;
+    assessmentId?: string;
+    proctorSessionId?: string;
+    severity?: string;
+    since?: string;
+    limit?: number;
+    offset?: number;
+  } = {}
+): Promise<ViolationDTO[]> {
+  const params = new URLSearchParams({ action: 'violations' });
+  Object.entries(filters).forEach(([k, v]) => {
+    if (v !== undefined && v !== null && v !== '') params.set(k, String(v));
+  });
+  return apiClient.get<ViolationDTO[]>(`/api/v1/features?${params.toString()}`);
+}
+
+export async function getActiveProctoredSessions(): Promise<ProctoredSessionDTO[]> {
+  return apiClient.get<ProctoredSessionDTO[]>('/api/v1/features?action=active-proctored-sessions');
+}
+
+export async function recordViolations(violations: unknown[]): Promise<ActionResponse<{ recorded: number }>> {
+  try {
+    const data = await apiClient.post<{ recorded: number }>('/api/v1/features', {
+      action: 'record-violations',
+      violations,
+    });
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to record violations' };
+  }
+}
+
+// ============================================================================
+// Study progress
+// ============================================================================
+export async function getStudySessions(
+  filters: { userId?: string; courseId?: string; since?: string; limit?: number; offset?: number } = {}
+): Promise<StudySessionDTO[]> {
+  const params = new URLSearchParams({ action: 'study-sessions' });
+  Object.entries(filters).forEach(([k, v]) => {
+    if (v !== undefined && v !== null && v !== '') params.set(k, String(v));
+  });
+  return apiClient.get<StudySessionDTO[]>(`/api/v1/features?${params.toString()}`);
+}
+
+export async function getStudySummary(
+  filters: { userId?: string; days?: number } = {}
+): Promise<StudyProgressSummaryDTO> {
+  const params = new URLSearchParams({ action: 'study-summary' });
+  if (filters.userId) params.set('userId', filters.userId);
+  if (filters.days !== undefined) params.set('days', String(filters.days));
+  return apiClient.get<StudyProgressSummaryDTO>(`/api/v1/features?${params.toString()}`);
+}
+
+export async function startStudySession(payload: {
+  course_id?: string | null;
+  lesson_id?: string | null;
+  label?: string | null;
+}): Promise<ActionResponse<StudySessionDTO>> {
+  try {
+    const data = await apiClient.post<StudySessionDTO>('/api/v1/features', {
+      action: 'start-study-session',
+      ...payload,
+    });
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to start study session' };
+  }
+}
+
+export async function endStudySession(
+  id: string,
+  payload: { focus_seconds: number; idle_seconds?: number }
+): Promise<ActionResponse<StudySessionDTO>> {
+  try {
+    const data = await apiClient.post<StudySessionDTO>('/api/v1/features', {
+      action: 'end-study-session',
+      id,
+      ...payload,
+    });
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to end study session' };
+  }
+}
+
+// ============================================================================
+// Curriculum topics / discussion read receipts
+// ============================================================================
+export async function getTopics(courseId: string): Promise<TopicDTO[]> {
+  return apiClient.get<TopicDTO[]>(`/api/v1/features?action=topics&courseId=${encodeURIComponent(courseId)}`);
+}
+
+export async function saveTopic(topic: Partial<TopicDTO>): Promise<ActionResponse<TopicDTO>> {
+  try {
+    const data = await apiClient.post<TopicDTO>('/api/v1/features', { action: 'save-topic', ...topic });
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to save topic' };
+  }
+}
+
+export async function deleteTopic(id: string): Promise<ActionResponse> {
+  try {
+    await apiClient.post('/api/v1/features', { action: 'delete-topic', id });
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to delete topic' };
+  }
+}
+
+export async function markDiscussionViewed(discussionId: string): Promise<ActionResponse> {
+  try {
+    await apiClient.post('/api/v1/features', { action: 'mark-discussion-viewed', discussionId });
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to mark viewed' };
+  }
 }

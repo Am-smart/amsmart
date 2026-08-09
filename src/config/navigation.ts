@@ -3,6 +3,7 @@ import {
   LayoutDashboard, BookOpen, Library, FileText, HelpCircle, BarChart3,
   MessageSquare, Calendar, FileCode, Video, ShieldCheck, Settings,
   CircleHelp, BookMarked, Users, RefreshCw, LineChart, Activity, Info,
+  Award, TrendingUp,
 } from 'lucide-react';
 import React from 'react';
 import type { UserRole, User } from '@/lib/types';
@@ -40,6 +41,8 @@ export const NAVIGATION: Record<UserRole, NavItem[]> = {
     { id: 'planner',     label: 'Planner',        icon: icon(Calendar) },
     { id: 'live',        label: 'Live Classes',   icon: icon(Video) },
     { id: 'anti-cheat',  label: 'Anti-Cheat',     icon: icon(ShieldCheck) },
+    { id: 'progress',    label: 'Study Progress', icon: icon(TrendingUp) },
+    { id: 'certificates', label: 'Certificates',  icon: icon(Award),       permission: 'certificate:view' },
     { id: 'settings',    label: 'Settings',       icon: icon(Settings) },
     { id: 'help',        label: 'Help',           icon: icon(CircleHelp) },
   ],
@@ -54,6 +57,7 @@ export const NAVIGATION: Record<UserRole, NavItem[]> = {
     { id: 'discussions', label: 'Discussions',    icon: icon(MessageSquare) },
     { id: 'calendar',    label: 'Calendar',       icon: icon(Calendar) },
     { id: 'quizzes',     label: 'Quizzes',        icon: icon(HelpCircle),  permission: 'quiz:manage' },
+    { id: 'certificates', label: 'Certificates',  icon: icon(Award),       permission: 'certificate:manage' },
     { id: 'help',        label: 'Help',           icon: icon(CircleHelp) },
     { id: 'live',        label: 'Live Classes',   icon: icon(Video) },
     { id: 'anti-cheat',  label: 'Anti-Cheat',     icon: icon(ShieldCheck) },

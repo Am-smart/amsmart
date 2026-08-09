@@ -7,7 +7,10 @@ export type Permission =
   | 'quiz:manage' | 'quiz:take'
   | 'user:manage' | 'user:view'
   | 'system:manage' | 'system:logs:view'
-  | 'ticket:view' | 'ticket:create' | 'ticket:manage';
+  | 'ticket:view' | 'ticket:create' | 'ticket:manage'
+  | 'certificate:view' | 'certificate:manage'
+  | 'proctoring:view' | 'proctoring:monitor'
+  | 'broadcast:manage' | 'invite:manage' | 'report:view';
 
 const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   admin: [
@@ -17,7 +20,10 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'quiz:manage', 'quiz:take',
     'user:manage', 'user:view',
     'system:manage', 'system:logs:view',
-    'ticket:view', 'ticket:create', 'ticket:manage'
+    'ticket:view', 'ticket:create', 'ticket:manage',
+    'certificate:view', 'certificate:manage',
+    'proctoring:view', 'proctoring:monitor',
+    'broadcast:manage', 'invite:manage', 'report:view'
   ],
   teacher: [
     'course:create', 'course:update', 'course:view',
@@ -25,7 +31,9 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'assignment:manage', 'assignment:grade',
     'quiz:manage',
     'user:view',
-    'ticket:view', 'ticket:create', 'ticket:manage'
+    'ticket:view', 'ticket:create', 'ticket:manage',
+    'certificate:view', 'certificate:manage',
+    'proctoring:view'
   ],
   student: [
     'course:view',
@@ -33,7 +41,8 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'assignment:submit',
     'quiz:take',
     'user:view',
-    'ticket:view', 'ticket:create'
+    'ticket:view', 'ticket:create',
+    'certificate:view'
   ]
 };
 
