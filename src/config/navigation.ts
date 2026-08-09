@@ -42,6 +42,8 @@ export const NAVIGATION: Record<UserRole, NavItem[]> = {
     { id: 'planner',     label: 'Planner',        icon: icon(Calendar) },
     { id: 'live',        label: 'Live Classes',   icon: icon(Video) },
     { id: 'anti-cheat',  label: 'Anti-Cheat',     icon: icon(ShieldCheck) },
+    { id: 'progress',    label: 'Study Progress', icon: icon(TrendingUp) },
+    { id: 'certificates', label: 'Certificates',  icon: icon(Award),       permission: 'certificate:view' },
     { id: 'settings',    label: 'Settings',       icon: icon(Settings) },
     { id: 'help',        label: 'Help',           icon: icon(CircleHelp) },
   ],
