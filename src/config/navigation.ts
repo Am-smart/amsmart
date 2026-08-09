@@ -3,8 +3,7 @@ import {
   LayoutDashboard, BookOpen, Library, FileText, HelpCircle, BarChart3,
   MessageSquare, Calendar, FileCode, Video, ShieldCheck, Settings,
   CircleHelp, BookMarked, Users, RefreshCw, LineChart, Activity, Info,
-  Award, TrendingUp, Megaphone, LifeBuoy, MailPlus, Radio, AlertTriangle,
-  ClipboardList,
+  Award, TrendingUp,
 } from 'lucide-react';
 import React from 'react';
 import type { UserRole, User } from '@/lib/types';
@@ -68,14 +67,7 @@ export const NAVIGATION: Record<UserRole, NavItem[]> = {
     { id: 'dashboard',   label: 'Dashboard',              icon: icon(BarChart3) },
     { id: 'resets',      label: 'Password Resets',        icon: icon(RefreshCw),  permission: 'user:manage' },
     { id: 'users',       label: 'Users',                  icon: icon(Users),       permission: 'user:manage' },
-    { id: 'invites',     label: 'Invites',                icon: icon(MailPlus),    permission: 'invite:manage' },
-    { id: 'courses',     label: 'Course Oversight',       icon: icon(BookOpen),    permission: 'course:view' },
     { id: 'analytics',   label: 'Analytics',              icon: icon(LineChart) },
-    { id: 'reports',     label: 'Reports',                icon: icon(ClipboardList), permission: 'report:view' },
-    { id: 'broadcasts',  label: 'Broadcasts',             icon: icon(Megaphone),   permission: 'broadcast:manage' },
-    { id: 'support',     label: 'Support Tickets',        icon: icon(LifeBuoy),    permission: 'ticket:manage' },
-    { id: 'live-proctoring', label: 'Live Proctoring',    icon: icon(Radio),       permission: 'proctoring:monitor' },
-    { id: 'violations',  label: 'Violations',             icon: icon(AlertTriangle), permission: 'proctoring:view' },
     { id: 'maintenance', label: 'System & Admin Control', icon: icon(ShieldCheck), permission: 'system:manage' },
     { id: 'health',      label: 'System Health',          icon: icon(Activity),    permission: 'system:logs:view' },
     { id: 'management',  label: 'System Management',      icon: icon(Settings),    permission: 'system:manage' },
