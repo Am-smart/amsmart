@@ -225,3 +225,78 @@ export class SystemMapper {
     return toCleanDTO<PushSubscriptionDTO>(ps);
   }
 }
+
+// ============================================================================
+// Certificates / Proctoring / Study / Curriculum
+// ============================================================================
+import type {
+  Certificate, CertificateDTO,
+  Violation, ViolationDTO,
+  StudySession, StudySessionDTO,
+  Topic, TopicDTO,
+} from '../types';
+
+export class CertificateMapper {
+  static toDTO(c: Certificate): CertificateDTO {
+    return {
+      id: c.id,
+      user_id: c.user_id,
+      course_id: c.course_id,
+      code: c.code,
+      title: c.title || 'Certificate of Completion',
+      recipient_name: c.recipient_name || c.users?.full_name || '',
+      course_title: c.course_title || c.courses?.title || '',
+      final_grade: c.final_grade ?? null,
+      template: c.template || 'default',
+      pdf_url: c.pdf_url ?? null,
+      issued_at: c.issued_at,
+      revoked: !!c.revoked_at,
+      revoked_reason: c.revoked_reason ?? null,
+    };
+  }
+}
+
+export class ProctoringMapper {
+  static toViolationDTO(v: Violation): ViolationDTO {
+    return {
+      id: v.id ?? '',
+      session_id: v.session_id,
+      user_id: v.user_id ?? null,
+      user_name: v.users?.full_name || v.user_email || 'Unknown',
+      assessment_id: v.assessment_id ?? null,
+      assessment_type: v.assessment_type || 'quiz',
+      assessment_title: v.assessment_title || '',
+      kind: v.kind,
+      severity: v.severity,
+      message: v.message || '',
+      timestamp: v.timestamp,
+    };
+  }
+}
+
+export class StudyMapper {
+  static toDTO(s: StudySession): StudySessionDTO {
+    return {
+      id: s.id ?? '',
+      course_id: s.course_id ?? null,
+      course_title: s.courses?.title || '',
+      label: s.label || '',
+      started_at: s.started_at,
+      ended_at: s.ended_at ?? null,
+      focus_seconds: s.focus_seconds ?? 0,
+      idle_seconds: s.idle_seconds ?? 0,
+    };
+  }
+}
+
+export class CurriculumMapper {
+  static toTopicDTO(t: Topic): TopicDTO {
+    return {
+      id: t.id,
+      course_id: t.course_id,
+      title: t.title,
+      description: t.description || '',
+      order_index: t.order_index ?? 0,
+    };
+  }
+}
