@@ -40,7 +40,7 @@ function ViolationsPage() {
     const q = search.trim().toLowerCase();
     if (!q) return violations;
     return violations.filter((v) =>
-      [v.user_email, v.assessment_title, v.kind, v.message].some((f) => (f || '').toLowerCase().includes(q))
+      [v.user_name, v.assessment_title, v.kind, v.message].some((f) => (f || '').toLowerCase().includes(q))
     );
   }, [violations, search]);
 

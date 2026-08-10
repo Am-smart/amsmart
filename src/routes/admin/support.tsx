@@ -88,7 +88,7 @@ function SupportPage() {
                 <div>
                   <h2 className="font-bold text-slate-900">{t.subject}</h2>
                   <p className="text-xs text-slate-500">
-                    {t.users?.full_name || 'Unknown user'} · {new Date(t.created_at).toLocaleString()}
+                    {t.user?.full_name || 'Unknown user'} · {new Date(t.created_at).toLocaleString()}
                     {t.category ? ` · ${t.category}` : ''}
                   </p>
                 </div>

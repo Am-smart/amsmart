@@ -55,7 +55,7 @@ function ReportsPage() {
     { metric: 'Total courses', value: courses.length },
     { metric: 'Published courses', value: courses.filter((c) => c.status === 'published').length },
     { metric: 'Certificates issued', value: certificates.length },
-    { metric: 'Certificates revoked', value: certificates.filter((c) => c.revoked_at).length },
+    { metric: 'Certificates revoked', value: certificates.filter((c) => c.revoked).length },
     { metric: 'Violations (30 days)', value: violations.length },
     { metric: 'Critical violations (30 days)', value: violations.filter((v) => v.severity === 'CRITICAL').length },
     { metric: 'Open support tickets', value: tickets.filter((t) => t.status === 'open').length },

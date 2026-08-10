@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import React, { useState } from 'react';
 import { Check, Copy, Mail, UserPlus } from 'lucide-react';
-import { InviteModal } from '@/components/users';
+import { InviteModal } from '@/components/users/InviteModal';
 import { EmptyState } from '@/components/ui-legacy';
 
 interface GeneratedInvite {
@@ -71,7 +71,7 @@ function InvitesPage() {
       <InviteModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onInviteCreated={(role, link) =>
+        onInviteCreated={(role: string, link: string) =>
           setInvites((prev) => [
             { id: `${Date.now()}`, role, link, createdAt: new Date().toISOString() },
             ...prev,
