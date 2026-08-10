@@ -53,6 +53,7 @@ import { Route as AdminSystemRouteImport } from './routes/admin/system'
 import { Route as AdminSupportRouteImport } from './routes/admin/support'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminResetsRouteImport } from './routes/admin/resets'
+import { Route as AdminReportsRouteImport } from './routes/admin/reports'
 import { Route as AdminManagementRouteImport } from './routes/admin/management'
 import { Route as AdminMaintenanceRouteImport } from './routes/admin/maintenance'
 import { Route as AdminLiveProctoringRouteImport } from './routes/admin/live-proctoring'
@@ -292,6 +293,11 @@ const AdminResetsRoute = AdminResetsRouteImport.update({
   path: '/resets',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminReportsRoute = AdminReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminManagementRoute = AdminManagementRouteImport.update({
   id: '/management',
   path: '/management',
@@ -400,6 +406,7 @@ export interface FileRoutesByFullPath {
   '/admin/live-proctoring': typeof AdminLiveProctoringRoute
   '/admin/maintenance': typeof AdminMaintenanceRoute
   '/admin/management': typeof AdminManagementRoute
+  '/admin/reports': typeof AdminReportsRoute
   '/admin/resets': typeof AdminResetsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/support': typeof AdminSupportRoute
@@ -461,6 +468,7 @@ export interface FileRoutesByTo {
   '/admin/live-proctoring': typeof AdminLiveProctoringRoute
   '/admin/maintenance': typeof AdminMaintenanceRoute
   '/admin/management': typeof AdminManagementRoute
+  '/admin/reports': typeof AdminReportsRoute
   '/admin/resets': typeof AdminResetsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/support': typeof AdminSupportRoute
@@ -526,6 +534,7 @@ export interface FileRoutesById {
   '/admin/live-proctoring': typeof AdminLiveProctoringRoute
   '/admin/maintenance': typeof AdminMaintenanceRoute
   '/admin/management': typeof AdminManagementRoute
+  '/admin/reports': typeof AdminReportsRoute
   '/admin/resets': typeof AdminResetsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/support': typeof AdminSupportRoute
@@ -592,6 +601,7 @@ export interface FileRouteTypes {
     | '/admin/live-proctoring'
     | '/admin/maintenance'
     | '/admin/management'
+    | '/admin/reports'
     | '/admin/resets'
     | '/admin/settings'
     | '/admin/support'
@@ -653,6 +663,7 @@ export interface FileRouteTypes {
     | '/admin/live-proctoring'
     | '/admin/maintenance'
     | '/admin/management'
+    | '/admin/reports'
     | '/admin/resets'
     | '/admin/settings'
     | '/admin/support'
@@ -717,6 +728,7 @@ export interface FileRouteTypes {
     | '/admin/live-proctoring'
     | '/admin/maintenance'
     | '/admin/management'
+    | '/admin/reports'
     | '/admin/resets'
     | '/admin/settings'
     | '/admin/support'
@@ -1092,6 +1104,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminResetsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/reports': {
+      id: '/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/management': {
       id: '/admin/management'
       path: '/management'
@@ -1231,6 +1250,7 @@ interface AdminRouteRouteChildren {
   AdminLiveProctoringRoute: typeof AdminLiveProctoringRoute
   AdminMaintenanceRoute: typeof AdminMaintenanceRoute
   AdminManagementRoute: typeof AdminManagementRoute
+  AdminReportsRoute: typeof AdminReportsRoute
   AdminResetsRoute: typeof AdminResetsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminSupportRoute: typeof AdminSupportRoute
@@ -1250,6 +1270,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminLiveProctoringRoute: AdminLiveProctoringRoute,
   AdminMaintenanceRoute: AdminMaintenanceRoute,
   AdminManagementRoute: AdminManagementRoute,
+  AdminReportsRoute: AdminReportsRoute,
   AdminResetsRoute: AdminResetsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminSupportRoute: AdminSupportRoute,
