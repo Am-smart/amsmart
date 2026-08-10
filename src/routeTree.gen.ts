@@ -56,6 +56,7 @@ import { Route as AdminResetsRouteImport } from './routes/admin/resets'
 import { Route as AdminManagementRouteImport } from './routes/admin/management'
 import { Route as AdminMaintenanceRouteImport } from './routes/admin/maintenance'
 import { Route as AdminLiveProctoringRouteImport } from './routes/admin/live-proctoring'
+import { Route as AdminInvitesRouteImport } from './routes/admin/invites'
 import { Route as AdminHelpRouteImport } from './routes/admin/help'
 import { Route as AdminHealthRouteImport } from './routes/admin/health'
 import { Route as AdminCoursesRouteImport } from './routes/admin/courses'
@@ -306,6 +307,11 @@ const AdminLiveProctoringRoute = AdminLiveProctoringRouteImport.update({
   path: '/live-proctoring',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminInvitesRoute = AdminInvitesRouteImport.update({
+  id: '/invites',
+  path: '/invites',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminHelpRoute = AdminHelpRouteImport.update({
   id: '/help',
   path: '/help',
@@ -390,6 +396,7 @@ export interface FileRoutesByFullPath {
   '/admin/courses': typeof AdminCoursesRoute
   '/admin/health': typeof AdminHealthRoute
   '/admin/help': typeof AdminHelpRoute
+  '/admin/invites': typeof AdminInvitesRoute
   '/admin/live-proctoring': typeof AdminLiveProctoringRoute
   '/admin/maintenance': typeof AdminMaintenanceRoute
   '/admin/management': typeof AdminManagementRoute
@@ -450,6 +457,7 @@ export interface FileRoutesByTo {
   '/admin/courses': typeof AdminCoursesRoute
   '/admin/health': typeof AdminHealthRoute
   '/admin/help': typeof AdminHelpRoute
+  '/admin/invites': typeof AdminInvitesRoute
   '/admin/live-proctoring': typeof AdminLiveProctoringRoute
   '/admin/maintenance': typeof AdminMaintenanceRoute
   '/admin/management': typeof AdminManagementRoute
@@ -514,6 +522,7 @@ export interface FileRoutesById {
   '/admin/courses': typeof AdminCoursesRoute
   '/admin/health': typeof AdminHealthRoute
   '/admin/help': typeof AdminHelpRoute
+  '/admin/invites': typeof AdminInvitesRoute
   '/admin/live-proctoring': typeof AdminLiveProctoringRoute
   '/admin/maintenance': typeof AdminMaintenanceRoute
   '/admin/management': typeof AdminManagementRoute
@@ -579,6 +588,7 @@ export interface FileRouteTypes {
     | '/admin/courses'
     | '/admin/health'
     | '/admin/help'
+    | '/admin/invites'
     | '/admin/live-proctoring'
     | '/admin/maintenance'
     | '/admin/management'
@@ -639,6 +649,7 @@ export interface FileRouteTypes {
     | '/admin/courses'
     | '/admin/health'
     | '/admin/help'
+    | '/admin/invites'
     | '/admin/live-proctoring'
     | '/admin/maintenance'
     | '/admin/management'
@@ -702,6 +713,7 @@ export interface FileRouteTypes {
     | '/admin/courses'
     | '/admin/health'
     | '/admin/help'
+    | '/admin/invites'
     | '/admin/live-proctoring'
     | '/admin/maintenance'
     | '/admin/management'
@@ -1101,6 +1113,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLiveProctoringRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/invites': {
+      id: '/admin/invites'
+      path: '/invites'
+      fullPath: '/admin/invites'
+      preLoaderRoute: typeof AdminInvitesRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/help': {
       id: '/admin/help'
       path: '/help'
@@ -1208,6 +1227,7 @@ interface AdminRouteRouteChildren {
   AdminCoursesRoute: typeof AdminCoursesRoute
   AdminHealthRoute: typeof AdminHealthRoute
   AdminHelpRoute: typeof AdminHelpRoute
+  AdminInvitesRoute: typeof AdminInvitesRoute
   AdminLiveProctoringRoute: typeof AdminLiveProctoringRoute
   AdminMaintenanceRoute: typeof AdminMaintenanceRoute
   AdminManagementRoute: typeof AdminManagementRoute
@@ -1226,6 +1246,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminCoursesRoute: AdminCoursesRoute,
   AdminHealthRoute: AdminHealthRoute,
   AdminHelpRoute: AdminHelpRoute,
+  AdminInvitesRoute: AdminInvitesRoute,
   AdminLiveProctoringRoute: AdminLiveProctoringRoute,
   AdminMaintenanceRoute: AdminMaintenanceRoute,
   AdminManagementRoute: AdminManagementRoute,
