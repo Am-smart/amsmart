@@ -7,9 +7,10 @@ import { Modal } from '@/components/ui-legacy/Modal';
 interface InviteModalProps {
     isOpen: boolean;
     onClose: () => void;
+    onInviteCreated?: (role: UserRole, link: string) => void;
 }
 
-export const InviteModal: React.FC<InviteModalProps> = ({ isOpen, onClose }) => {
+export const InviteModal: React.FC<InviteModalProps> = ({ isOpen, onClose, onInviteCreated }) => {
     const [role, setRole] = useState<UserRole>('student');
     const [email, setEmail] = useState('');
     const [inviteLink, setInviteLink] = useState<string | null>(null);
@@ -27,6 +28,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({ isOpen, onClose }) => 
             const res = await generateInvite(role, (role === 'admin' || role === 'teacher') ? email : undefined);
             if (res.success && res.data) {
                 setInviteLink(res.data.link);
+                onInviteCreated?.(role, res.data.link);
             } else {
                 setError(res.error || 'Failed to generate invite');
             }

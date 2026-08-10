@@ -47,14 +47,21 @@ import { Route as StudentCalendarRouteImport } from './routes/student/calendar'
 import { Route as StudentAssignmentsRouteImport } from './routes/student/assignments'
 import { Route as StudentAntiCheatRouteImport } from './routes/student/anti-cheat'
 import { Route as StudentAnalyticsRouteImport } from './routes/student/analytics'
+import { Route as AdminViolationsRouteImport } from './routes/admin/violations'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminSystemRouteImport } from './routes/admin/system'
+import { Route as AdminSupportRouteImport } from './routes/admin/support'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminResetsRouteImport } from './routes/admin/resets'
+import { Route as AdminReportsRouteImport } from './routes/admin/reports'
 import { Route as AdminManagementRouteImport } from './routes/admin/management'
 import { Route as AdminMaintenanceRouteImport } from './routes/admin/maintenance'
+import { Route as AdminLiveProctoringRouteImport } from './routes/admin/live-proctoring'
+import { Route as AdminInvitesRouteImport } from './routes/admin/invites'
 import { Route as AdminHelpRouteImport } from './routes/admin/help'
 import { Route as AdminHealthRouteImport } from './routes/admin/health'
+import { Route as AdminCoursesRouteImport } from './routes/admin/courses'
+import { Route as AdminBroadcastsRouteImport } from './routes/admin/broadcasts'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
 import { Route as ApiV1SystemRouteImport } from './routes/api/v1/system'
 import { Route as ApiV1LearningRouteImport } from './routes/api/v1/learning'
@@ -256,6 +263,11 @@ const StudentAnalyticsRoute = StudentAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => StudentRouteRoute,
 } as any)
+const AdminViolationsRoute = AdminViolationsRouteImport.update({
+  id: '/violations',
+  path: '/violations',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -264,6 +276,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
 const AdminSystemRoute = AdminSystemRouteImport.update({
   id: '/system',
   path: '/system',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminSupportRoute = AdminSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
@@ -276,6 +293,11 @@ const AdminResetsRoute = AdminResetsRouteImport.update({
   path: '/resets',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminReportsRoute = AdminReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminManagementRoute = AdminManagementRouteImport.update({
   id: '/management',
   path: '/management',
@@ -286,6 +308,16 @@ const AdminMaintenanceRoute = AdminMaintenanceRouteImport.update({
   path: '/maintenance',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminLiveProctoringRoute = AdminLiveProctoringRouteImport.update({
+  id: '/live-proctoring',
+  path: '/live-proctoring',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminInvitesRoute = AdminInvitesRouteImport.update({
+  id: '/invites',
+  path: '/invites',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminHelpRoute = AdminHelpRouteImport.update({
   id: '/help',
   path: '/help',
@@ -294,6 +326,16 @@ const AdminHelpRoute = AdminHelpRouteImport.update({
 const AdminHealthRoute = AdminHealthRouteImport.update({
   id: '/health',
   path: '/health',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminCoursesRoute = AdminCoursesRouteImport.update({
+  id: '/courses',
+  path: '/courses',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminBroadcastsRoute = AdminBroadcastsRouteImport.update({
+  id: '/broadcasts',
+  path: '/broadcasts',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
@@ -356,14 +398,21 @@ export interface FileRoutesByFullPath {
   '/teacher': typeof TeacherRouteRouteWithChildren
   '/help': typeof HelpRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/broadcasts': typeof AdminBroadcastsRoute
+  '/admin/courses': typeof AdminCoursesRoute
   '/admin/health': typeof AdminHealthRoute
   '/admin/help': typeof AdminHelpRoute
+  '/admin/invites': typeof AdminInvitesRoute
+  '/admin/live-proctoring': typeof AdminLiveProctoringRoute
   '/admin/maintenance': typeof AdminMaintenanceRoute
   '/admin/management': typeof AdminManagementRoute
+  '/admin/reports': typeof AdminReportsRoute
   '/admin/resets': typeof AdminResetsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/support': typeof AdminSupportRoute
   '/admin/system': typeof AdminSystemRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/violations': typeof AdminViolationsRoute
   '/student/analytics': typeof StudentAnalyticsRoute
   '/student/anti-cheat': typeof StudentAntiCheatRoute
   '/student/assignments': typeof StudentAssignmentsRoute
@@ -411,14 +460,21 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/help': typeof HelpRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/broadcasts': typeof AdminBroadcastsRoute
+  '/admin/courses': typeof AdminCoursesRoute
   '/admin/health': typeof AdminHealthRoute
   '/admin/help': typeof AdminHelpRoute
+  '/admin/invites': typeof AdminInvitesRoute
+  '/admin/live-proctoring': typeof AdminLiveProctoringRoute
   '/admin/maintenance': typeof AdminMaintenanceRoute
   '/admin/management': typeof AdminManagementRoute
+  '/admin/reports': typeof AdminReportsRoute
   '/admin/resets': typeof AdminResetsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/support': typeof AdminSupportRoute
   '/admin/system': typeof AdminSystemRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/violations': typeof AdminViolationsRoute
   '/student/analytics': typeof StudentAnalyticsRoute
   '/student/anti-cheat': typeof StudentAntiCheatRoute
   '/student/assignments': typeof StudentAssignmentsRoute
@@ -470,14 +526,21 @@ export interface FileRoutesById {
   '/teacher': typeof TeacherRouteRouteWithChildren
   '/help': typeof HelpRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/broadcasts': typeof AdminBroadcastsRoute
+  '/admin/courses': typeof AdminCoursesRoute
   '/admin/health': typeof AdminHealthRoute
   '/admin/help': typeof AdminHelpRoute
+  '/admin/invites': typeof AdminInvitesRoute
+  '/admin/live-proctoring': typeof AdminLiveProctoringRoute
   '/admin/maintenance': typeof AdminMaintenanceRoute
   '/admin/management': typeof AdminManagementRoute
+  '/admin/reports': typeof AdminReportsRoute
   '/admin/resets': typeof AdminResetsRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/support': typeof AdminSupportRoute
   '/admin/system': typeof AdminSystemRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/violations': typeof AdminViolationsRoute
   '/student/analytics': typeof StudentAnalyticsRoute
   '/student/anti-cheat': typeof StudentAntiCheatRoute
   '/student/assignments': typeof StudentAssignmentsRoute
@@ -530,14 +593,21 @@ export interface FileRouteTypes {
     | '/teacher'
     | '/help'
     | '/admin/analytics'
+    | '/admin/broadcasts'
+    | '/admin/courses'
     | '/admin/health'
     | '/admin/help'
+    | '/admin/invites'
+    | '/admin/live-proctoring'
     | '/admin/maintenance'
     | '/admin/management'
+    | '/admin/reports'
     | '/admin/resets'
     | '/admin/settings'
+    | '/admin/support'
     | '/admin/system'
     | '/admin/users'
+    | '/admin/violations'
     | '/student/analytics'
     | '/student/anti-cheat'
     | '/student/assignments'
@@ -585,14 +655,21 @@ export interface FileRouteTypes {
     | '/'
     | '/help'
     | '/admin/analytics'
+    | '/admin/broadcasts'
+    | '/admin/courses'
     | '/admin/health'
     | '/admin/help'
+    | '/admin/invites'
+    | '/admin/live-proctoring'
     | '/admin/maintenance'
     | '/admin/management'
+    | '/admin/reports'
     | '/admin/resets'
     | '/admin/settings'
+    | '/admin/support'
     | '/admin/system'
     | '/admin/users'
+    | '/admin/violations'
     | '/student/analytics'
     | '/student/anti-cheat'
     | '/student/assignments'
@@ -643,14 +720,21 @@ export interface FileRouteTypes {
     | '/teacher'
     | '/help'
     | '/admin/analytics'
+    | '/admin/broadcasts'
+    | '/admin/courses'
     | '/admin/health'
     | '/admin/help'
+    | '/admin/invites'
+    | '/admin/live-proctoring'
     | '/admin/maintenance'
     | '/admin/management'
+    | '/admin/reports'
     | '/admin/resets'
     | '/admin/settings'
+    | '/admin/support'
     | '/admin/system'
     | '/admin/users'
+    | '/admin/violations'
     | '/student/analytics'
     | '/student/anti-cheat'
     | '/student/assignments'
@@ -978,6 +1062,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentAnalyticsRouteImport
       parentRoute: typeof StudentRouteRoute
     }
+    '/admin/violations': {
+      id: '/admin/violations'
+      path: '/violations'
+      fullPath: '/admin/violations'
+      preLoaderRoute: typeof AdminViolationsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/users': {
       id: '/admin/users'
       path: '/users'
@@ -990,6 +1081,13 @@ declare module '@tanstack/react-router' {
       path: '/system'
       fullPath: '/admin/system'
       preLoaderRoute: typeof AdminSystemRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/support': {
+      id: '/admin/support'
+      path: '/support'
+      fullPath: '/admin/support'
+      preLoaderRoute: typeof AdminSupportRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/admin/settings': {
@@ -1006,6 +1104,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminResetsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/reports': {
+      id: '/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/management': {
       id: '/admin/management'
       path: '/management'
@@ -1020,6 +1125,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMaintenanceRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/live-proctoring': {
+      id: '/admin/live-proctoring'
+      path: '/live-proctoring'
+      fullPath: '/admin/live-proctoring'
+      preLoaderRoute: typeof AdminLiveProctoringRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/invites': {
+      id: '/admin/invites'
+      path: '/invites'
+      fullPath: '/admin/invites'
+      preLoaderRoute: typeof AdminInvitesRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/help': {
       id: '/admin/help'
       path: '/help'
@@ -1032,6 +1151,20 @@ declare module '@tanstack/react-router' {
       path: '/health'
       fullPath: '/admin/health'
       preLoaderRoute: typeof AdminHealthRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/courses': {
+      id: '/admin/courses'
+      path: '/courses'
+      fullPath: '/admin/courses'
+      preLoaderRoute: typeof AdminCoursesRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/broadcasts': {
+      id: '/admin/broadcasts'
+      path: '/broadcasts'
+      fullPath: '/admin/broadcasts'
+      preLoaderRoute: typeof AdminBroadcastsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/admin/analytics': {
@@ -1109,27 +1242,41 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminBroadcastsRoute: typeof AdminBroadcastsRoute
+  AdminCoursesRoute: typeof AdminCoursesRoute
   AdminHealthRoute: typeof AdminHealthRoute
   AdminHelpRoute: typeof AdminHelpRoute
+  AdminInvitesRoute: typeof AdminInvitesRoute
+  AdminLiveProctoringRoute: typeof AdminLiveProctoringRoute
   AdminMaintenanceRoute: typeof AdminMaintenanceRoute
   AdminManagementRoute: typeof AdminManagementRoute
+  AdminReportsRoute: typeof AdminReportsRoute
   AdminResetsRoute: typeof AdminResetsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminSupportRoute: typeof AdminSupportRoute
   AdminSystemRoute: typeof AdminSystemRoute
   AdminUsersRoute: typeof AdminUsersRoute
+  AdminViolationsRoute: typeof AdminViolationsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminBroadcastsRoute: AdminBroadcastsRoute,
+  AdminCoursesRoute: AdminCoursesRoute,
   AdminHealthRoute: AdminHealthRoute,
   AdminHelpRoute: AdminHelpRoute,
+  AdminInvitesRoute: AdminInvitesRoute,
+  AdminLiveProctoringRoute: AdminLiveProctoringRoute,
   AdminMaintenanceRoute: AdminMaintenanceRoute,
   AdminManagementRoute: AdminManagementRoute,
+  AdminReportsRoute: AdminReportsRoute,
   AdminResetsRoute: AdminResetsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
+  AdminSupportRoute: AdminSupportRoute,
   AdminSystemRoute: AdminSystemRoute,
   AdminUsersRoute: AdminUsersRoute,
+  AdminViolationsRoute: AdminViolationsRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
