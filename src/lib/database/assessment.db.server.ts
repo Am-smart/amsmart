@@ -1,6 +1,9 @@
 import { withSession, supabase } from '../supabase.server';
 import { Assignment, Quiz, Submission, QuizSubmission } from '../types';
-import { dbUtils } from './db-utils.server';
+import { dbUtils, SAFE_USER_SELECT } from './db-utils.server';
+
+// Never `users!student_id(*)`: that ships password hashes and reset tokens.
+const STUDENT_EMBED = `users!student_id(${SAFE_USER_SELECT})`;
 
 export const assessmentDb = {
   // Assignment Operations
@@ -15,6 +18,7 @@ export const assessmentDb = {
     if (teacherId) query = query.eq('teacher_id', teacherId);
     if (courseId) query = query.eq('course_id', courseId);
 
+    query = query.order('due_date', { ascending: true, nullsFirst: false }).order('id', { ascending: true });
     query = dbUtils.applyPagination(query, { limit, offset });
 
     const { data, error } = await query;
@@ -43,6 +47,7 @@ export const assessmentDb = {
     if (courseId) query = query.eq('course_id', courseId);
     if (teacherId) query = query.eq('teacher_id', teacherId);
 
+    query = query.order('created_at', { ascending: false }).order('id', { ascending: true });
     query = dbUtils.applyPagination(query, { limit, offset });
 
     const { data, error } = await query;
@@ -61,19 +66,20 @@ export const assessmentDb = {
 
   // Submission Operations
   async findSubmissionById(id: string, sessionId: string): Promise<Submission | null> {
-    const { data, error } = await withSession(supabase.from('submissions').select('*, assignments(*), users!student_id(*)').eq('id', id), sessionId).maybeSingle();
+    const { data, error } = await withSession(supabase.from('submissions').select(`*, assignments(*), ${STUDENT_EMBED}`).eq('id', id), sessionId).maybeSingle();
     if (error) dbUtils.handleError(error);
     return data as Submission;
   },
 
   async findAllSubmissions(assignmentId?: string, studentId?: string, sessionId?: string, limit?: number, offset?: number, teacherId?: string, status?: string, courseId?: string): Promise<Submission[]> {
-    let query = withSession(supabase.from('submissions').select('*, assignments!inner(*, courses(*)), users!student_id(*)'), sessionId);
+    let query = withSession(supabase.from('submissions').select(`*, assignments!inner(*, courses(*)), ${STUDENT_EMBED}`), sessionId);
     if (assignmentId) query = query.eq('assignment_id', assignmentId);
     if (studentId) query = query.eq('student_id', studentId);
     if (teacherId) query = query.eq('assignments.teacher_id', teacherId);
     if (status) query = query.eq('status', status);
     if (courseId) query = query.eq('assignments.course_id', courseId);
 
+    query = query.order('submitted_at', { ascending: false, nullsFirst: false }).order('id', { ascending: true });
     query = dbUtils.applyPagination(query, { limit, offset });
 
     const { data, error } = await query;
@@ -95,17 +101,18 @@ export const assessmentDb = {
 
   // Quiz Submission Operations
   async findQuizSubmissionById(id: string, sessionId: string): Promise<QuizSubmission | null> {
-    const { data, error } = await withSession(supabase.from('quiz_submissions').select('*, quizzes(*), users!student_id(*)').eq('id', id), sessionId).maybeSingle();
+    const { data, error } = await withSession(supabase.from('quiz_submissions').select(`*, quizzes(*), ${STUDENT_EMBED}`).eq('id', id), sessionId).maybeSingle();
     if (error) dbUtils.handleError(error);
     return data as QuizSubmission;
   },
 
   async findAllQuizSubmissions(quizId?: string, studentId?: string, sessionId?: string, teacherId?: string, courseId?: string, options: { limit?: number; offset?: number } = {}): Promise<QuizSubmission[]> {
-    let query = withSession(supabase.from('quiz_submissions').select('*, quizzes!inner(*), users!student_id(*)'), sessionId);
+    let query = withSession(supabase.from('quiz_submissions').select(`*, quizzes!inner(*), ${STUDENT_EMBED}`), sessionId);
     if (quizId) query = query.eq('quiz_id', quizId);
     if (studentId) query = query.eq('student_id', studentId);
     if (teacherId) query = query.eq('quizzes.teacher_id', teacherId);
     if (courseId) query = query.eq('quizzes.course_id', courseId);
+    query = query.order('submitted_at', { ascending: false, nullsFirst: false }).order('id', { ascending: true });
     query = dbUtils.applyPagination(query, options);
     const { data, error } = await query;
     if (error) dbUtils.handleError(error);
