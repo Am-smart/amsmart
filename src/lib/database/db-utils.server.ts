@@ -10,7 +10,7 @@ import { withSession } from '../supabase.server';
  * always sends an explicit, clamped range so results are deterministic and
  * bounded no matter what a caller passes.
  */
-export const DEFAULT_PAGE_SIZE = 200;
+export const DEFAULT_PAGE_SIZE = 1000;
 export const MAX_PAGE_SIZE = 1000;
 
 /**
