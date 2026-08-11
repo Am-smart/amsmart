@@ -1,6 +1,26 @@
 import { DatabaseError, DatabaseResponse } from '../types';
 import { withSession } from '../supabase.server';
 
+/**
+ * Pagination guard-rails.
+ *
+ * PostgREST silently truncates unbounded reads at its server-side cap, which
+ * makes "SELECT everything" list queries look correct in dev and quietly lose
+ * rows in production. Every list query goes through `applyPagination`, which
+ * always sends an explicit, clamped range so results are deterministic and
+ * bounded no matter what a caller passes.
+ */
+export const DEFAULT_PAGE_SIZE = 200;
+export const MAX_PAGE_SIZE = 1000;
+
+/**
+ * Column projection for embedded `users` relations. Never `users(*)` — the
+ * users table holds password hashes and reset tokens that must never travel
+ * with a joined row.
+ */
+export const SAFE_USER_SELECT =
+  'id, full_name, email, role, phone, active, created_at, updated_at, version, metadata';
+
 export const dbUtils = {
   /**
    * Prepares upsert data with version increment and updated_at
@@ -88,21 +108,28 @@ export const dbUtils = {
   },
 
   /**
-   * Applies common pagination and filtering to a Supabase query
+   * Applies bounded pagination to a Supabase query.
+   *
+   * - `limit` is clamped to `MAX_PAGE_SIZE`.
+   * - A missing `limit` falls back to `DEFAULT_PAGE_SIZE` so no query is ever
+   *   unbounded.
+   * - `offset` always uses `range()` so limit + offset cannot conflict.
    */
   applyPagination<Q extends { limit: (n: number) => Q; range: (from: number, to: number) => Q }>(
     query: Q,
     options: { limit?: number; offset?: number } = {}
   ): Q {
-    let q = query;
-    if (options.limit) {
-        q = q.limit(options.limit);
-    }
-    if (options.offset !== undefined) {
-        const limit = options.limit || 10;
-        q = q.range(options.offset, options.offset + limit - 1);
-    }
-    return q;
+    const requested = Number(options.limit);
+    const limit = Math.min(
+      Number.isFinite(requested) && requested > 0 ? Math.floor(requested) : DEFAULT_PAGE_SIZE,
+      MAX_PAGE_SIZE
+    );
+
+    const rawOffset = Number(options.offset);
+    const offset = Number.isFinite(rawOffset) && rawOffset > 0 ? Math.floor(rawOffset) : 0;
+
+    if (offset > 0) return query.range(offset, offset + limit - 1);
+    return query.limit(limit);
   },
 
   /**
