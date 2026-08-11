@@ -21,6 +21,8 @@ export const learningDb = {
       query = query.eq('status', 'published');
     }
 
+    // Stable ordering: without it, range()-based paging can repeat or skip rows.
+    query = query.order('created_at', { ascending: false }).order('id', { ascending: true });
     query = dbUtils.applyPagination(query, { limit, offset });
 
     const { data, error } = await query;
@@ -75,6 +77,7 @@ export const learningDb = {
   },
 
   async findLessonCompletions(studentId: string, lessonIds: string[], sessionId: string): Promise<string[]> {
+    if (!lessonIds.length) return [];
     const { data, error } = await withSession(supabase.from('lesson_completions'), sessionId)
         .select('lesson_id')
         .eq('student_id', studentId)
@@ -97,9 +100,14 @@ export const learningDb = {
   },
 
   async findAllMaterials(courseId?: string, sessionId?: string, teacherId?: string, options: { limit?: number; offset?: number } = {}): Promise<Material[]> {
-    let query = withSession(supabase.from('materials').select('*, courses(*)'), sessionId);
+    // `courses!inner` is required: filtering on an embedded column with a
+    // non-inner join does not remove parent rows, so the teacher scope was
+    // silently ignored and every material was returned.
+    const select = teacherId ? '*, courses!inner(*)' : '*, courses(*)';
+    let query = withSession(supabase.from('materials').select(select), sessionId);
     if (courseId) query = query.eq('course_id', courseId);
     if (teacherId) query = query.eq('courses.teacher_id', teacherId);
+    query = query.order('created_at', { ascending: false }).order('id', { ascending: true });
     query = dbUtils.applyPagination(query, options);
     const { data, error } = await query;
     if (error) dbUtils.handleError(error);
@@ -118,16 +126,18 @@ export const learningDb = {
   // Enrollment Operations
   async findEnrollmentsByStudentId(studentId: string, sessionId: string): Promise<Enrollment[]> {
     const { data, error } = await withSession(supabase.from('enrollments'), sessionId)
-      .select('*, courses(*), users!student_id(*)')
+      .select(ENROLLMENT_SELECT)
       .eq('student_id', studentId);
     if (error) dbUtils.handleError(error);
     return data as Enrollment[];
   },
 
   async findEnrollmentsByCourseIds(courseIds: string[], sessionId: string): Promise<Enrollment[]> {
+    if (!courseIds.length) return [];
     const { data, error } = await withSession(supabase.from('enrollments'), sessionId)
-      .select('*, courses(*), users!student_id(*)')
-      .in('course_id', courseIds);
+      .select(ENROLLMENT_SELECT)
+      .in('course_id', courseIds)
+      .order('enrolled_at', { ascending: false });
     if (error) dbUtils.handleError(error);
     return data as Enrollment[];
   },
