@@ -1,6 +1,8 @@
 import { withSession, supabase } from '../supabase.server';
 import { Course, Lesson, Material, Enrollment } from '../types';
-import { dbUtils } from './db-utils.server';
+import { dbUtils, SAFE_USER_SELECT } from './db-utils.server';
+
+const ENROLLMENT_SELECT = `*, courses(*), users!student_id(${SAFE_USER_SELECT})`;
 
 export const learningDb = {
   // Course Operations
