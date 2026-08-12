@@ -11,9 +11,22 @@
  * Lovable Cloud client at `@/integrations/supabase/client` (publishable key,
  * persists session in localStorage in the browser).
  */
+import "@/lib/server-only";
 import { supabase as cloudSupabase } from "@/integrations/supabase/client";
+import { supabaseAdmin as cloudAdmin } from "@/integrations/supabase/client.server";
 
-export const supabase = cloudSupabase as unknown as any;
+/**
+ * Server-side data access runs with the privileged (service-role) client.
+ *
+ * Every read/write in this app is reached through `/api/v1/*` handlers that
+ * already validate the custom session cookie and enforce role/ownership rules
+ * (see `src/lib/auth/*` and `src/lib/services/*`). The database keeps RLS
+ * enabled with no permissive policies, so the Data API stays closed to any
+ * direct browser access — the trusted server path is the only way in.
+ *
+ * Falls back to the publishable client if no service-role key is configured.
+ */
+export const supabase = ((cloudAdmin ?? cloudSupabase) as unknown) as any;
 export const supabaseServer = supabase;
 
 /**
