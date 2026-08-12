@@ -7,10 +7,16 @@ import { authService } from "@/lib/services";
  * `app-invite-session` cookie, then redirects to the landing page with a
  * signup flag. No auth required.
  */
+function redirect(location: string): Response {
+  // NOTE: `Response.redirect()` returns immutable headers, which breaks
+  // Set-Cookie merging in the server runtime — build the response manually.
+  return new Response(null, { status: 302, headers: { Location: location } });
+}
+
 async function handleAccept(request: Request): Promise<Response> {
   const url = new URL(request.url);
   const token = url.searchParams.get("token");
-  if (!token) return Response.redirect(new URL("/", url).toString(), 302);
+  if (!token) return redirect(new URL("/", url).toString());
 
   try {
     const invite = await authService.validateInvite(token);
@@ -32,10 +38,10 @@ async function handleAccept(request: Request): Promise<Response> {
     );
     const redirectUrl = new URL("/", url);
     redirectUrl.searchParams.set("signup", "true");
-    return Response.redirect(redirectUrl.toString(), 302);
+    return redirect(redirectUrl.toString());
   } catch (error) {
     console.error("Invite validation failed:", error);
-    return Response.redirect(new URL("/?error=invalid_invite", url).toString(), 302);
+    return redirect(new URL("/?error=invalid_invite", url).toString());
   }
 }
 

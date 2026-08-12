@@ -10,7 +10,7 @@ function redirectToPublic(request: Request): Response {
   const target = new URL("/api/public/v1/auth/invite/accept", url);
   const token = url.searchParams.get("token");
   if (token) target.searchParams.set("token", token);
-  return Response.redirect(target.toString(), 302);
+  return new Response(null, { status: 302, headers: { Location: target.toString() } });
 }
 
 export const Route = createFileRoute("/api/v1/auth/invite/accept")({
