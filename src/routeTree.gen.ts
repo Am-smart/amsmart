@@ -70,6 +70,7 @@ import { Route as ApiV1AuthRouteImport } from './routes/api/v1/auth'
 import { Route as ApiV1AssessmentRouteImport } from './routes/api/v1/assessment'
 import { Route as ApiV1SystemUploadRouteImport } from './routes/api/v1/system/upload'
 import { Route as ApiV1AuthInviteRouteImport } from './routes/api/v1/auth/invite'
+import { Route as ApiV1AuthInviteAcceptRouteImport } from './routes/api/v1/auth/invite/accept'
 import { Route as ApiPublicV1CertificatesVerifyRouteImport } from './routes/api/public/v1/certificates/verify'
 import { Route as ApiPublicV1AuthInviteAcceptRouteImport } from './routes/api/public/v1/auth/invite/accept'
 
@@ -378,6 +379,11 @@ const ApiV1AuthInviteRoute = ApiV1AuthInviteRouteImport.update({
   path: '/invite',
   getParentRoute: () => ApiV1AuthRoute,
 } as any)
+const ApiV1AuthInviteAcceptRoute = ApiV1AuthInviteAcceptRouteImport.update({
+  id: '/accept',
+  path: '/accept',
+  getParentRoute: () => ApiV1AuthInviteRoute,
+} as any)
 const ApiPublicV1CertificatesVerifyRoute =
   ApiPublicV1CertificatesVerifyRouteImport.update({
     id: '/api/public/v1/certificates/verify',
@@ -451,9 +457,10 @@ export interface FileRoutesByFullPath {
   '/api/v1/features': typeof ApiV1FeaturesRoute
   '/api/v1/learning': typeof ApiV1LearningRoute
   '/api/v1/system': typeof ApiV1SystemRouteWithChildren
-  '/api/v1/auth/invite': typeof ApiV1AuthInviteRoute
+  '/api/v1/auth/invite': typeof ApiV1AuthInviteRouteWithChildren
   '/api/v1/system/upload': typeof ApiV1SystemUploadRoute
   '/api/public/v1/certificates/verify': typeof ApiPublicV1CertificatesVerifyRoute
+  '/api/v1/auth/invite/accept': typeof ApiV1AuthInviteAcceptRoute
   '/api/public/v1/auth/invite/accept': typeof ApiPublicV1AuthInviteAcceptRoute
 }
 export interface FileRoutesByTo {
@@ -513,9 +520,10 @@ export interface FileRoutesByTo {
   '/api/v1/features': typeof ApiV1FeaturesRoute
   '/api/v1/learning': typeof ApiV1LearningRoute
   '/api/v1/system': typeof ApiV1SystemRouteWithChildren
-  '/api/v1/auth/invite': typeof ApiV1AuthInviteRoute
+  '/api/v1/auth/invite': typeof ApiV1AuthInviteRouteWithChildren
   '/api/v1/system/upload': typeof ApiV1SystemUploadRoute
   '/api/public/v1/certificates/verify': typeof ApiPublicV1CertificatesVerifyRoute
+  '/api/v1/auth/invite/accept': typeof ApiV1AuthInviteAcceptRoute
   '/api/public/v1/auth/invite/accept': typeof ApiPublicV1AuthInviteAcceptRoute
 }
 export interface FileRoutesById {
@@ -579,9 +587,10 @@ export interface FileRoutesById {
   '/api/v1/features': typeof ApiV1FeaturesRoute
   '/api/v1/learning': typeof ApiV1LearningRoute
   '/api/v1/system': typeof ApiV1SystemRouteWithChildren
-  '/api/v1/auth/invite': typeof ApiV1AuthInviteRoute
+  '/api/v1/auth/invite': typeof ApiV1AuthInviteRouteWithChildren
   '/api/v1/system/upload': typeof ApiV1SystemUploadRoute
   '/api/public/v1/certificates/verify': typeof ApiPublicV1CertificatesVerifyRoute
+  '/api/v1/auth/invite/accept': typeof ApiV1AuthInviteAcceptRoute
   '/api/public/v1/auth/invite/accept': typeof ApiPublicV1AuthInviteAcceptRoute
 }
 export interface FileRouteTypes {
@@ -649,6 +658,7 @@ export interface FileRouteTypes {
     | '/api/v1/auth/invite'
     | '/api/v1/system/upload'
     | '/api/public/v1/certificates/verify'
+    | '/api/v1/auth/invite/accept'
     | '/api/public/v1/auth/invite/accept'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -711,6 +721,7 @@ export interface FileRouteTypes {
     | '/api/v1/auth/invite'
     | '/api/v1/system/upload'
     | '/api/public/v1/certificates/verify'
+    | '/api/v1/auth/invite/accept'
     | '/api/public/v1/auth/invite/accept'
   id:
     | '__root__'
@@ -776,6 +787,7 @@ export interface FileRouteTypes {
     | '/api/v1/auth/invite'
     | '/api/v1/system/upload'
     | '/api/public/v1/certificates/verify'
+    | '/api/v1/auth/invite/accept'
     | '/api/public/v1/auth/invite/accept'
   fileRoutesById: FileRoutesById
 }
@@ -1223,6 +1235,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiV1AuthInviteRouteImport
       parentRoute: typeof ApiV1AuthRoute
     }
+    '/api/v1/auth/invite/accept': {
+      id: '/api/v1/auth/invite/accept'
+      path: '/accept'
+      fullPath: '/api/v1/auth/invite/accept'
+      preLoaderRoute: typeof ApiV1AuthInviteAcceptRouteImport
+      parentRoute: typeof ApiV1AuthInviteRoute
+    }
     '/api/public/v1/certificates/verify': {
       id: '/api/public/v1/certificates/verify'
       path: '/api/public/v1/certificates/verify'
@@ -1368,12 +1387,24 @@ const TeacherRouteRouteWithChildren = TeacherRouteRoute._addFileChildren(
   TeacherRouteRouteChildren,
 )
 
+interface ApiV1AuthInviteRouteChildren {
+  ApiV1AuthInviteAcceptRoute: typeof ApiV1AuthInviteAcceptRoute
+}
+
+const ApiV1AuthInviteRouteChildren: ApiV1AuthInviteRouteChildren = {
+  ApiV1AuthInviteAcceptRoute: ApiV1AuthInviteAcceptRoute,
+}
+
+const ApiV1AuthInviteRouteWithChildren = ApiV1AuthInviteRoute._addFileChildren(
+  ApiV1AuthInviteRouteChildren,
+)
+
 interface ApiV1AuthRouteChildren {
-  ApiV1AuthInviteRoute: typeof ApiV1AuthInviteRoute
+  ApiV1AuthInviteRoute: typeof ApiV1AuthInviteRouteWithChildren
 }
 
 const ApiV1AuthRouteChildren: ApiV1AuthRouteChildren = {
-  ApiV1AuthInviteRoute: ApiV1AuthInviteRoute,
+  ApiV1AuthInviteRoute: ApiV1AuthInviteRouteWithChildren,
 }
 
 const ApiV1AuthRouteWithChildren = ApiV1AuthRoute._addFileChildren(
