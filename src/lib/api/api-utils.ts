@@ -26,6 +26,36 @@ export async function getSessionUser(): Promise<User | null> {
   }
 }
 
+/**
+ * Resolve the public-facing origin of the current request.
+ * Prefers proxy-forwarded host/proto (Lovable/Vercel), then the Origin
+ * header, then the request URL itself.
+ */
+export function getRequestOrigin(request: Request): string {
+  try {
+    const forwardedHost =
+      getRequestHeader("x-forwarded-host") || getRequestHeader("host");
+    const forwardedProto = getRequestHeader("x-forwarded-proto");
+    if (forwardedHost) {
+      const proto =
+        forwardedProto ||
+        (forwardedHost.startsWith("localhost") || forwardedHost.startsWith("127.")
+          ? "http"
+          : "https");
+      return `${proto}://${forwardedHost}`;
+    }
+    const origin = getRequestHeader("origin");
+    if (origin) return origin.replace(/\/+$/, "");
+  } catch {
+    /* fall through to request URL */
+  }
+  try {
+    return new URL(request.url).origin;
+  } catch {
+    return "";
+  }
+}
+
 export function jsonSuccess<T>(data: T, init: ResponseInit = {}): Response {
   return new Response(JSON.stringify({ success: true, data }), {
     status: init.status ?? 200,
