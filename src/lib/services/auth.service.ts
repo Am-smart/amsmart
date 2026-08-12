@@ -211,7 +211,7 @@ export class AuthService {
     };
   }
 
-  async generateInvite(currentUser: User, role: UserRole, email?: string): Promise<{ token: string; link: string }> {
+  async generateInvite(currentUser: User, role: UserRole, email?: string, baseUrlOverride?: string): Promise<{ token: string; link: string }> {
     if (!rbac.can(currentUser, 'user:manage')) {
         throw new ForbiddenError('Only admins can generate invites');
     }
@@ -233,8 +233,8 @@ export class AuthService {
         expires_at: expiresAt
     });
 
-    const baseUrl = process.env.APP_URL || process.env.VITE_APP_URL || '';
-    const link = `${baseUrl}/api/v1/auth/invite/accept?token=${rawToken}`;
+    const baseUrl = (baseUrlOverride || process.env.APP_URL || process.env.VITE_APP_URL || '').replace(/\/+$/, '');
+    const link = `${baseUrl}/api/public/v1/auth/invite/accept?token=${rawToken}`;
 
     return { token: rawToken, link };
   }
