@@ -788,7 +788,9 @@ export class SystemService {
         'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
         'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'text/plain', 'text/csv'
+        'text/plain', 'text/csv',
+        // Proctoring evidence (webcam stills, screen/audio chunks)
+        'video/webm', 'audio/webm', 'audio/ogg'
     ];
 
     if (file.size > MAX_FILE_SIZE) {

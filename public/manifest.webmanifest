@@ -1,0 +1,16 @@
+{
+  "name": "SmartLMS Learning Management System",
+  "short_name": "SmartLMS",
+  "description": "A powerful and lightweight learning management system.",
+  "id": "com.smartlms.app",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#6366f1",
+  "theme_color": "#6366f1",
+  "categories": ["education", "productivity"],
+  "icons": [
+    { "src": "/favicon.ico", "sizes": "48x48", "type": "image/x-icon", "purpose": "any" }
+  ]
+}
