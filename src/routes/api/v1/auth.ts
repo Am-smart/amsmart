@@ -126,10 +126,6 @@ const POST = withHandler(async (user, request) => {
       if (!user) throw new UnauthorizedError();
       return authService.updatePreferences(data.preferences, user);
     }
-    case "generate-invite": {
-      if (!user) throw new UnauthorizedError();
-      return authService.generateInvite(user, data.role, data.email, getRequestOrigin(request));
-    }
     default:
       throw new BadRequestError("Invalid POST action");
   }
