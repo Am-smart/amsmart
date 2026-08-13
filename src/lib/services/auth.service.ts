@@ -8,7 +8,7 @@ import { UserMapper } from '../mappers';
 import { rbac } from '../auth/rbac';
 import { comparePassword, hashPassword, generateToken, hashToken } from '../crypto';
 import { USER_ROLES, SIGNUP_LIMITS } from '../constants';
-import { BadRequestError, UnauthorizedError, ForbiddenError, NotFoundError, ConflictError } from '../api-error';
+import { AppError, BadRequestError, UnauthorizedError, ForbiddenError, NotFoundError, ConflictError } from '../api-error';
 
 export class AuthService {
   async validateSession(token: string): Promise<User | null> {
