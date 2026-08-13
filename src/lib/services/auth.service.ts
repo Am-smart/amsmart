@@ -8,7 +8,7 @@ import { UserMapper } from '../mappers';
 import { rbac } from '../auth/rbac';
 import { comparePassword, hashPassword, generateToken, hashToken } from '../crypto';
 import { USER_ROLES, SIGNUP_LIMITS } from '../constants';
-import { BadRequestError, UnauthorizedError, ForbiddenError, NotFoundError, ConflictError } from '../api-error';
+import { AppError, BadRequestError, UnauthorizedError, ForbiddenError, NotFoundError, ConflictError } from '../api-error';
 
 export class AuthService {
   async validateSession(token: string): Promise<User | null> {
@@ -244,15 +244,15 @@ export class AuthService {
     const invite = await authDb.findInviteByHash(tokenHash);
 
     if (!invite) {
-        throw new BadRequestError('Invalid invite token');
+        throw new AppError('Invalid invite token', 400, 'INVITE_INVALID');
     }
 
     if (invite.used_at) {
-        throw new BadRequestError('Invite has already been used');
+        throw new AppError('Invite has already been used', 400, 'INVITE_USED');
     }
 
     if (new Date(invite.expires_at) < new Date()) {
-        throw new BadRequestError('Invite has expired');
+        throw new AppError('Invite has expired', 400, 'INVITE_EXPIRED');
     }
 
     return invite;

@@ -652,7 +652,8 @@ export async function updatePreferences(preferences: Record<string, unknown>): P
 
 export async function generateInvite(role: UserRole, email?: string): Promise<ActionResponse<{ token: string; link: string }>> {
     try {
-        const data = await apiClient.post<{ token: string; link: string }>('/api/v1/auth', { action: 'generate-invite', role, email });
+        // Single canonical invite-issuing endpoint.
+        const data = await apiClient.post<{ token: string; link: string }>('/api/v1/auth/invite', { role, email });
         return { success: true, data };
     } catch (error: unknown) {
         return { success: false, error: (error as Error).message };

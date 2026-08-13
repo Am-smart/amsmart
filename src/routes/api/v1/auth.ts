@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getCookie, setCookie, deleteCookie } from "@tanstack/react-start/server";
-import { withHandler, getRequestOrigin } from "@/lib/api/api-utils";
+import { withHandler } from "@/lib/api/api-utils";
 import { authService } from "@/lib/services";
 import { UserMapper } from "@/lib/mappers";
 import { rbac } from "@/lib/auth/rbac";
@@ -125,10 +125,6 @@ const POST = withHandler(async (user, request) => {
     case "preferences": {
       if (!user) throw new UnauthorizedError();
       return authService.updatePreferences(data.preferences, user);
-    }
-    case "generate-invite": {
-      if (!user) throw new UnauthorizedError();
-      return authService.generateInvite(user, data.role, data.email, getRequestOrigin(request));
     }
     default:
       throw new BadRequestError("Invalid POST action");
