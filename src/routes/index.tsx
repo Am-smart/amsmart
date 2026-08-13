@@ -57,9 +57,10 @@ function HomePage() {
   useEffect(() => {
     if (!isLoading && user && role) {
       if (window.location.search.includes("signup=true")) return;
+      if (inviteError || window.location.search.includes(INVITE_ERROR_PARAM)) return;
       router.push(`/${role}`);
     }
-  }, [user, role, isLoading, router]);
+  }, [user, role, isLoading, router, inviteError]);
 
   const toggleAuth = useCallback((view: AuthView = "login", initialRole?: AuthRole) => {
     setAuthView(view);
