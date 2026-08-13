@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { getCookie, setCookie, deleteCookie } from "@tanstack/react-start/server";
-import { withHandler, getRequestOrigin } from "@/lib/api/api-utils";
+import { withHandler } from "@/lib/api/api-utils";
 import { authService } from "@/lib/services";
 import { UserMapper } from "@/lib/mappers";
 import { rbac } from "@/lib/auth/rbac";

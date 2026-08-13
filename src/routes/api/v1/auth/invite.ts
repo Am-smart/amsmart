@@ -5,8 +5,8 @@ import { sanitizeObject } from "@/lib/validation";
 import { BadRequestError, UnauthorizedError } from "@/lib/api-error";
 
 /**
- * Invite issuance endpoint. Legacy clients also call `/api/v1/auth?action=generate-invite`;
- * this route exposes a dedicated POST for issuing invites (admin/teacher only).
+ * Canonical invite issuance endpoint (admin-only).
+ * The old `/api/v1/auth?action=generate-invite` action has been removed.
  */
 const POST = withHandler(async (user, request) => {
   if (!user) throw new UnauthorizedError();
