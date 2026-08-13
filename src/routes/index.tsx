@@ -106,6 +106,17 @@ function HomePage() {
           </div>
         </div>
       )}
+
+      {inviteError && (
+        <InviteErrorNotice
+          code={inviteError}
+          onClose={() => setInviteError(null)}
+          onSignIn={() => {
+            setInviteError(null);
+            toggleAuth("login");
+          }}
+        />
+      )}
     </div>
   );
 }
