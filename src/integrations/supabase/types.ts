@@ -67,11 +67,13 @@ export type Database = {
           allow_late_submissions: boolean | null
           allowed_extensions: string[] | null
           anti_cheat_enabled: boolean | null
+          assignment_type: string
           attachments: Json | null
           course_id: string | null
           created_at: string | null
           description: string | null
           due_date: string | null
+          groups: Json
           hard_enforcement: boolean | null
           id: string
           late_penalty_per_day: number | null
@@ -90,11 +92,13 @@ export type Database = {
           allow_late_submissions?: boolean | null
           allowed_extensions?: string[] | null
           anti_cheat_enabled?: boolean | null
+          assignment_type?: string
           attachments?: Json | null
           course_id?: string | null
           created_at?: string | null
           description?: string | null
           due_date?: string | null
+          groups?: Json
           hard_enforcement?: boolean | null
           id?: string
           late_penalty_per_day?: number | null
@@ -113,11 +117,13 @@ export type Database = {
           allow_late_submissions?: boolean | null
           allowed_extensions?: string[] | null
           anti_cheat_enabled?: boolean | null
+          assignment_type?: string
           attachments?: Json | null
           course_id?: string | null
           created_at?: string | null
           description?: string | null
           due_date?: string | null
+          groups?: Json
           hard_enforcement?: boolean | null
           id?: string
           late_penalty_per_day?: number | null
@@ -241,6 +247,66 @@ export type Database = {
           },
         ]
       }
+      certificate_requests: {
+        Row: {
+          certificate_id: string | null
+          course_id: string
+          created_at: string
+          decision_reason: string | null
+          id: string
+          message: string | null
+          metadata: Json
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          certificate_id?: string | null
+          course_id: string
+          created_at?: string
+          decision_reason?: string | null
+          id?: string
+          message?: string | null
+          metadata?: Json
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          certificate_id?: string | null
+          course_id?: string
+          created_at?: string
+          decision_reason?: string | null
+          id?: string
+          message?: string | null
+          metadata?: Json
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "certificate_requests_certificate_id_fkey"
+            columns: ["certificate_id"]
+            isOneToOne: false
+            referencedRelation: "certificates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "certificate_requests_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       certificates: {
         Row: {
           code: string
@@ -325,6 +391,7 @@ export type Database = {
       }
       courses: {
         Row: {
+          archived_at: string | null
           created_at: string | null
           created_by: string | null
           description: string | null
@@ -332,6 +399,7 @@ export type Database = {
           id: string
           max_enrollment: number | null
           metadata: Json | null
+          semester: string | null
           status: string | null
           teacher_id: string | null
           thumbnail_url: string | null
@@ -340,6 +408,7 @@ export type Database = {
           version: number | null
         }
         Insert: {
+          archived_at?: string | null
           created_at?: string | null
           created_by?: string | null
           description?: string | null
@@ -347,6 +416,7 @@ export type Database = {
           id?: string
           max_enrollment?: number | null
           metadata?: Json | null
+          semester?: string | null
           status?: string | null
           teacher_id?: string | null
           thumbnail_url?: string | null
@@ -355,6 +425,7 @@ export type Database = {
           version?: number | null
         }
         Update: {
+          archived_at?: string | null
           created_at?: string | null
           created_by?: string | null
           description?: string | null
@@ -362,6 +433,7 @@ export type Database = {
           id?: string
           max_enrollment?: number | null
           metadata?: Json | null
+          semester?: string | null
           status?: string | null
           teacher_id?: string | null
           thumbnail_url?: string | null
@@ -423,6 +495,7 @@ export type Database = {
           updated_at: string | null
           user_id: string | null
           version: number | null
+          view_count: number
         }
         Insert: {
           content: string
@@ -434,6 +507,7 @@ export type Database = {
           updated_at?: string | null
           user_id?: string | null
           version?: number | null
+          view_count?: number
         }
         Update: {
           content?: string
@@ -445,6 +519,7 @@ export type Database = {
           updated_at?: string | null
           user_id?: string | null
           version?: number | null
+          view_count?: number
         }
         Relationships: [
           {
@@ -1233,6 +1308,7 @@ export type Database = {
           final_grade: number | null
           grade: number | null
           graded_at: string | null
+          group_id: string | null
           id: string
           late_penalty_applied: number | null
           question_scores: Json | null
@@ -1255,6 +1331,7 @@ export type Database = {
           final_grade?: number | null
           grade?: number | null
           graded_at?: string | null
+          group_id?: string | null
           id?: string
           late_penalty_applied?: number | null
           question_scores?: Json | null
@@ -1277,6 +1354,7 @@ export type Database = {
           final_grade?: number | null
           grade?: number | null
           graded_at?: string | null
+          group_id?: string | null
           id?: string
           late_penalty_applied?: number | null
           question_scores?: Json | null
@@ -1420,6 +1498,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      system_settings: {
+        Row: {
+          created_at: string
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          created_at?: string
+          key: string
+          updated_at?: string
+          value?: Json
+        }
+        Update: {
+          created_at?: string
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
       }
       topics: {
         Row: {
