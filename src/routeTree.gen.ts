@@ -31,6 +31,7 @@ import { Route as TeacherCertificatesRouteImport } from './routes/teacher/certif
 import { Route as TeacherCalendarRouteImport } from './routes/teacher/calendar'
 import { Route as TeacherAssignmentsRouteImport } from './routes/teacher/assignments'
 import { Route as TeacherAntiCheatRouteImport } from './routes/teacher/anti-cheat'
+import { Route as TeacherAnalyticsRouteImport } from './routes/teacher/analytics'
 import { Route as StudentSettingsRouteImport } from './routes/student/settings'
 import { Route as StudentQuizzesRouteImport } from './routes/student/quizzes'
 import { Route as StudentProgressRouteImport } from './routes/student/progress'
@@ -182,6 +183,11 @@ const TeacherAssignmentsRoute = TeacherAssignmentsRouteImport.update({
 const TeacherAntiCheatRoute = TeacherAntiCheatRouteImport.update({
   id: '/anti-cheat',
   path: '/anti-cheat',
+  getParentRoute: () => TeacherRouteRoute,
+} as any)
+const TeacherAnalyticsRoute = TeacherAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
   getParentRoute: () => TeacherRouteRoute,
 } as any)
 const StudentSettingsRoute = StudentSettingsRouteImport.update({
@@ -435,6 +441,7 @@ export interface FileRoutesByFullPath {
   '/student/progress': typeof StudentProgressRoute
   '/student/quizzes': typeof StudentQuizzesRoute
   '/student/settings': typeof StudentSettingsRoute
+  '/teacher/analytics': typeof TeacherAnalyticsRoute
   '/teacher/anti-cheat': typeof TeacherAntiCheatRoute
   '/teacher/assignments': typeof TeacherAssignmentsRoute
   '/teacher/calendar': typeof TeacherCalendarRoute
@@ -498,6 +505,7 @@ export interface FileRoutesByTo {
   '/student/progress': typeof StudentProgressRoute
   '/student/quizzes': typeof StudentQuizzesRoute
   '/student/settings': typeof StudentSettingsRoute
+  '/teacher/analytics': typeof TeacherAnalyticsRoute
   '/teacher/anti-cheat': typeof TeacherAntiCheatRoute
   '/teacher/assignments': typeof TeacherAssignmentsRoute
   '/teacher/calendar': typeof TeacherCalendarRoute
@@ -565,6 +573,7 @@ export interface FileRoutesById {
   '/student/progress': typeof StudentProgressRoute
   '/student/quizzes': typeof StudentQuizzesRoute
   '/student/settings': typeof StudentSettingsRoute
+  '/teacher/analytics': typeof TeacherAnalyticsRoute
   '/teacher/anti-cheat': typeof TeacherAntiCheatRoute
   '/teacher/assignments': typeof TeacherAssignmentsRoute
   '/teacher/calendar': typeof TeacherCalendarRoute
@@ -633,6 +642,7 @@ export interface FileRouteTypes {
     | '/student/progress'
     | '/student/quizzes'
     | '/student/settings'
+    | '/teacher/analytics'
     | '/teacher/anti-cheat'
     | '/teacher/assignments'
     | '/teacher/calendar'
@@ -696,6 +706,7 @@ export interface FileRouteTypes {
     | '/student/progress'
     | '/student/quizzes'
     | '/student/settings'
+    | '/teacher/analytics'
     | '/teacher/anti-cheat'
     | '/teacher/assignments'
     | '/teacher/calendar'
@@ -762,6 +773,7 @@ export interface FileRouteTypes {
     | '/student/progress'
     | '/student/quizzes'
     | '/student/settings'
+    | '/teacher/analytics'
     | '/teacher/anti-cheat'
     | '/teacher/assignments'
     | '/teacher/calendar'
@@ -960,6 +972,13 @@ declare module '@tanstack/react-router' {
       path: '/anti-cheat'
       fullPath: '/teacher/anti-cheat'
       preLoaderRoute: typeof TeacherAntiCheatRouteImport
+      parentRoute: typeof TeacherRouteRoute
+    }
+    '/teacher/analytics': {
+      id: '/teacher/analytics'
+      path: '/analytics'
+      fullPath: '/teacher/analytics'
+      preLoaderRoute: typeof TeacherAnalyticsRouteImport
       parentRoute: typeof TeacherRouteRoute
     }
     '/student/settings': {
@@ -1348,6 +1367,7 @@ const StudentRouteRouteWithChildren = StudentRouteRoute._addFileChildren(
 )
 
 interface TeacherRouteRouteChildren {
+  TeacherAnalyticsRoute: typeof TeacherAnalyticsRoute
   TeacherAntiCheatRoute: typeof TeacherAntiCheatRoute
   TeacherAssignmentsRoute: typeof TeacherAssignmentsRoute
   TeacherCalendarRoute: typeof TeacherCalendarRoute
@@ -1366,6 +1386,7 @@ interface TeacherRouteRouteChildren {
 }
 
 const TeacherRouteRouteChildren: TeacherRouteRouteChildren = {
+  TeacherAnalyticsRoute: TeacherAnalyticsRoute,
   TeacherAntiCheatRoute: TeacherAntiCheatRoute,
   TeacherAssignmentsRoute: TeacherAssignmentsRoute,
   TeacherCalendarRoute: TeacherCalendarRoute,

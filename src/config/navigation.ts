@@ -53,6 +53,7 @@ export const NAVIGATION: Record<UserRole, NavItem[]> = {
     { id: 'assignments', label: 'Assignments',    icon: icon(FileText),    permission: 'assignment:manage' },
     { id: 'grading',     label: 'Grading Queue',  icon: icon(BarChart3),   permission: 'assignment:grade' },
     { id: 'gradebook',   label: 'Grade Book',     icon: icon(BookMarked),  permission: 'assignment:grade' },
+    { id: 'analytics',   label: 'Analytics',      icon: icon(LineChart) },
     { id: 'students',    label: 'Students',       icon: icon(Users),       permission: 'user:view' },
     { id: 'discussions', label: 'Discussions',    icon: icon(MessageSquare) },
     { id: 'calendar',    label: 'Calendar',       icon: icon(Calendar) },
