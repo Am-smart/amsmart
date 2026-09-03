@@ -145,6 +145,22 @@ export interface Attachment {
 // AttachmentDTO is an alias for Attachment to maintain backward compatibility
 export type AttachmentDTO = Attachment;
 
+/**
+ * A working group defined on a group assignment. Membership is stored on the
+ * assignment itself (`assignments.groups`), and submissions are tied to a
+ * group through `submissions.group_id`.
+ */
+export interface AssignmentGroup {
+  id: string;
+  name: string;
+  /** Student ids that belong to this group. */
+  member_ids: string[];
+  /** Group leader. Must be one of `member_ids`. */
+  leader_id?: string | null;
+}
+
+export type AssignmentType = 'individual' | 'group';
+
 export interface Assignment {
   id: string;
   course_id: string;
@@ -167,6 +183,9 @@ export interface Assignment {
   version?: number;
   questions: AssignmentQuestion[];
   attachments?: Attachment[];
+  /** 'group' assignments are scoped to the groups listed in `groups`. */
+  assignment_type?: AssignmentType;
+  groups?: AssignmentGroup[];
   metadata?: Record<string, any>;
   courses?: Course;
 }
@@ -203,6 +222,9 @@ export interface AssignmentDTO {
   regrade_requests_enabled: boolean;
   questions: QuestionDTO[];
   attachments?: AttachmentDTO[];
+  /** 'group' assignments are scoped to the groups listed in `groups`. */
+  assignment_type?: AssignmentType;
+  groups?: AssignmentGroup[];
   course?: CourseDTO;
   version?: number;
   created_at?: string;
@@ -283,6 +305,8 @@ export interface Submission {
   id: string;
   assignment_id: string;
   student_id: string;
+  /** Set for group assignments: the group this submission belongs to. */
+  group_id?: string | null;
   submitted_at: string;
   updated_at?: string;
   submission_text?: string;
@@ -312,6 +336,8 @@ export interface SubmissionDTO {
   id: string;
   assignment_id: string;
   student_id: string;
+  /** Set for group assignments: the group this submission belongs to. */
+  group_id?: string | null;
   submitted_at: string;
   updated_at?: string;
   status: 'draft' | 'submitted' | 'graded' | 'returned';
