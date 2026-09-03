@@ -145,6 +145,22 @@ export interface Attachment {
 // AttachmentDTO is an alias for Attachment to maintain backward compatibility
 export type AttachmentDTO = Attachment;
 
+/**
+ * A working group defined on a group assignment. Membership is stored on the
+ * assignment itself (`assignments.groups`), and submissions are tied to a
+ * group through `submissions.group_id`.
+ */
+export interface AssignmentGroup {
+  id: string;
+  name: string;
+  /** Student ids that belong to this group. */
+  member_ids: string[];
+  /** Group leader. Must be one of `member_ids`. */
+  leader_id?: string | null;
+}
+
+export type AssignmentType = 'individual' | 'group';
+
 export interface Assignment {
   id: string;
   course_id: string;
