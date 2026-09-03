@@ -305,6 +305,8 @@ export interface Submission {
   id: string;
   assignment_id: string;
   student_id: string;
+  /** Set for group assignments: the group this submission belongs to. */
+  group_id?: string | null;
   submitted_at: string;
   updated_at?: string;
   submission_text?: string;
@@ -334,6 +336,8 @@ export interface SubmissionDTO {
   id: string;
   assignment_id: string;
   student_id: string;
+  /** Set for group assignments: the group this submission belongs to. */
+  group_id?: string | null;
   submitted_at: string;
   updated_at?: string;
   status: 'draft' | 'submitted' | 'graded' | 'returned';
