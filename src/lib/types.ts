@@ -183,6 +183,9 @@ export interface Assignment {
   version?: number;
   questions: AssignmentQuestion[];
   attachments?: Attachment[];
+  /** 'group' assignments are scoped to the groups listed in `groups`. */
+  assignment_type?: AssignmentType;
+  groups?: AssignmentGroup[];
   metadata?: Record<string, any>;
   courses?: Course;
 }
@@ -219,6 +222,9 @@ export interface AssignmentDTO {
   regrade_requests_enabled: boolean;
   questions: QuestionDTO[];
   attachments?: AttachmentDTO[];
+  /** 'group' assignments are scoped to the groups listed in `groups`. */
+  assignment_type?: AssignmentType;
+  groups?: AssignmentGroup[];
   course?: CourseDTO;
   version?: number;
   created_at?: string;
