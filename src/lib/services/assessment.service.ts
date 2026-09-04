@@ -20,7 +20,10 @@ export class AssessmentService {
         const now = new Date();
         return assignments.filter(a =>
             enrolledCourseIds.includes(a.course_id) &&
-            (!a.start_at || new Date(a.start_at) <= now)
+            (!a.start_at || new Date(a.start_at) <= now) &&
+            // Group assignments (questions, files, everything) are only visible
+            // to the students who are members of one of its groups.
+            AssessmentDomain.canStudentAccessAssignment(a, userId)
         );
     }
     return assessmentDb.findAllAssignments(teacherId, courseId, sessionId!, limit, offset);
