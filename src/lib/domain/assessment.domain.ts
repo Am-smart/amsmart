@@ -1,4 +1,4 @@
-import { Assignment, Quiz, QuizQuestion, QuizSubmission, Submission } from '../types';
+import { Assignment, AssignmentGroup, Quiz, QuizQuestion, QuizSubmission, Submission } from '../types';
 import { ASSESSMENT_STATUS, SUBMISSION_STATUS } from '../constants';
 
 export class AssessmentDomain {
@@ -85,6 +85,118 @@ export class AssessmentDomain {
             throw new Error(`Total question points (${totalPoints}) must match points possible (${assignment.points_possible})`);
         }
     }
+    if (assignment.assignment_type === 'group') {
+        this.validateGroups(assignment.groups);
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Group assignments
+  // ---------------------------------------------------------------------------
+
+  /** True when the assignment is delivered to groups instead of individuals. */
+  static isGroupAssignment(assignment?: Partial<Assignment> | null): boolean {
+    return assignment?.assignment_type === 'group';
+  }
+
+  static normalizeGroups(groups?: unknown): AssignmentGroup[] {
+    if (!Array.isArray(groups)) return [];
+    return groups
+      .filter((g): g is Record<string, any> => !!g && typeof g === 'object')
+      .map((g) => ({
+        id: String(g.id || '').trim(),
+        name: String(g.name || '').trim(),
+        member_ids: Array.isArray(g.member_ids) ? g.member_ids.map((m: unknown) => String(m)).filter(Boolean) : [],
+        leader_id: g.leader_id ? String(g.leader_id) : null,
+      }));
+  }
+
+  /**
+   * Groups must be uniquely named/identified, non-empty, and a student may only
+   * belong to a single group per assignment. A leader, when set, must be a member.
+   */
+  static validateGroups(groups?: unknown) {
+    const list = this.normalizeGroups(groups);
+    if (list.length === 0) {
+      throw new Error('A group assignment must define at least one group');
+    }
+    const seenIds = new Set<string>();
+    const seenNames = new Set<string>();
+    const seenMembers = new Map<string, string>();
+
+    list.forEach((group, idx) => {
+      if (!group.id) throw new Error(`Group ${idx + 1} is missing an identifier`);
+      if (!group.name) throw new Error(`Group ${idx + 1} needs a name`);
+      if (seenIds.has(group.id)) throw new Error(`Duplicate group identifier "${group.id}"`);
+      const nameKey = group.name.toLowerCase();
+      if (seenNames.has(nameKey)) throw new Error(`Duplicate group name "${group.name}"`);
+      seenIds.add(group.id);
+      seenNames.add(nameKey);
+
+      if (group.member_ids.length === 0) {
+        throw new Error(`Group "${group.name}" must have at least one member`);
+      }
+      const unique = new Set(group.member_ids);
+      if (unique.size !== group.member_ids.length) {
+        throw new Error(`Group "${group.name}" lists the same student more than once`);
+      }
+      group.member_ids.forEach((memberId) => {
+        const other = seenMembers.get(memberId);
+        if (other) {
+          throw new Error(`A student cannot belong to both "${other}" and "${group.name}"`);
+        }
+        seenMembers.set(memberId, group.name);
+      });
+      if (group.leader_id && !group.member_ids.includes(group.leader_id)) {
+        throw new Error(`The leader of "${group.name}" must also be a member of the group`);
+      }
+    });
+  }
+
+  /** The group a student belongs to on this assignment, if any. */
+  static findGroupForStudent(
+    assignment: Partial<Assignment> | null | undefined,
+    studentId: string,
+  ): AssignmentGroup | null {
+    if (!assignment || !studentId) return null;
+    const groups = this.normalizeGroups(assignment.groups);
+    return groups.find((g) => g.member_ids.includes(studentId)) || null;
+  }
+
+  static findGroupById(
+    assignment: Partial<Assignment> | null | undefined,
+    groupId?: string | null,
+  ): AssignmentGroup | null {
+    if (!assignment || !groupId) return null;
+    return this.normalizeGroups(assignment.groups).find((g) => g.id === groupId) || null;
+  }
+
+  /**
+   * Whether a student may see/work on an assignment. Individual assignments are
+   * open to every enrolled student; group assignments only to group members.
+   */
+  static canStudentAccessAssignment(
+    assignment: Partial<Assignment> | null | undefined,
+    studentId: string,
+  ): boolean {
+    if (!assignment) return false;
+    if (!this.isGroupAssignment(assignment)) return true;
+    return !!this.findGroupForStudent(assignment, studentId);
+  }
+
+  /**
+   * Who may raise a regrade request. For group work this is the leader only
+   * (falling back to any member when no leader was designated).
+   */
+  static canRequestRegrade(
+    assignment: Partial<Assignment> | null | undefined,
+    studentId: string,
+  ): boolean {
+    if (!assignment) return false;
+    if (!this.isGroupAssignment(assignment)) return true;
+    const group = this.findGroupForStudent(assignment, studentId);
+    if (!group) return false;
+    return group.leader_id ? group.leader_id === studentId : true;
   }
 
   static validateQuiz(quiz: Partial<Quiz>) {
@@ -206,10 +318,13 @@ export class AssessmentDomain {
   static prepareAssignment(assignment: Partial<Assignment>, teacherId: string): Partial<Assignment> {
     this.validateAssignment(assignment);
     const rest = this.sanitizeEntity(assignment);
+    const isGroup = assignment.assignment_type === 'group';
     return {
       ...rest,
       teacher_id: assignment.teacher_id || teacherId,
       status: assignment.status || ASSESSMENT_STATUS.DRAFT,
+      assignment_type: isGroup ? 'group' : 'individual',
+      groups: isGroup ? this.normalizeGroups(assignment.groups) : [],
       allowed_extensions: assignment.allowed_extensions || ['pdf', 'doc', 'docx', 'zip', 'jpg', 'png']
     };
   }

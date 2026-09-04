@@ -20,7 +20,10 @@ export class AssessmentService {
         const now = new Date();
         return assignments.filter(a =>
             enrolledCourseIds.includes(a.course_id) &&
-            (!a.start_at || new Date(a.start_at) <= now)
+            (!a.start_at || new Date(a.start_at) <= now) &&
+            // Group assignments (questions, files, everything) are only visible
+            // to the students who are members of one of its groups.
+            AssessmentDomain.canStudentAccessAssignment(a, userId)
         );
     }
     return assessmentDb.findAllAssignments(teacherId, courseId, sessionId!, limit, offset);
@@ -208,10 +211,53 @@ export class AssessmentService {
   }
 
   // Submissions
+  /**
+   * Resolves the group assignments a student can work on, together with the
+   * group they belong to. Used to widen a student's submission view to the
+   * shared group submission without exposing other groups' work.
+   */
+  private async getStudentGroupKeys(
+    studentId: string,
+    sessionId: string,
+    assignmentId?: string,
+    courseId?: string,
+  ): Promise<{ assignmentId: string; groupId: string }[]> {
+    const assignments = await this.getAssignments(
+      undefined,
+      courseId,
+      sessionId,
+      undefined,
+      undefined,
+      studentId,
+      'student',
+    );
+    return assignments
+      .filter((a) => AssessmentDomain.isGroupAssignment(a) && (!assignmentId || a.id === assignmentId))
+      .map((a) => {
+        const group = AssessmentDomain.findGroupForStudent(a, studentId);
+        return group ? { assignmentId: a.id, groupId: group.id } : null;
+      })
+      .filter((k): k is { assignmentId: string; groupId: string } => !!k);
+  }
+
   async getSubmissions(assignmentId?: string, studentId?: string, sessionId?: string, limit?: number, offset?: number, userId?: string, userRole?: string, status?: string, courseId?: string): Promise<Submission[]> {
     if (userRole === 'student' && userId) {
-        // Students can only see their own submissions
-        return assessmentDb.findAllSubmissions(assignmentId, userId, sessionId!, limit, offset, undefined, status, courseId);
+        // Students see their own submissions, plus the shared submission of any
+        // group they belong to (which a teammate may have submitted).
+        const own = await assessmentDb.findAllSubmissions(assignmentId, userId, sessionId!, limit, offset, undefined, status, courseId);
+        const groupKeys = await this.getStudentGroupKeys(userId, sessionId!, assignmentId, courseId);
+        if (groupKeys.length === 0) return own;
+
+        const groupSubs = await assessmentDb.findSubmissionsByGroups(groupKeys, sessionId!);
+        const merged = [...own];
+        const seen = new Set(own.map((s) => s.id));
+        groupSubs.forEach((s) => {
+            if (seen.has(s.id)) return;
+            if (status && s.status !== status) return;
+            seen.add(s.id);
+            merged.push(s);
+        });
+        return merged;
     }
 
     if (userRole === 'teacher' && userId) {
@@ -223,16 +269,42 @@ export class AssessmentService {
   }
 
   async submitAssignment(studentId: string, assignmentId: string, content: Partial<Submission>, sessionId: string): Promise<Submission> {
-    // Idempotency: Check if already submitted
-    const existing = await assessmentDb.findAllSubmissions(assignmentId, studentId, sessionId);
+    const assignment = await assessmentDb.findAssignmentById(assignmentId, sessionId);
+    if (!assignment) throw new NotFoundError('Assignment not found');
+
+    // Enrollment gate: only students enrolled in the course may submit.
+    const { serviceRegistry } = await import('./service-registry');
+    const enrollments = await serviceRegistry.systemService.getStudentEnrollments(studentId, sessionId);
+    if (!enrollments.some((e) => e.course_id === assignment.course_id)) {
+        throw new ForbiddenError('You are not enrolled in the course for this assignment');
+    }
+
+    const isGroup = AssessmentDomain.isGroupAssignment(assignment);
+    const group = isGroup ? AssessmentDomain.findGroupForStudent(assignment, studentId) : null;
+    if (isGroup && !group) {
+        throw new ForbiddenError('This is a group assignment and you are not a member of any of its groups');
+    }
+
+    // Idempotency: one submission per student, or one shared submission per group.
+    const existing = isGroup
+        ? await assessmentDb.findSubmissionsByGroups([{ assignmentId, groupId: group!.id }], sessionId)
+        : await assessmentDb.findAllSubmissions(assignmentId, studentId, sessionId);
     if (existing.length > 0 && existing[0].status !== SUBMISSION_STATUS.DRAFT) {
         return existing[0];
     }
 
-    const assignment = await assessmentDb.findAssignmentById(assignmentId, sessionId);
-    if (!assignment) throw new NotFoundError('Assignment not found');
-
     const submissionToSave = AssessmentDomain.prepareSubmission(studentId, assignmentId, content);
+    if (isGroup) {
+        submissionToSave.group_id = group!.id;
+        // Keep the shared group row: update in place rather than creating a
+        // second submission owned by another member.
+        if (existing.length > 0) {
+            submissionToSave.id = existing[0].id;
+            submissionToSave.student_id = existing[0].student_id;
+        }
+    } else {
+        submissionToSave.group_id = null;
+    }
 
     // Calculate late penalty
     const submittedAt = new Date(submissionToSave.submitted_at!);
@@ -249,6 +321,58 @@ export class AssessmentService {
     }
 
     return assessmentDb.upsertSubmission(submissionToSave, sessionId);
+  }
+
+  /**
+   * Student-initiated regrade request. Group work can only be escalated by the
+   * group leader (or any member when no leader was designated).
+   */
+  async requestRegrade(studentId: string, assignmentId: string, reason: string, sessionId: string): Promise<Submission> {
+    const assignment = await assessmentDb.findAssignmentById(assignmentId, sessionId);
+    if (!assignment) throw new NotFoundError('Assignment not found');
+    if (!assignment.regrade_requests_enabled) {
+        throw new ForbiddenError('Regrade requests are disabled for this assignment');
+    }
+
+    const message = (reason || '').trim();
+    if (!message) throw new Error('Please describe why the work should be reviewed again');
+
+    const isGroup = AssessmentDomain.isGroupAssignment(assignment);
+    const group = isGroup ? AssessmentDomain.findGroupForStudent(assignment, studentId) : null;
+    if (isGroup && !group) {
+        throw new ForbiddenError('You are not a member of any group on this assignment');
+    }
+    if (!AssessmentDomain.canRequestRegrade(assignment, studentId)) {
+        throw new ForbiddenError('Only the group leader can request a regrade for group work');
+    }
+
+    const existing = isGroup
+        ? await assessmentDb.findSubmissionsByGroups([{ assignmentId, groupId: group!.id }], sessionId)
+        : await assessmentDb.findAllSubmissions(assignmentId, studentId, sessionId);
+
+    const submission = existing[0];
+    if (!submission) throw new NotFoundError('No submission found for this assignment');
+    if (submission.status !== SUBMISSION_STATUS.GRADED) {
+        throw new ForbiddenError('Only graded submissions can be sent back for review');
+    }
+
+    const updated = await assessmentDb.upsertSubmission({
+        id: submission.id,
+        assignment_id: submission.assignment_id,
+        student_id: submission.student_id,
+        regrade_request: message,
+    } as Partial<Submission>, sessionId);
+
+    const { serviceRegistry } = await import('./service-registry');
+    await serviceRegistry.systemService.notifyUser({
+        target_id: assignment.teacher_id,
+        n_title: 'Regrade Requested',
+        n_msg: `A regrade was requested for "${assignment.title}".`,
+        n_link: `grading-queue:${submission.id}`,
+        n_type: 'regrade'
+    }, sessionId);
+
+    return updated;
   }
 
   async gradeSubmission(submissionId: string, gradeData: Partial<Submission>, sessionId: string, performingUserId?: string, performingUserRole?: string, options: { draft?: boolean } = {}): Promise<Submission> {
@@ -331,13 +455,23 @@ export class AssessmentService {
     // Trigger Notification only on real grading, not draft saves
     if (!options.draft && submission.status !== SUBMISSION_STATUS.GRADED) {
         const { serviceRegistry } = await import('./service-registry');
-        await serviceRegistry.systemService.notifyUser({
-            target_id: updated.student_id,
-            n_title: 'Assignment Graded',
-            n_msg: 'Your submission for an assignment has been graded.',
-            n_link: `assignment-list:${updated.assignment_id}`,
-            n_type: 'grading'
-        }, sessionId);
+        // Group work: every member of the graded group is notified.
+        const group = AssessmentDomain.findGroupById(assignment, updated.group_id);
+        const recipients = group && group.member_ids.length > 0
+            ? Array.from(new Set(group.member_ids))
+            : [updated.student_id];
+
+        for (const recipient of recipients) {
+            await serviceRegistry.systemService.notifyUser({
+                target_id: recipient,
+                n_title: 'Assignment Graded',
+                n_msg: group
+                    ? `Your group "${group.name}" submission has been graded.`
+                    : 'Your submission for an assignment has been graded.',
+                n_link: `assignment-list:${updated.assignment_id}`,
+                n_type: 'grading'
+            }, sessionId);
+        }
     }
 
     return updated;
