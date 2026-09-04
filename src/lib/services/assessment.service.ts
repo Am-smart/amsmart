@@ -455,13 +455,23 @@ export class AssessmentService {
     // Trigger Notification only on real grading, not draft saves
     if (!options.draft && submission.status !== SUBMISSION_STATUS.GRADED) {
         const { serviceRegistry } = await import('./service-registry');
-        await serviceRegistry.systemService.notifyUser({
-            target_id: updated.student_id,
-            n_title: 'Assignment Graded',
-            n_msg: 'Your submission for an assignment has been graded.',
-            n_link: `assignment-list:${updated.assignment_id}`,
-            n_type: 'grading'
-        }, sessionId);
+        // Group work: every member of the graded group is notified.
+        const group = AssessmentDomain.findGroupById(assignment, updated.group_id);
+        const recipients = group && group.member_ids.length > 0
+            ? Array.from(new Set(group.member_ids))
+            : [updated.student_id];
+
+        for (const recipient of recipients) {
+            await serviceRegistry.systemService.notifyUser({
+                target_id: recipient,
+                n_title: 'Assignment Graded',
+                n_msg: group
+                    ? `Your group "${group.name}" submission has been graded.`
+                    : 'Your submission for an assignment has been graded.',
+                n_link: `assignment-list:${updated.assignment_id}`,
+                n_type: 'grading'
+            }, sessionId);
+        }
     }
 
     return updated;
