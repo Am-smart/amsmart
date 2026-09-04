@@ -87,6 +87,35 @@ export const assessmentDb = {
     return data as Submission[];
   },
 
+  /**
+   * Submissions belonging to specific (assignment, group) pairs. Used so every
+   * member of a group sees and works on the single shared group submission.
+   */
+  async findSubmissionsByGroups(
+    keys: { assignmentId: string; groupId: string }[],
+    sessionId: string,
+  ): Promise<Submission[]> {
+    const valid = keys.filter((k) => k.assignmentId && k.groupId);
+    if (valid.length === 0) return [];
+
+    const filter = valid
+      .map((k) => `and(assignment_id.eq.${k.assignmentId},group_id.eq.${k.groupId})`)
+      .join(',');
+
+    const { data, error } = await withSession(
+      supabase
+        .from('submissions')
+        .select(`*, assignments!inner(*, courses(*)), ${STUDENT_EMBED}`)
+        .or(filter)
+        .order('submitted_at', { ascending: false, nullsFirst: false })
+        .order('id', { ascending: true }),
+      sessionId,
+    );
+    if (error) dbUtils.handleError(error);
+    return (data || []) as Submission[];
+  },
+
+
   async upsertSubmission(submission: Partial<Submission>, sessionId: string): Promise<Submission> {
     return dbUtils.upsert(supabase.from('submissions'), submission, 'Submission', sessionId, {
       onConflict: 'assignment_id,student_id',
