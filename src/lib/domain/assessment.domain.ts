@@ -318,10 +318,13 @@ export class AssessmentDomain {
   static prepareAssignment(assignment: Partial<Assignment>, teacherId: string): Partial<Assignment> {
     this.validateAssignment(assignment);
     const rest = this.sanitizeEntity(assignment);
+    const isGroup = assignment.assignment_type === 'group';
     return {
       ...rest,
       teacher_id: assignment.teacher_id || teacherId,
       status: assignment.status || ASSESSMENT_STATUS.DRAFT,
+      assignment_type: isGroup ? 'group' : 'individual',
+      groups: isGroup ? this.normalizeGroups(assignment.groups) : [],
       allowed_extensions: assignment.allowed_extensions || ['pdf', 'doc', 'docx', 'zip', 'jpg', 'png']
     };
   }
