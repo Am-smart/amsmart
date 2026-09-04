@@ -264,6 +264,20 @@ export async function submitAssignment(assignmentId: string, content: Partial<Su
   }
 }
 
+/**
+ * Ask the teacher to review a graded submission again. For group assignments
+ * only the group leader is allowed to do this (enforced server-side).
+ */
+export async function requestRegrade(assignmentId: string, reason: string): Promise<ActionResponse<SubmissionDTO>> {
+  try {
+    const data = await apiClient.post<SubmissionDTO>('/api/v1/assessment', { action: 'request-regrade', assignmentId, reason });
+    return { success: true, data };
+  } catch (error: unknown) {
+    return { success: false, error: (error as Error).message };
+  }
+}
+
+
 export async function getSubmissions(filters: { assignmentId?: string; studentId?: string; status?: string; courseId?: string; limit?: number; offset?: number } = {}): Promise<SubmissionDTO[]> {
     let url = '/api/v1/assessment?action=submissions';
     if (filters.assignmentId) url += `&assignmentId=${filters.assignmentId}`;

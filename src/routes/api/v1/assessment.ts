@@ -83,6 +83,12 @@ const POST = withHandler(async (user, request) => {
       return AssessmentMapper.stripUnfinalizedGrading(
         AssessmentMapper.toSubmissionDTO(sub)
       );
+    case "request-regrade": {
+      if (!rbac.can(user, "assignment:submit")) throw new UnauthorizedError();
+      const { assignmentId, reason } = data;
+      if (!assignmentId) throw new BadRequestError("assignmentId is required");
+      const sub = await assessmentService.requestRegrade(user.id, assignmentId, String(reason || ""), user.sessionId!);
+      return AssessmentMapper.stripUnfinalizedGrading(AssessmentMapper.toSubmissionDTO(sub));
     }
     case "save-quiz": {
       if (!rbac.can(user, "quiz:manage")) throw new UnauthorizedError();
