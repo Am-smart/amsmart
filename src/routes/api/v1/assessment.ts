@@ -83,6 +83,7 @@ const POST = withHandler(async (user, request) => {
       return AssessmentMapper.stripUnfinalizedGrading(
         AssessmentMapper.toSubmissionDTO(sub)
       );
+    }
     case "request-regrade": {
       if (!rbac.can(user, "assignment:submit")) throw new UnauthorizedError();
       const { assignmentId, reason } = data;
