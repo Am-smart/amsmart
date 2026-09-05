@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { SubmissionDTO } from '@/lib/types';
-import { Clock, RotateCcw, User, FileText, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Clock, RotateCcw, User, FileText, CheckCircle2, ChevronLeft, ChevronRight, Users } from 'lucide-react';
 
 interface GradingQueueProps {
   submissions: SubmissionDTO[];
