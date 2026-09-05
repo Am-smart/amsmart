@@ -5,7 +5,7 @@ import { useAntiCheat } from '@/hooks/useAntiCheat';
 import { useIndexedDB } from '@/hooks/useIndexedDB';
 import { useAppContext } from '@/components/AppContext';
 import { FileUpload } from '@/components/ui-legacy/FileUpload';
-import { Shield } from 'lucide-react';
+import { Shield, Users, Crown, Lock } from 'lucide-react';
 
 interface AssignmentFormProps {
   assignment: AssignmentDTO;
@@ -51,6 +51,12 @@ export const AssignmentForm: React.FC<AssignmentFormProps> = ({ assignment, user
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { addToQueue, isOnline } = useIndexedDB();
+
+  const isGroupWork = assignment.assignment_type === 'group';
+  const myGroup = isGroupWork
+    ? (assignment.groups || []).find((g) => g.member_ids.includes(user.id))
+    : undefined;
+  const isLeader = !!myGroup && myGroup.leader_id === user.id;
 
   const { violationCount } = useAntiCheat(
     assignment.anti_cheat_enabled,
