@@ -5,7 +5,7 @@ import { useAntiCheat } from '@/hooks/useAntiCheat';
 import { useIndexedDB } from '@/hooks/useIndexedDB';
 import { useAppContext } from '@/components/AppContext';
 import { FileUpload } from '@/components/ui-legacy/FileUpload';
-import { Shield } from 'lucide-react';
+import { Shield, Users, Crown, Lock } from 'lucide-react';
 
 interface AssignmentFormProps {
   assignment: AssignmentDTO;
@@ -51,6 +51,12 @@ export const AssignmentForm: React.FC<AssignmentFormProps> = ({ assignment, user
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { addToQueue, isOnline } = useIndexedDB();
+
+  const isGroupWork = assignment.assignment_type === 'group';
+  const myGroup = isGroupWork
+    ? (assignment.groups || []).find((g) => g.member_ids.includes(user.id))
+    : undefined;
+  const isLeader = !!myGroup && myGroup.leader_id === user.id;
 
   const { violationCount } = useAntiCheat(
     assignment.anti_cheat_enabled,
@@ -151,9 +157,27 @@ export const AssignmentForm: React.FC<AssignmentFormProps> = ({ assignment, user
     }
   };
 
+  if (isGroupWork && !myGroup) {
+    return (
+      <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center animate-in zoom-in duration-300">
+          <Lock size={56} className="text-slate-400 mx-auto mb-6" />
+          <h2 className="text-xl font-black text-slate-900 mb-2 uppercase">Group Members Only</h2>
+          <p className="text-sm text-slate-500 mb-8 font-medium">
+            This is group work and you have not been placed in a group yet. Please contact your instructor.
+          </p>
+          <button onClick={onCancel} className="btn-primary w-full py-3 rounded-xl font-bold shadow-lg shadow-blue-500/20">
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-50 p-2 md:p-4">
       <div className="bg-white w-full max-w-2xl rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 flex flex-col max-h-[95vh] md:max-h-[90vh] relative">
+
         {isLocked && (
             <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm z-[60] flex items-center justify-center p-4 md:p-6 text-center">
                 <div className="bg-white rounded-3xl p-6 md:p-8 max-w-sm w-full shadow-2xl animate-in zoom-in duration-300">
@@ -181,10 +205,35 @@ export const AssignmentForm: React.FC<AssignmentFormProps> = ({ assignment, user
         </header>
 
         <div className="p-4 md:p-8 space-y-6 md:space-y-8 overflow-y-auto flex-1">
+          {myGroup && (
+            <div className="bg-indigo-50 p-4 md:p-5 rounded-2xl border border-indigo-100 flex items-start gap-3">
+              <Users size={18} className="text-indigo-600 mt-0.5 shrink-0" />
+              <div>
+                <h4 className="text-xs font-bold text-indigo-700 uppercase tracking-widest">
+                  Group submission — {myGroup.name}
+                </h4>
+                <p className="text-sm text-indigo-900 mt-1">
+                  {myGroup.member_ids.length} member{myGroup.member_ids.length === 1 ? '' : 's'} share one submission and
+                  one grade.
+                  {myGroup.leader_id
+                    ? isLeader
+                      ? ' You are the group leader, so regrade requests are yours to send.'
+                      : ' Only your group leader can send a regrade request.'
+                    : ''}
+                </p>
+                {isLeader && (
+                  <span className="inline-flex items-center gap-1 mt-2 text-[10px] font-black uppercase tracking-widest text-amber-600 bg-amber-50 px-2 py-1 rounded-full">
+                    <Crown size={11} /> Group leader
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
           <div className="bg-blue-50 p-4 md:p-6 rounded-2xl border border-blue-100">
             <h4 className="text-xs font-bold text-blue-700 uppercase mb-2">Instructions</h4>
             <div className="text-sm text-blue-900 leading-relaxed whitespace-pre-line">{assignment.description}</div>
           </div>
+
 
           {assignment.questions && assignment.questions.length > 0 ? (
             <div className="space-y-8">

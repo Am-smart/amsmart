@@ -3,6 +3,7 @@ import { SubmissionDTO, QuestionDTO } from '@/lib/types';
 import { useAppContext } from '@/components/AppContext';
 import { gradeSubmission } from '@/lib/api-actions';
 import { Modal } from '@/components/ui-legacy/Modal';
+import { Users } from 'lucide-react';
 
 type RawAnswer = string | number | boolean | { mode: 'essay' | 'file' | 'link'; value: string } | undefined;
 
@@ -45,6 +46,12 @@ export const GradingModal: React.FC<GradingModalProps> = ({ submission, onSave, 
     }, [submission]);
 
     const questions = submission.assignment?.questions || [];
+
+    // Group submissions carry one shared grade for every member.
+    const gradedGroup = useMemo(() => {
+        if (!submission.group_id || submission.assignment?.assignment_type !== 'group') return null;
+        return (submission.assignment.groups || []).find(g => g.id === submission.group_id) || null;
+    }, [submission]);
 
     // Validate question IDs are unique and present
     if (questions.length > 0) {
@@ -188,6 +195,22 @@ export const GradingModal: React.FC<GradingModalProps> = ({ submission, onSave, 
             }
         >
             <div className="space-y-6">
+                {gradedGroup && (
+                    <div className="bg-indigo-50 p-4 rounded-2xl border border-indigo-100 flex items-start gap-3">
+                        <Users size={18} className="text-indigo-600 mt-0.5 shrink-0" />
+                        <div className="text-sm text-indigo-900">
+                            <div className="text-xs font-black uppercase tracking-widest text-indigo-700">
+                                Group submission — {gradedGroup.name}
+                            </div>
+                            <p className="mt-1">
+                                This grade and feedback apply to all {gradedGroup.member_ids.length} group member
+                                {gradedGroup.member_ids.length === 1 ? '' : 's'}
+                                {gradedGroup.leader_id ? ' and only the leader can request a regrade.' : '.'}
+                            </p>
+                        </div>
+                    </div>
+                )}
+
                 <div className="bg-blue-50 p-3 sm:p-4 md:p-6 rounded-2xl border border-blue-100 space-y-4">
                         <h4 className="text-xs sm:text-sm font-bold text-blue-700 uppercase mb-2">Student Submission</h4>
 

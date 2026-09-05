@@ -73,6 +73,10 @@ const POST = withHandler(async (user, request) => {
       // Fetch assignment to validate answer modes against allowed submission types
       const { assessmentDb } = await import('@/lib/database/assessment.db.server');
       const assignment = await assessmentDb.findAssignmentById(assignmentId, user.sessionId!);
+      // Group assignments are locked to their members.
+      if (assignment && !AssessmentDomain.canStudentAccessAssignment(assignment, user.id)) {
+        throw new UnauthorizedError("You are not a member of a group for this assignment");
+      }
       if (assignment?.questions && content.answers) {
         AssessmentDomain.validateAnswerModes(content.answers, assignment.questions);
       }

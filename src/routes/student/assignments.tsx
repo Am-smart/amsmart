@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/components/auth/AuthContext';
-import { getEnrollments, getAssignments, getSubmissions } from '@/lib/api-actions';
+import { getEnrollments, getAssignments, getSubmissions, requestRegrade } from '@/lib/api-actions';
 import { AssignmentsList } from "@/components/assessments/AssignmentsList";
 import { AssignmentDTO, SubmissionDTO } from '@/lib/types';
 import { dynamic } from '@/lib/next-compat';
@@ -77,6 +77,7 @@ function AssignmentsPage() {
       <AssignmentsList
           assignments={assignments}
           submissions={submissions}
+          currentUserId={user?.id}
           onSubmit={(a) => setActiveAssignment(a)}
           onViewFeedback={(a) => {
               const sub = submissions.find(s => s.assignment_id === a.id);
@@ -84,18 +85,19 @@ function AssignmentsPage() {
                   setFeedbackView({ assignment: a, submission: sub });
               }
           }}
-          onRegradeRequest={async (a) => {
+          onRegradeRequest={async (a, reason) => {
               if (!a.regrade_requests_enabled) {
                   addToast('Regrade requests are disabled for this assignment.', 'error');
                   return;
               }
               try {
-                  // No requestRegrade in api-actions yet, but can be implemented via generic patch
+                  const result = await requestRegrade(a.id, reason);
+                  if (!result.success) throw new Error(result.error || 'Failed to send regrade request.');
                   addToast('Regrade request sent successfully!', 'success');
                   fetchData();
               } catch (err) {
                   console.error('Failed to send regrade request:', err);
-                  addToast('Failed to send regrade request.', 'error');
+                  addToast(err instanceof Error ? err.message : 'Failed to send regrade request.', 'error');
               }
           }}
       />

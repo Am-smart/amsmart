@@ -8,6 +8,7 @@ import { useAuth } from '@/components/auth/AuthContext';
 import { ASSESSMENT_STATUS, ANTI_CHEAT_VIOLATIONS } from '@/lib/constants';
 import { Modal } from '@/components/ui-legacy/Modal';
 import { AntiCheatConfigModal } from './AntiCheatConfigModal';
+import { GroupBuilder } from './GroupBuilder';
 
 interface AssignmentEditorProps {
     teacherId: string;
@@ -35,6 +36,8 @@ export const AssignmentEditor: React.FC<AssignmentEditorProps> = ({ teacherId, a
         anti_cheat_enabled: assignment?.anti_cheat_enabled || false,
         hard_enforcement: assignment?.hard_enforcement || false,
         regrade_requests_enabled: assignment?.regrade_requests_enabled !== false,
+        assignment_type: assignment?.assignment_type || 'individual',
+        groups: assignment?.groups || [],
         questions: assignment?.questions || [],
         attachments: assignment?.attachments || [],
         allowed_extensions: assignment?.allowed_extensions || ['pdf', 'doc', 'docx', 'zip', 'jpg', 'png'],
@@ -190,6 +193,42 @@ export const AssignmentEditor: React.FC<AssignmentEditorProps> = ({ teacherId, a
                                 </div>
                             </div>
                         </div>
+
+                        <div className="bg-white p-6 rounded-2xl border-2 border-slate-50 space-y-4 shadow-sm">
+                            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Submission Mode</h4>
+                            <div className="flex flex-col sm:flex-row gap-3">
+                                {([
+                                    { value: 'individual', label: 'Individual', hint: 'Every enrolled student submits on their own.' },
+                                    { value: 'group', label: 'Group Work', hint: 'Only group members can open and submit this work.' },
+                                ] as const).map(opt => (
+                                    <label
+                                        key={opt.value}
+                                        className={`flex-1 p-4 rounded-xl border-2 cursor-pointer transition-all ${(formData.assignment_type || 'individual') === opt.value ? 'border-blue-500 bg-blue-50' : 'border-slate-200 hover:border-slate-300'}`}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                type="radio"
+                                                name="assignmentType"
+                                                className="accent-blue-600"
+                                                checked={(formData.assignment_type || 'individual') === opt.value}
+                                                onChange={() => setFormData({ ...formData, assignment_type: opt.value })}
+                                            />
+                                            <span className="text-sm font-bold text-slate-800">{opt.label}</span>
+                                        </div>
+                                        <p className="text-xs text-slate-500 mt-1 ml-6">{opt.hint}</p>
+                                    </label>
+                                ))}
+                            </div>
+                            {formData.assignment_type === 'group' && (
+                                <GroupBuilder
+                                    courseId={formData.course_id}
+                                    groups={formData.groups || []}
+                                    onChange={(groups) => setFormData({ ...formData, groups })}
+                                />
+                            )}
+                        </div>
+
+
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="bg-white p-6 rounded-2xl border-2 border-slate-50 space-y-4 shadow-sm">
