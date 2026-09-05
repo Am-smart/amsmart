@@ -46,6 +46,13 @@ export const GradingQueue: React.FC<GradingQueueProps> = ({ submissions, onGrade
     return Array.from({ length: maxButtons }, (_, i) => start + i);
   }, [totalPages, currentPage]);
 
+  // Group submissions are shared by a whole group — surface which one.
+  const groupLabel = (sub: SubmissionDTO) => {
+    if (!sub.group_id || sub.assignment?.assignment_type !== 'group') return null;
+    const group = (sub.assignment.groups || []).find(g => g.id === sub.group_id);
+    return group?.name || 'Group';
+  };
+
   const courseLabel = (sub: SubmissionDTO) => {
     const title = sub.assignment?.course?.title;
     if (title) return title;
@@ -79,7 +86,14 @@ export const GradingQueue: React.FC<GradingQueueProps> = ({ submissions, onGrade
                   <User size={20} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="font-bold text-slate-900 truncate">{sub.student?.full_name || 'Anonymous Student'}</div>
+                  <div className="font-bold text-slate-900 truncate">
+                    {groupLabel(sub) || sub.student?.full_name || 'Anonymous Student'}
+                  </div>
+                  {groupLabel(sub) && (
+                    <div className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-indigo-600">
+                      <Users size={10} /> Group work · submitted by {sub.student?.full_name || 'a member'}
+                    </div>
+                  )}
                   <div className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">
                     {new Date(sub.submitted_at).toLocaleString()}
                   </div>
@@ -153,7 +167,14 @@ export const GradingQueue: React.FC<GradingQueueProps> = ({ submissions, onGrade
                                             <User size={20} />
                                         </div>
                                         <div>
-                                            <div className="font-bold text-slate-900 group-hover:text-blue-700 transition-colors">{sub.student?.full_name || 'Anonymous Student'}</div>
+                                            <div className="font-bold text-slate-900 group-hover:text-blue-700 transition-colors">
+                                                {groupLabel(sub) || sub.student?.full_name || 'Anonymous Student'}
+                                            </div>
+                                            {groupLabel(sub) && (
+                                                <div className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-indigo-600">
+                                                    <Users size={11} /> Group work · submitted by {sub.student?.full_name || 'a member'}
+                                                </div>
+                                            )}
                                             <div className="text-[10px] text-slate-400 font-bold uppercase tracking-tight italic">Submitted: {new Date(sub.submitted_at).toLocaleString()}</div>
                                         </div>
                                     </div>
