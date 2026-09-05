@@ -1,7 +1,7 @@
 import React from 'react';
 import { AssignmentDTO, SubmissionDTO } from '@/lib/types';
 import { Countdown } from '@/components/ui-legacy/Countdown';
-import { FileText, Calendar, CheckCircle2, Clock, AlertCircle, MessageSquare, RotateCcw } from 'lucide-react';
+import { FileText, Calendar, CheckCircle2, Clock, AlertCircle, MessageSquare, RotateCcw, Users, Crown } from 'lucide-react';
 
 interface AssignmentsListProps {
   assignments: AssignmentDTO[];
@@ -9,9 +9,11 @@ interface AssignmentsListProps {
   onSubmit: (assignment: AssignmentDTO) => void;
   onViewFeedback: (assignment: AssignmentDTO) => void;
   onRegradeRequest: (assignment: AssignmentDTO, reason: string) => void;
+  /** Current student id — used to resolve group membership and leadership. */
+  currentUserId?: string;
 }
 
-export const AssignmentsList: React.FC<AssignmentsListProps> = ({ assignments, submissions, onSubmit, onViewFeedback, onRegradeRequest }) => {
+export const AssignmentsList: React.FC<AssignmentsListProps> = ({ assignments, submissions, onSubmit, onViewFeedback, onRegradeRequest, currentUserId }) => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -49,6 +51,11 @@ export const AssignmentsList: React.FC<AssignmentsListProps> = ({ assignments, s
                   const isPastDue = new Date(assignment.due_date) < new Date();
                   const submission = submissions.find(s => s.assignment_id === assignment.id);
                   const isOverdue = isPastDue && !submission;
+                  const group = assignment.assignment_type === 'group'
+                    ? (assignment.groups || []).find(g => !!currentUserId && g.member_ids.includes(currentUserId))
+                    : undefined;
+                  const isLeader = !!group && !!currentUserId && group.leader_id === currentUserId;
+                  const canRegrade = !group || !group.leader_id || isLeader;
 
                   return (
                     <tr key={assignment.id} className="hover:bg-slate-50/30 transition-colors group">
@@ -60,6 +67,12 @@ export const AssignmentsList: React.FC<AssignmentsListProps> = ({ assignments, s
                             <div>
                                 <div className="font-bold text-slate-900 group-hover:text-blue-700 transition-colors">{assignment.title}</div>
                                 <div className="text-[10px] text-slate-500 mt-0.5 line-clamp-1 max-w-[200px]">{assignment.description}</div>
+                                {group && (
+                                    <div className="mt-1.5 inline-flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full">
+                                        <Users size={10} /> {group.name}
+                                        {isLeader && <span className="inline-flex items-center gap-0.5 text-amber-600"><Crown size={10} /> Leader</span>}
+                                    </div>
+                                )}
                             </div>
                         </div>
                       </td>
@@ -120,7 +133,7 @@ export const AssignmentsList: React.FC<AssignmentsListProps> = ({ assignments, s
                                     >
                                         <MessageSquare size={14} /> Feedback
                                     </button>
-                                    {assignment.regrade_requests_enabled !== false && !submission.regrade_request && (
+                                    {assignment.regrade_requests_enabled !== false && !submission.regrade_request && canRegrade && (
                                         <button
                                         onClick={() => {
                                             const reason = prompt('Reason for regrade request:');
@@ -130,6 +143,11 @@ export const AssignmentsList: React.FC<AssignmentsListProps> = ({ assignments, s
                                         >
                                             <RotateCcw size={14} /> Regrade
                                         </button>
+                                    )}
+                                    {assignment.regrade_requests_enabled !== false && !submission.regrade_request && !canRegrade && (
+                                        <span className="inline-flex items-center gap-1.5 px-3 py-2 text-[9px] font-black uppercase tracking-widest text-slate-400 bg-slate-50 rounded-xl">
+                                            <Crown size={12} /> Leader only
+                                        </span>
                                     )}
                                 </div>
                             ) : (
