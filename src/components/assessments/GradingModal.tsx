@@ -3,6 +3,7 @@ import { SubmissionDTO, QuestionDTO } from '@/lib/types';
 import { useAppContext } from '@/components/AppContext';
 import { gradeSubmission } from '@/lib/api-actions';
 import { Modal } from '@/components/ui-legacy/Modal';
+import { Users } from 'lucide-react';
 
 type RawAnswer = string | number | boolean | { mode: 'essay' | 'file' | 'link'; value: string } | undefined;
 
@@ -45,6 +46,12 @@ export const GradingModal: React.FC<GradingModalProps> = ({ submission, onSave, 
     }, [submission]);
 
     const questions = submission.assignment?.questions || [];
+
+    // Group submissions carry one shared grade for every member.
+    const gradedGroup = useMemo(() => {
+        if (!submission.group_id || submission.assignment?.assignment_type !== 'group') return null;
+        return (submission.assignment.groups || []).find(g => g.id === submission.group_id) || null;
+    }, [submission]);
 
     // Validate question IDs are unique and present
     if (questions.length > 0) {
