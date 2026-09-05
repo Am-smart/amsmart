@@ -205,10 +205,35 @@ export const AssignmentForm: React.FC<AssignmentFormProps> = ({ assignment, user
         </header>
 
         <div className="p-4 md:p-8 space-y-6 md:space-y-8 overflow-y-auto flex-1">
+          {myGroup && (
+            <div className="bg-indigo-50 p-4 md:p-5 rounded-2xl border border-indigo-100 flex items-start gap-3">
+              <Users size={18} className="text-indigo-600 mt-0.5 shrink-0" />
+              <div>
+                <h4 className="text-xs font-bold text-indigo-700 uppercase tracking-widest">
+                  Group submission — {myGroup.name}
+                </h4>
+                <p className="text-sm text-indigo-900 mt-1">
+                  {myGroup.member_ids.length} member{myGroup.member_ids.length === 1 ? '' : 's'} share one submission and
+                  one grade.
+                  {myGroup.leader_id
+                    ? isLeader
+                      ? ' You are the group leader, so regrade requests are yours to send.'
+                      : ' Only your group leader can send a regrade request.'
+                    : ''}
+                </p>
+                {isLeader && (
+                  <span className="inline-flex items-center gap-1 mt-2 text-[10px] font-black uppercase tracking-widest text-amber-600 bg-amber-50 px-2 py-1 rounded-full">
+                    <Crown size={11} /> Group leader
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
           <div className="bg-blue-50 p-4 md:p-6 rounded-2xl border border-blue-100">
             <h4 className="text-xs font-bold text-blue-700 uppercase mb-2">Instructions</h4>
             <div className="text-sm text-blue-900 leading-relaxed whitespace-pre-line">{assignment.description}</div>
           </div>
+
 
           {assignment.questions && assignment.questions.length > 0 ? (
             <div className="space-y-8">
