@@ -157,9 +157,27 @@ export const AssignmentForm: React.FC<AssignmentFormProps> = ({ assignment, user
     }
   };
 
+  if (isGroupWork && !myGroup) {
+    return (
+      <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center animate-in zoom-in duration-300">
+          <Lock size={56} className="text-slate-400 mx-auto mb-6" />
+          <h2 className="text-xl font-black text-slate-900 mb-2 uppercase">Group Members Only</h2>
+          <p className="text-sm text-slate-500 mb-8 font-medium">
+            This is group work and you have not been placed in a group yet. Please contact your instructor.
+          </p>
+          <button onClick={onCancel} className="btn-primary w-full py-3 rounded-xl font-bold shadow-lg shadow-blue-500/20">
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 bg-slate-900/60 flex items-center justify-center z-50 p-2 md:p-4">
       <div className="bg-white w-full max-w-2xl rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 flex flex-col max-h-[95vh] md:max-h-[90vh] relative">
+
         {isLocked && (
             <div className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm z-[60] flex items-center justify-center p-4 md:p-6 text-center">
                 <div className="bg-white rounded-3xl p-6 md:p-8 max-w-sm w-full shadow-2xl animate-in zoom-in duration-300">
