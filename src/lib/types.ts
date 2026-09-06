@@ -986,3 +986,54 @@ export interface TopicDTO {
   description: string;
   order_index: number;
 }
+
+// ============================================================================
+// Certificate requests (student apply → teacher review → admin approval)
+// ============================================================================
+export type CertificateRequestStatus = 'pending' | 'teacher_approved' | 'approved' | 'rejected';
+
+export interface CertificateRequest {
+  id: string;
+  user_id: string;
+  course_id: string;
+  status: CertificateRequestStatus;
+  message?: string | null;
+  decision_reason?: string | null;
+  reviewed_by?: string | null;
+  reviewed_at?: string | null;
+  teacher_reviewed_by?: string | null;
+  teacher_reviewed_at?: string | null;
+  teacher_note?: string | null;
+  certificate_id?: string | null;
+  metadata?: Record<string, unknown>;
+  created_at?: string;
+  updated_at?: string;
+  users?: { full_name: string; email: string };
+  courses?: { title: string; teacher_id?: string };
+}
+
+export interface CertificateRequestDTO {
+  id: string;
+  user_id: string;
+  course_id: string;
+  student_name: string;
+  course_title: string;
+  status: CertificateRequestStatus;
+  message: string;
+  decision_reason: string;
+  teacher_note: string;
+  certificate_id: string | null;
+  created_at: string | null;
+  reviewed_at: string | null;
+  teacher_reviewed_at: string | null;
+}
+
+/** Admin-managed certificate template (stored in the `settings` table). */
+export interface CertificateTemplate {
+  id: string;
+  name: string;
+  title: string;
+  accent: string;
+  body: string;
+  is_default?: boolean;
+}
