@@ -6,4 +6,5 @@ export * from './certificate.db.server';
 export * from './proctoring.db.server';
 export * from './study.db.server';
 export * from './curriculum.db.server';
+export * from './certificate-request.db.server';
 export * from './discussion-views.db.server';
