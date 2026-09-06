@@ -300,3 +300,25 @@ export class CurriculumMapper {
     };
   }
 }
+
+import type { CertificateRequest, CertificateRequestDTO } from '../types';
+
+export class CertificateRequestMapper {
+  static toDTO(r: CertificateRequest): CertificateRequestDTO {
+    return {
+      id: r.id,
+      user_id: r.user_id,
+      course_id: r.course_id,
+      student_name: r.users?.full_name || '',
+      course_title: r.courses?.title || '',
+      status: r.status,
+      message: r.message || '',
+      decision_reason: r.decision_reason || '',
+      teacher_note: r.teacher_note || '',
+      certificate_id: r.certificate_id ?? null,
+      created_at: r.created_at ?? null,
+      reviewed_at: r.reviewed_at ?? null,
+      teacher_reviewed_at: r.teacher_reviewed_at ?? null,
+    };
+  }
+}
