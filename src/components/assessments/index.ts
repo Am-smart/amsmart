@@ -8,3 +8,4 @@ export * from './AssignmentForm';
 export * from './GradingQueue';
 export * from './QuizEditor';
 export * from './QuizzesList';
+export * from './GroupBuilder';
