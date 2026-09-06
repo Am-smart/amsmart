@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { FileText, FileSpreadsheet } from 'lucide-react';
+import { FileText, FileSpreadsheet, Users, Crown } from 'lucide-react';
 import { exportToPDF, exportToCSV } from '@/lib/report-utils';
 import type { CourseDTO, EnrollmentDTO, SubmissionDTO, QuizSubmissionDTO } from '@/lib/types';
 
@@ -55,6 +55,35 @@ export const TeacherAnalytics: React.FC<TeacherAnalyticsProps> = ({
     });
   }, [courses, enrollments]);
 
+  /**
+   * Group assignment results. One submission row is shared by a whole group,
+   * so each row here is a group's single grade for that assignment.
+   */
+  const groupResults = useMemo(() => {
+    return submissions
+      .filter((s) => s.group_id && s.assignment?.assignment_type === 'group')
+      .map((s) => {
+        const group = (s.assignment?.groups || []).find((g) => g.id === s.group_id);
+        return {
+          key: s.id,
+          assignment: s.assignment?.title || 'Assignment',
+          course: s.assignment?.course?.title || '',
+          group: group?.name || 'Group',
+          members: group?.member_ids.length || 0,
+          hasLeader: !!group?.leader_id,
+          status: s.status,
+          grade: s.status === 'graded' ? (s.final_grade ?? s.grade ?? null) : null,
+          points: s.assignment?.points_possible ?? null,
+        };
+      })
+      .sort((a, b) => a.assignment.localeCompare(b.assignment) || a.group.localeCompare(b.group));
+  }, [submissions]);
+
+  const avgGroupGrade = useMemo(() => {
+    const scored = groupResults.filter((g) => g.grade !== null);
+    return scored.length ? Math.round(scored.reduce((acc, g) => acc + (g.grade || 0), 0) / scored.length) : 0;
+  }, [groupResults]);
+
   const rows: [string, string][] = [
     ['Courses', String(stats.courses)],
     ['Unique Students', String(stats.students)],
@@ -63,6 +92,8 @@ export const TeacherAnalytics: React.FC<TeacherAnalyticsProps> = ({
     ['Average Assignment Grade', `${stats.avgGrade}%`],
     ['Average Quiz Score', `${stats.avgQuizScore}%`],
     ['Average Course Progress', `${stats.avgProgress}%`],
+    ['Group Submissions', String(groupResults.length)],
+    ['Average Group Grade', `${avgGroupGrade}%`],
   ];
 
   const handleExportPDF = () =>
@@ -139,6 +170,54 @@ export const TeacherAnalytics: React.FC<TeacherAnalyticsProps> = ({
                   <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-2">
                     {c.progress}% avg progress
                   </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+        <div className="px-6 py-5 border-b border-slate-100 flex items-center gap-2">
+          <Users size={18} className="text-indigo-600" />
+          <div>
+            <h3 className="font-bold text-slate-900">Group Results</h3>
+            <p className="text-xs text-slate-500 mt-1">
+              Average group grade: <span className="font-bold">{avgGroupGrade}%</span>
+            </p>
+          </div>
+        </div>
+        {groupResults.length === 0 ? (
+          <div className="p-10 text-center text-sm text-slate-500">No group submissions yet.</div>
+        ) : (
+          <div className="divide-y divide-slate-100">
+            {groupResults.map((g) => (
+              <div key={g.key} className="p-6 flex flex-col sm:flex-row sm:items-center gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="font-bold text-slate-900 truncate">
+                    {g.group}
+                    {g.hasLeader && <Crown size={12} className="inline ml-2 text-amber-500" />}
+                  </div>
+                  <div className="text-xs text-slate-500 mt-1 truncate">
+                    {g.assignment}
+                    {g.course ? ` · ${g.course}` : ''} · {g.members} member{g.members === 1 ? '' : 's'}
+                  </div>
+                </div>
+                <div className="text-right shrink-0">
+                  {g.grade === null ? (
+                    <span className="text-[10px] font-black uppercase tracking-widest text-amber-600 bg-amber-50 px-3 py-1.5 rounded-full">
+                      Awaiting grading
+                    </span>
+                  ) : (
+                    <>
+                      <div className="text-xl font-bold text-slate-900">{g.grade}%</div>
+                      {g.points !== null && (
+                        <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                          of {g.points} pts
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
               </div>
             ))}
