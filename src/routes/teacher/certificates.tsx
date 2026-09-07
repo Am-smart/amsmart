@@ -9,15 +9,19 @@ import {
   revokeCertificate,
   getEnrollments,
   getUsers,
+  getCertificateRequests,
+  reviewCertificateRequest,
 } from '@/lib/api-actions';
-import { CertificateCard } from '@/components/certificates';
+import { CertificateCard, CertificateRequestList } from '@/components/certificates';
 import { EmptyState, Skeleton } from '@/components/ui-legacy';
-import type { CertificateDTO, EnrollmentDTO, UserDTO } from '@/lib/types';
+import type { CertificateDTO, CertificateRequestDTO, EnrollmentDTO, UserDTO } from '@/lib/types';
 
 function TeacherCertificatesPage() {
   const { user } = useAuth();
   const { courses, addToast } = useAppContext();
   const [certificates, setCertificates] = useState<CertificateDTO[]>([]);
+  const [requests, setRequests] = useState<CertificateRequestDTO[]>([]);
+  const [reviewingId, setReviewingId] = useState<string | null>(null);
   const [enrollments, setEnrollments] = useState<EnrollmentDTO[]>([]);
   const [students, setStudents] = useState<UserDTO[]>([]);
   const [courseId, setCourseId] = useState('');
@@ -31,10 +35,11 @@ function TeacherCertificatesPage() {
     if (!user) return;
     setIsLoading(true);
     setError(null);
-    Promise.all([getCertificates({}), getUsers()])
-      .then(([certs, list]) => {
+    Promise.all([getCertificates({}), getUsers(), getCertificateRequests({})])
+      .then(([certs, list, reqs]) => {
         setCertificates(certs);
         setStudents(list);
+        setRequests(reqs);
       })
       .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load certificates'))
       .finally(() => setIsLoading(false));
@@ -70,6 +75,32 @@ function TeacherCertificatesPage() {
       load();
     } else {
       addToast(res.error || 'Failed to issue certificate', 'error');
+    }
+  };
+
+  const pendingRequests = useMemo(() => requests.filter((r) => r.status === 'pending'), [requests]);
+  const reviewedRequests = useMemo(() => requests.filter((r) => r.status !== 'pending'), [requests]);
+
+  const handleReview = async (
+    request: CertificateRequestDTO,
+    decision: 'teacher_approved' | 'rejected'
+  ) => {
+    const note =
+      decision === 'rejected'
+        ? window.prompt('Reason for declining this request (shared with the student):') || ''
+        : window.prompt('Optional note for the administrator:') || '';
+    if (decision === 'rejected' && !note.trim()) return;
+    setReviewingId(request.id);
+    const res = await reviewCertificateRequest(request.id, decision, note.trim() || undefined);
+    setReviewingId(null);
+    if (res.success) {
+      addToast(
+        decision === 'rejected' ? 'Request declined' : 'Request recommended for approval',
+        'success'
+      );
+      load();
+    } else {
+      addToast(res.error || 'Failed to review request', 'error');
     }
   };
 
@@ -141,6 +172,53 @@ function TeacherCertificatesPage() {
           </button>
         </div>
       </form>
+
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold text-foreground">
+          Pending requests{pendingRequests.length ? ` (${pendingRequests.length})` : ''}
+        </h2>
+        {isLoading ? (
+          <Skeleton className="h-24 rounded-xl" />
+        ) : pendingRequests.length === 0 ? (
+          <EmptyState
+            icon={Award}
+            title="No pending requests"
+            description="Requests from your students will appear here for review."
+          />
+        ) : (
+          <CertificateRequestList
+            requests={pendingRequests}
+            showStudent
+            renderActions={(r) => (
+              <>
+                <button
+                  type="button"
+                  onClick={() => handleReview(r, 'teacher_approved')}
+                  disabled={reviewingId === r.id}
+                  className="rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground disabled:opacity-50"
+                >
+                  Recommend for approval
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleReview(r, 'rejected')}
+                  disabled={reviewingId === r.id}
+                  className="rounded-lg border border-destructive/40 px-3 py-1.5 text-sm font-medium text-destructive hover:bg-destructive/10 disabled:opacity-50"
+                >
+                  Decline
+                </button>
+              </>
+            )}
+          />
+        )}
+      </section>
+
+      {!isLoading && reviewedRequests.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="text-lg font-semibold text-foreground">Reviewed requests</h2>
+          <CertificateRequestList requests={reviewedRequests} showStudent />
+        </section>
+      )}
 
       {error && <p className="rounded-lg bg-destructive/10 px-4 py-3 text-sm text-destructive">{error}</p>}
 
