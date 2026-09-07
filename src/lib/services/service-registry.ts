@@ -4,6 +4,7 @@ import { AssessmentService } from './assessment.service';
 import { SystemService } from './system.service';
 import { PushService } from './push.service';
 import type { CertificateService } from './certificate.service';
+import type { CertificateRequestService } from './certificate-request.service';
 import type { ProctoringService } from './proctoring.service';
 import type { StudyService } from './study.service';
 import type { CurriculumService } from './curriculum.service';
@@ -53,6 +54,7 @@ class ServiceRegistry {
   get systemService(): SystemService { return this.get<SystemService>('systemService'); }
   get pushService(): PushService { return this.get<PushService>('pushService'); }
   get certificateService(): CertificateService { return this.get<CertificateService>('certificateService'); }
+  get certificateRequestService(): CertificateRequestService { return this.get<CertificateRequestService>('certificateRequestService'); }
   get proctoringService(): ProctoringService { return this.get<ProctoringService>('proctoringService'); }
   get studyService(): StudyService { return this.get<StudyService>('studyService'); }
   get curriculumService(): CurriculumService { return this.get<CurriculumService>('curriculumService'); }
