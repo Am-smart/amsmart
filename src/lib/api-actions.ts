@@ -32,6 +32,8 @@ import {
   SupportTicketDTO,
   SignupRequestDTO,
   CertificateDTO,
+  CertificateRequestDTO,
+  CertificateTemplate,
   ViolationDTO,
   ProctoredSessionDTO,
   StudySessionDTO,
@@ -751,6 +753,91 @@ export async function verifyCertificate(code: string): Promise<{
   const payload = await res.json().catch(() => ({}));
   if (!res.ok || !payload?.success) throw new Error(payload?.error || 'Verification failed');
   return payload.data;
+}
+
+// ============================================================================
+// Certificate requests & templates
+// ============================================================================
+export async function getCertificateRequests(
+  filters: { userId?: string; courseId?: string; status?: string[]; limit?: number; offset?: number } = {}
+): Promise<CertificateRequestDTO[]> {
+  const params = new URLSearchParams({ action: 'certificate-requests' });
+  if (filters.userId) params.set('userId', filters.userId);
+  if (filters.courseId) params.set('courseId', filters.courseId);
+  if (filters.status?.length) params.set('status', filters.status.join(','));
+  if (filters.limit !== undefined) params.set('limit', String(filters.limit));
+  if (filters.offset !== undefined) params.set('offset', String(filters.offset));
+  return apiClient.get<CertificateRequestDTO[]>(`/api/v1/features?${params.toString()}`);
+}
+
+export async function requestCertificate(
+  courseId: string,
+  message?: string
+): Promise<ActionResponse<CertificateRequestDTO>> {
+  try {
+    const data = await apiClient.post<CertificateRequestDTO>('/api/v1/features', {
+      action: 'request-certificate',
+      course_id: courseId,
+      message,
+    });
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to submit request' };
+  }
+}
+
+export async function reviewCertificateRequest(
+  id: string,
+  decision: 'teacher_approved' | 'rejected',
+  note?: string
+): Promise<ActionResponse<CertificateRequestDTO>> {
+  try {
+    const data = await apiClient.post<CertificateRequestDTO>('/api/v1/features', {
+      action: 'review-certificate-request',
+      id,
+      decision,
+      note,
+    });
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to review request' };
+  }
+}
+
+export async function decideCertificateRequest(
+  id: string,
+  decision: 'approved' | 'rejected',
+  options: { reason?: string; template?: string; final_grade?: number | null } = {}
+): Promise<ActionResponse<CertificateRequestDTO>> {
+  try {
+    const data = await apiClient.post<CertificateRequestDTO>('/api/v1/features', {
+      action: 'decide-certificate-request',
+      id,
+      decision,
+      ...options,
+    });
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to decide request' };
+  }
+}
+
+export async function getCertificateTemplates(): Promise<CertificateTemplate[]> {
+  return apiClient.get<CertificateTemplate[]>('/api/v1/features?action=certificate-templates');
+}
+
+export async function saveCertificateTemplates(
+  templates: CertificateTemplate[]
+): Promise<ActionResponse<CertificateTemplate[]>> {
+  try {
+    const data = await apiClient.post<CertificateTemplate[]>('/api/v1/features', {
+      action: 'save-certificate-templates',
+      templates,
+    });
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to save templates' };
+  }
 }
 
 // ============================================================================

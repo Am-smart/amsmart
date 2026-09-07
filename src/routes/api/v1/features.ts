@@ -5,8 +5,20 @@
  */
 import { createFileRoute } from "@tanstack/react-router";
 import { withHandler } from "@/lib/api/api-utils";
-import { certificateService, proctoringService, studyService, curriculumService } from "@/lib/services";
-import { CertificateMapper, ProctoringMapper, StudyMapper, CurriculumMapper } from "@/lib/mappers";
+import {
+  certificateService,
+  certificateRequestService,
+  proctoringService,
+  studyService,
+  curriculumService,
+} from "@/lib/services";
+import {
+  CertificateMapper,
+  CertificateRequestMapper,
+  ProctoringMapper,
+  StudyMapper,
+  CurriculumMapper,
+} from "@/lib/mappers";
 import { BadRequestError, UnauthorizedError } from "@/lib/api-error";
 import { sanitizeObject } from "@/lib/validation";
 
@@ -35,6 +47,19 @@ const GET = withHandler(async (user, request) => {
       if (!id) throw new BadRequestError("id is required");
       return CertificateMapper.toDTO(await certificateService.get(user, id, sessionId));
     }
+    case "certificate-requests": {
+      const statusParam = searchParams.get("status");
+      const requests = await certificateRequestService.list(user, sessionId, {
+        userId: searchParams.get("userId") || undefined,
+        courseId: searchParams.get("courseId") || undefined,
+        status: statusParam ? statusParam.split(",") : undefined,
+        limit,
+        offset,
+      });
+      return requests.map(CertificateRequestMapper.toDTO);
+    }
+    case "certificate-templates":
+      return certificateRequestService.getTemplates(user, sessionId);
     case "violations": {
       const violations = await proctoringService.list(user, sessionId, {
         userId: searchParams.get("userId") || undefined,
@@ -113,6 +138,31 @@ const POST = withHandler(async (user, request) => {
       await certificateService.remove(user, body.id, sessionId);
       return { deleted: true };
     }
+    case "request-certificate":
+      return CertificateRequestMapper.toDTO(
+        await certificateRequestService.apply(
+          user,
+          { course_id: body.course_id, message: body.message },
+          sessionId
+        )
+      );
+    case "review-certificate-request": {
+      if (!body.id) throw new BadRequestError("id is required");
+      return CertificateRequestMapper.toDTO(
+        await certificateRequestService.teacherReview(user, body.id, body.decision, body.note, sessionId)
+      );
+    }
+    case "decide-certificate-request": {
+      if (!body.id) throw new BadRequestError("id is required");
+      return CertificateRequestMapper.toDTO(
+        await certificateRequestService.adminDecide(user, body.id, body.decision, body.reason, sessionId, {
+          template: body.template,
+          final_grade: body.final_grade ?? null,
+        })
+      );
+    }
+    case "save-certificate-templates":
+      return certificateRequestService.saveTemplates(user, body.templates, sessionId);
     case "record-violations":
       return proctoringService.record(user, body.violations ?? body.violation, sessionId);
     case "start-study-session":

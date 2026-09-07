@@ -62,6 +62,7 @@ import { Route as AdminInvitesRouteImport } from './routes/admin/invites'
 import { Route as AdminHelpRouteImport } from './routes/admin/help'
 import { Route as AdminHealthRouteImport } from './routes/admin/health'
 import { Route as AdminCoursesRouteImport } from './routes/admin/courses'
+import { Route as AdminCertificatesRouteImport } from './routes/admin/certificates'
 import { Route as AdminBroadcastsRouteImport } from './routes/admin/broadcasts'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
 import { Route as ApiV1SystemRouteImport } from './routes/api/v1/system'
@@ -340,6 +341,11 @@ const AdminCoursesRoute = AdminCoursesRouteImport.update({
   path: '/courses',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminCertificatesRoute = AdminCertificatesRouteImport.update({
+  id: '/certificates',
+  path: '/certificates',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminBroadcastsRoute = AdminBroadcastsRouteImport.update({
   id: '/broadcasts',
   path: '/broadcasts',
@@ -411,6 +417,7 @@ export interface FileRoutesByFullPath {
   '/help': typeof HelpRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/broadcasts': typeof AdminBroadcastsRoute
+  '/admin/certificates': typeof AdminCertificatesRoute
   '/admin/courses': typeof AdminCoursesRoute
   '/admin/health': typeof AdminHealthRoute
   '/admin/help': typeof AdminHelpRoute
@@ -475,6 +482,7 @@ export interface FileRoutesByTo {
   '/help': typeof HelpRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/broadcasts': typeof AdminBroadcastsRoute
+  '/admin/certificates': typeof AdminCertificatesRoute
   '/admin/courses': typeof AdminCoursesRoute
   '/admin/health': typeof AdminHealthRoute
   '/admin/help': typeof AdminHelpRoute
@@ -543,6 +551,7 @@ export interface FileRoutesById {
   '/help': typeof HelpRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/broadcasts': typeof AdminBroadcastsRoute
+  '/admin/certificates': typeof AdminCertificatesRoute
   '/admin/courses': typeof AdminCoursesRoute
   '/admin/health': typeof AdminHealthRoute
   '/admin/help': typeof AdminHelpRoute
@@ -612,6 +621,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/admin/analytics'
     | '/admin/broadcasts'
+    | '/admin/certificates'
     | '/admin/courses'
     | '/admin/health'
     | '/admin/help'
@@ -676,6 +686,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/admin/analytics'
     | '/admin/broadcasts'
+    | '/admin/certificates'
     | '/admin/courses'
     | '/admin/health'
     | '/admin/help'
@@ -743,6 +754,7 @@ export interface FileRouteTypes {
     | '/help'
     | '/admin/analytics'
     | '/admin/broadcasts'
+    | '/admin/certificates'
     | '/admin/courses'
     | '/admin/health'
     | '/admin/help'
@@ -1191,6 +1203,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCoursesRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/certificates': {
+      id: '/admin/certificates'
+      path: '/certificates'
+      fullPath: '/admin/certificates'
+      preLoaderRoute: typeof AdminCertificatesRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/broadcasts': {
       id: '/admin/broadcasts'
       path: '/broadcasts'
@@ -1281,6 +1300,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminBroadcastsRoute: typeof AdminBroadcastsRoute
+  AdminCertificatesRoute: typeof AdminCertificatesRoute
   AdminCoursesRoute: typeof AdminCoursesRoute
   AdminHealthRoute: typeof AdminHealthRoute
   AdminHelpRoute: typeof AdminHelpRoute
@@ -1301,6 +1321,7 @@ interface AdminRouteRouteChildren {
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminBroadcastsRoute: AdminBroadcastsRoute,
+  AdminCertificatesRoute: AdminCertificatesRoute,
   AdminCoursesRoute: AdminCoursesRoute,
   AdminHealthRoute: AdminHealthRoute,
   AdminHelpRoute: AdminHelpRoute,
