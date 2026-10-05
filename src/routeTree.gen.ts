@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VerifyRouteImport } from './routes/verify'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as TeacherRouteRouteImport } from './routes/teacher/route'
 import { Route as StudentRouteRouteImport } from './routes/student/route'
@@ -76,6 +77,11 @@ import { Route as ApiV1AuthInviteAcceptRouteImport } from './routes/api/v1/auth/
 import { Route as ApiPublicV1CertificatesVerifyRouteImport } from './routes/api/public/v1/certificates/verify'
 import { Route as ApiPublicV1AuthInviteAcceptRouteImport } from './routes/api/public/v1/auth/invite/accept'
 
+const VerifyRoute = VerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HelpRoute = HelpRouteImport.update({
   id: '/help',
   path: '/help',
@@ -415,6 +421,7 @@ export interface FileRoutesByFullPath {
   '/student': typeof StudentRouteRouteWithChildren
   '/teacher': typeof TeacherRouteRouteWithChildren
   '/help': typeof HelpRoute
+  '/verify': typeof VerifyRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/broadcasts': typeof AdminBroadcastsRoute
   '/admin/certificates': typeof AdminCertificatesRoute
@@ -480,6 +487,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/help': typeof HelpRoute
+  '/verify': typeof VerifyRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/broadcasts': typeof AdminBroadcastsRoute
   '/admin/certificates': typeof AdminCertificatesRoute
@@ -549,6 +557,7 @@ export interface FileRoutesById {
   '/student': typeof StudentRouteRouteWithChildren
   '/teacher': typeof TeacherRouteRouteWithChildren
   '/help': typeof HelpRoute
+  '/verify': typeof VerifyRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/broadcasts': typeof AdminBroadcastsRoute
   '/admin/certificates': typeof AdminCertificatesRoute
@@ -619,6 +628,7 @@ export interface FileRouteTypes {
     | '/student'
     | '/teacher'
     | '/help'
+    | '/verify'
     | '/admin/analytics'
     | '/admin/broadcasts'
     | '/admin/certificates'
@@ -684,6 +694,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/help'
+    | '/verify'
     | '/admin/analytics'
     | '/admin/broadcasts'
     | '/admin/certificates'
@@ -752,6 +763,7 @@ export interface FileRouteTypes {
     | '/student'
     | '/teacher'
     | '/help'
+    | '/verify'
     | '/admin/analytics'
     | '/admin/broadcasts'
     | '/admin/certificates'
@@ -821,6 +833,7 @@ export interface RootRouteChildren {
   StudentRouteRoute: typeof StudentRouteRouteWithChildren
   TeacherRouteRoute: typeof TeacherRouteRouteWithChildren
   HelpRoute: typeof HelpRoute
+  VerifyRoute: typeof VerifyRoute
   ApiV1AssessmentRoute: typeof ApiV1AssessmentRoute
   ApiV1AuthRoute: typeof ApiV1AuthRouteWithChildren
   ApiV1FeaturesRoute: typeof ApiV1FeaturesRoute
@@ -832,6 +845,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/verify': {
+      id: '/verify'
+      path: '/verify'
+      fullPath: '/verify'
+      preLoaderRoute: typeof VerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/help': {
       id: '/help'
       path: '/help'
@@ -1471,6 +1491,7 @@ const rootRouteChildren: RootRouteChildren = {
   StudentRouteRoute: StudentRouteRouteWithChildren,
   TeacherRouteRoute: TeacherRouteRouteWithChildren,
   HelpRoute: HelpRoute,
+  VerifyRoute: VerifyRoute,
   ApiV1AssessmentRoute: ApiV1AssessmentRoute,
   ApiV1AuthRoute: ApiV1AuthRouteWithChildren,
   ApiV1FeaturesRoute: ApiV1FeaturesRoute,

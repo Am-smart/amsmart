@@ -73,6 +73,7 @@ export const NAVIGATION: Record<UserRole, NavItem[]> = {
     { id: 'analytics',   label: 'Analytics',              icon: icon(LineChart) },
     { id: 'reports',     label: 'Reports',                icon: icon(FileBarChart) },
     { id: 'live-proctoring', label: 'Live Proctoring',    icon: icon(Radio),       permission: 'system:logs:view' },
+    { id: 'certificates', label: 'Certificates',          icon: icon(Award),       permission: 'certificate:manage' },
     { id: 'violations',  label: 'Integrity Violations',   icon: icon(AlertTriangle), permission: 'system:logs:view' },
     { id: 'broadcasts',  label: 'Broadcasts',             icon: icon(Megaphone),   permission: 'system:manage' },
     { id: 'support',     label: 'Support Desk',           icon: icon(LifeBuoy),    permission: 'system:manage' },
