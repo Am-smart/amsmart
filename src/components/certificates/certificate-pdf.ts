@@ -55,6 +55,9 @@ export async function downloadCertificatePdf(cert: CertificateDTO): Promise<void
   const issued = cert.issued_at ? new Date(cert.issued_at).toLocaleDateString() : '';
   doc.text(`Issued: ${issued}`, 70, h - 70);
   doc.text(`Verification code: ${cert.code}`, w - 70, h - 70, { align: 'right' });
+  if (typeof window !== 'undefined') {
+    doc.text(`Verify at ${window.location.origin}/verify?code=${cert.code}`, w / 2, h - 52, { align: 'center' });
+  }
 
   doc.save(`certificate-${cert.code}.pdf`);
 }
