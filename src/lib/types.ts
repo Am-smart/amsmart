@@ -870,6 +870,9 @@ export interface CertificateDTO {
   course_title: string;
   final_grade: number | null;
   template: string;
+  template_name: string;
+  template_accent: string;
+  template_body: string;
   pdf_url: string | null;
   issued_at: string;
   revoked: boolean;

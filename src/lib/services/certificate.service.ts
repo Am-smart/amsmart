@@ -1,12 +1,45 @@
 import { certificateDb } from '../database/certificate.db.server';
+import { certificateRequestDb } from '../database/certificate-request.db.server';
 import { learningDb } from '../database/learning.db.server';
 import { systemDb } from '../database/system.db.server';
-import { CertificateDomain } from '../domain/certificate.domain';
+import { CertificateDomain, DEFAULT_CERTIFICATE_TEMPLATES } from '../domain/certificate.domain';
 import { rbac } from '../auth/rbac';
-import { Certificate, User } from '../types';
+import { Certificate, CertificateTemplate, User } from '../types';
 import { ForbiddenError, NotFoundError, ConflictError, BadRequestError } from '../api-error';
 
 export class CertificateService {
+  private async templates(sessionId: string): Promise<CertificateTemplate[]> {
+    const stored = await certificateRequestDb.getTemplates(sessionId);
+    return stored?.length
+      ? stored
+      : (DEFAULT_CERTIFICATE_TEMPLATES as unknown as CertificateTemplate[]);
+  }
+
+  private templateSnapshot(certificate: Certificate, templates: CertificateTemplate[]): Certificate {
+    const existing = certificate.metadata?.certificate_template;
+    if (existing && typeof existing === 'object' && !Array.isArray(existing)) return certificate;
+
+    const selected = templates.find((template) => template.id === certificate.template)
+      || templates.find((template) => template.is_default)
+      || templates[0];
+    if (!selected) return certificate;
+
+    return {
+      ...certificate,
+      title: selected.title,
+      metadata: {
+        ...certificate.metadata,
+        certificate_template: {
+          id: selected.id,
+          name: selected.name,
+          title: selected.title,
+          accent: selected.accent,
+          body: selected.body,
+        },
+      },
+    };
+  }
+
   /**
    * Scope rules:
    *  - student: own certificates only (userId is forced to the caller)
@@ -26,14 +59,18 @@ export class CertificateService {
       scoped.teacherId = currentUser.id;
     }
 
-    return certificateDb.findAll(sessionId, scoped);
+    const [certificates, templates] = await Promise.all([
+      certificateDb.findAll(sessionId, scoped),
+      this.templates(sessionId),
+    ]);
+    return certificates.map((certificate) => this.templateSnapshot(certificate, templates));
   }
 
   async get(currentUser: User, id: string, sessionId: string): Promise<Certificate> {
     const cert = await certificateDb.findById(id, sessionId);
     if (!cert) throw new NotFoundError('Certificate not found');
     await this.assertCanView(currentUser, cert, sessionId);
-    return cert;
+    return this.templateSnapshot(cert, await this.templates(sessionId));
   }
 
   /** Public, PII-light verification by code. No session required. */
@@ -83,13 +120,28 @@ export class CertificateService {
 
     const recipient = await systemDb.findUserById(payload.user_id, sessionId);
 
+    const templates = await this.templates(sessionId);
+    const selectedTemplate = payload.template
+      ? templates.find((template) => template.id === payload.template)
+      : templates.find((template) => template.is_default) || templates[0];
+    if (!selectedTemplate) throw new BadRequestError('Certificate template is unavailable');
+
     const prepared = CertificateDomain.prepare(
       {
         user_id: payload.user_id,
         course_id: payload.course_id,
         final_grade: payload.final_grade ?? null,
-        template: payload.template,
-        title: payload.title,
+        template: selectedTemplate.id,
+        title: payload.title || selectedTemplate.title,
+        metadata: {
+          certificate_template: {
+            id: selectedTemplate.id,
+            name: selectedTemplate.name,
+            title: selectedTemplate.title,
+            accent: selectedTemplate.accent,
+            body: selectedTemplate.body,
+          },
+        },
       },
       {
         issuedBy: currentUser.id,
