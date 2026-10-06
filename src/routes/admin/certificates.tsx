@@ -13,6 +13,7 @@ import {
   saveCertificateTemplates,
 } from '@/lib/api-actions';
 import { CertificateCard, CertificateRequestList } from '@/components/certificates';
+import { CertificateTemplatePreview } from '@/components/certificates/CertificateTemplatePreview';
 import { EmptyState, Skeleton } from '@/components/ui-legacy';
 import type { CertificateDTO, CertificateRequestDTO, CertificateTemplate } from '@/lib/types';
 
@@ -269,6 +270,7 @@ function AdminCertificatesPage() {
                     <Trash2 size={15} /> Remove
                   </button>
                 </div>
+                <CertificateTemplatePreview template={t} />
               </div>
             ))}
           </div>
@@ -296,6 +298,13 @@ function AdminCertificatesPage() {
 }
 
 export const Route = createFileRoute('/admin/certificates')({
-  head: () => ({ meta: [{ title: 'Admin — Certificates — SmartLMS' }] }),
+  head: () => ({ meta: [
+    { title: 'Admin — Certificates — SmartLMS' },
+    { name: 'description', content: 'Manage SmartLMS certificate requests, issued certificates, and templates with live PDF previews.' },
+    { property: 'og:title', content: 'Certificate Management — SmartLMS' },
+    { property: 'og:description', content: 'Review certificate requests and preview template colours and wording before issuance.' },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary' },
+  ] }),
   component: AdminCertificatesPage,
 });
