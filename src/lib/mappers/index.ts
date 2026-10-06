@@ -238,6 +238,10 @@ import type {
 
 export class CertificateMapper {
   static toDTO(c: Certificate): CertificateDTO {
+    const snapshot = c.metadata?.certificate_template;
+    const template = snapshot && typeof snapshot === 'object' && !Array.isArray(snapshot)
+      ? snapshot as Record<string, unknown>
+      : {};
     return {
       id: c.id,
       user_id: c.user_id,
@@ -248,6 +252,9 @@ export class CertificateMapper {
       course_title: c.course_title || c.courses?.title || '',
       final_grade: c.final_grade ?? null,
       template: c.template || 'default',
+      template_name: typeof template.name === 'string' ? template.name : 'Classic',
+      template_accent: typeof template.accent === 'string' ? template.accent : '#1e40af',
+      template_body: typeof template.body === 'string' ? template.body : 'has successfully completed',
       pdf_url: c.pdf_url ?? null,
       issued_at: c.issued_at,
       revoked: !!c.revoked_at,
