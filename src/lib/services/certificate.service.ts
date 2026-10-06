@@ -26,6 +26,7 @@ export class CertificateService {
 
     return {
       ...certificate,
+      title: selected.title,
       metadata: {
         ...certificate.metadata,
         certificate_template: {
@@ -120,9 +121,9 @@ export class CertificateService {
     const recipient = await systemDb.findUserById(payload.user_id, sessionId);
 
     const templates = await this.templates(sessionId);
-    const selectedTemplate = templates.find((template) => template.id === payload.template)
-      || templates.find((template) => template.is_default)
-      || templates[0];
+    const selectedTemplate = payload.template
+      ? templates.find((template) => template.id === payload.template)
+      : templates.find((template) => template.is_default) || templates[0];
     if (!selectedTemplate) throw new BadRequestError('Certificate template is unavailable');
 
     const prepared = CertificateDomain.prepare(
