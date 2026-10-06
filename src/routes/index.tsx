@@ -21,6 +21,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Empower your education with our all-in-one learning management system." },
       { property: "og:title", content: "SmartLMS - Modern Learning Platform" },
       { property: "og:description", content: "Empower your education with our all-in-one learning management system." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: HomePage,
