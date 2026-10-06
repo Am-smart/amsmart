@@ -33,8 +33,8 @@ export function CertificateTemplatePreview({ template }: { template: Certificate
           revoked: false, revoked_reason: null,
         };
         const doc = await renderCertificatePdf(sample);
-        const pdfjs = await import('pdfjs-dist');
-        const { default: workerUrl } = await import('pdfjs-dist/build/pdf.worker.min.mjs?url');
+        const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+        const { default: workerUrl } = await import('pdfjs-dist/legacy/build/pdf.worker.min.mjs?url');
         if (cancelled) return;
         pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
         const loading = pdfjs.getDocument({ data: doc.output('arraybuffer') });
