@@ -94,7 +94,7 @@ export function CertificateTemplatePreview({ template }: { template: Certificate
         <canvas ref={canvasRef} className="block h-full w-full" role="img" aria-label={`Sample certificate: ${template.title}. Sample Student ${template.body} Sample Course.`} />
         {!pdfUrl && busy && <div className="absolute inset-0 flex items-center justify-center bg-muted text-sm text-muted-foreground" role="status">Preparing preview…</div>}
         {error && <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-muted p-4 text-center" role="alert">
-          <p className="text-sm text-destructive">Unable to display the PDF preview.</p>
+          <p className="text-sm text-destructive" title={error}>Unable to display the PDF preview.</p>
           <Button variant="outline" size="sm" onClick={() => setRetry((value) => value + 1)}><RefreshCw />Retry</Button>
         </div>}
       </div>
