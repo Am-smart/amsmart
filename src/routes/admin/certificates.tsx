@@ -79,7 +79,14 @@ function AdminCertificatesPage() {
   };
 
   const handleRevoke = async (cert: CertificateDTO) => {
-    const res = await revokeCertificate(cert.id, 'Revoked by administrator');
+    const reason = window.prompt(
+      `Revoke the certificate for ${cert.recipient_name || 'this student'} (${cert.code})?\n\nThis reason will be shown publicly on the verification page:`,
+      'Revoked by administrator'
+    );
+    if (reason === null) return;
+    const trimmed = reason.trim().slice(0, 300);
+    if (!trimmed) { addToast('A revocation reason is required', 'error'); return; }
+    const res = await revokeCertificate(cert.id, trimmed);
     if (res.success) { addToast('Certificate revoked', 'success'); load(); }
     else addToast(res.error || 'Failed to revoke certificate', 'error');
   };

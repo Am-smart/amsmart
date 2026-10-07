@@ -746,6 +746,8 @@ export async function verifyCertificate(code: string): Promise<{
   course_title?: string;
   issued_at?: string | null;
   revoked?: boolean;
+  revoked_at?: string | null;
+  revoked_reason?: string | null;
 }> {
   const res = await fetch(`/api/public/v1/certificates/verify?code=${encodeURIComponent(code)}`, {
     headers: { 'Cache-Control': 'no-cache' },

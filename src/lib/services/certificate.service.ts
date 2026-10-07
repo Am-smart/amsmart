@@ -82,6 +82,8 @@ export class CertificateService {
     course_title: string;
     issued_at: string | null;
     revoked: boolean;
+    revoked_at: string | null;
+    revoked_reason: string | null;
   } | null> {
     const trimmed = (code || '').trim().toUpperCase();
     if (!trimmed || trimmed.length > 64) throw new BadRequestError('Invalid certificate code');
@@ -97,6 +99,8 @@ export class CertificateService {
       course_title: cert.course_title || '',
       issued_at: cert.issued_at ?? null,
       revoked: !!cert.revoked_at,
+      revoked_at: cert.revoked_at ?? null,
+      revoked_reason: cert.revoked_at ? (cert.revoked_reason ?? null) : null,
     };
   }
 

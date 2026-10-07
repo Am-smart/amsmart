@@ -42,7 +42,7 @@ export const certificateDb = {
     const client = adminClient || supabase;
     const { data, error } = await client
       .from('certificates')
-      .select('id, code, course_title, recipient_name, title, template, issued_at, revoked_at')
+      .select('id, code, course_title, recipient_name, title, template, issued_at, revoked_at, revoked_reason')
       .eq('code', code)
       .maybeSingle();
     if (error) dbUtils.handleError(error);
