@@ -84,6 +84,15 @@ function VerifyPage() {
             <div><dt className="text-muted-foreground">Issued</dt><dd className="font-medium text-foreground">{result.issued_at ? new Date(result.issued_at).toLocaleDateString() : '—'}</dd></div>
             <div><dt className="text-muted-foreground">Code</dt><dd className="break-all font-mono text-xs text-foreground">{result.code}</dd></div>
           </dl>
+          {result.revoked && (
+            <div className="mt-4 rounded-lg bg-destructive/10 px-4 py-3 text-sm">
+              <p className="font-semibold text-destructive">
+                Revoked{result.revoked_at ? ` on ${new Date(result.revoked_at).toLocaleDateString()}` : ''}
+              </p>
+              {result.revoked_reason && <p className="mt-1 text-foreground">Reason: {result.revoked_reason}</p>}
+              <p className="mt-1 text-muted-foreground">This certificate is no longer valid and should not be accepted.</p>
+            </div>
+          )}
         </article>
       )}
 
