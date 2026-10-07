@@ -255,6 +255,13 @@ export class CertificateMapper {
       template_name: typeof template.name === 'string' ? template.name : 'Classic',
       template_accent: typeof template.accent === 'string' ? template.accent : '#1e40af',
       template_body: typeof template.body === 'string' ? template.body : 'has successfully completed',
+      branding: {
+        institution_name: typeof template.institution_name === 'string' ? template.institution_name : undefined,
+        institution_subtitle: typeof template.institution_subtitle === 'string' ? template.institution_subtitle : undefined,
+        logo_data_url: typeof template.logo_data_url === 'string' ? template.logo_data_url : undefined,
+        signer_left: typeof template.signer_left === 'string' ? template.signer_left : undefined,
+        signer_right: typeof template.signer_right === 'string' ? template.signer_right : undefined,
+      },
       pdf_url: c.pdf_url ?? null,
       issued_at: c.issued_at,
       revoked: !!c.revoked_at,

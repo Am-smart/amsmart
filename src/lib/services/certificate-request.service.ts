@@ -268,6 +268,11 @@ export class CertificateRequestService {
         title: (t.title || 'Certificate of Completion').slice(0, 120),
         accent: /^#[0-9a-fA-F]{6}$/.test(t.accent || '') ? t.accent : '#1e40af',
         body: (t.body || 'has successfully completed').slice(0, 200),
+        institution_name: (t.institution_name || '').trim().slice(0, 100) || undefined,
+        institution_subtitle: (t.institution_subtitle || '').trim().slice(0, 100) || undefined,
+        logo_data_url: validLogo(t.logo_data_url),
+        signer_left: (t.signer_left || '').trim().slice(0, 60) || undefined,
+        signer_right: (t.signer_right || '').trim().slice(0, 60) || undefined,
         is_default: !!t.is_default,
       };
     });

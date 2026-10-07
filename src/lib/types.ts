@@ -873,6 +873,7 @@ export interface CertificateDTO {
   template_name: string;
   template_accent: string;
   template_body: string;
+  branding?: CertificateBranding;
   pdf_url: string | null;
   issued_at: string;
   revoked: boolean;
@@ -1032,7 +1033,17 @@ export interface CertificateRequestDTO {
 }
 
 /** Admin-managed certificate template (stored in the `settings` table). */
-export interface CertificateTemplate {
+/** Institution branding printed on certificates (snapshotted at issuance). */
+export interface CertificateBranding {
+  institution_name?: string;
+  institution_subtitle?: string;
+  /** PNG/JPEG data URL, resized client-side before saving. */
+  logo_data_url?: string;
+  signer_left?: string;
+  signer_right?: string;
+}
+
+export interface CertificateTemplate extends CertificateBranding {
   id: string;
   name: string;
   title: string;
