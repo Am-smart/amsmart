@@ -75,7 +75,9 @@ export function CertificateTemplatePreview({ template }: { template: Certificate
       destroyDocument?.();
       if (url) URL.revokeObjectURL(url);
     };
-  }, [template.id, template.name, template.title, template.accent, template.body, retry]);
+  }, [template.id, template.name, template.title, template.accent, template.body,
+    template.institution_name, template.institution_subtitle, template.logo_data_url,
+    template.signer_left, template.signer_right, retry]);
 
   return (
     <div className="min-w-0 space-y-2 border-t border-border pt-3">
