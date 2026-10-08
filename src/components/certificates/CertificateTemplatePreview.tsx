@@ -29,6 +29,7 @@ export function CertificateTemplatePreview({ template }: { template: Certificate
           recipient_name: 'Sample Student', course_title: 'Sample Course',
           final_grade: 95, template: template.id, template_name: template.name,
           template_accent: template.accent, template_body: template.body,
+          branding: template,
           pdf_url: null, issued_at: '2026-01-15T12:00:00Z',
           revoked: false, revoked_reason: null,
         };
