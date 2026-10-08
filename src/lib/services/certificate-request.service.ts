@@ -19,6 +19,9 @@ import { ForbiddenError, NotFoundError, ConflictError, BadRequestError } from '.
  * student applies → course teacher recommends/declines → admin approves
  * (which issues the certificate) or declines.
  */
+const validLogo = (v: unknown): string | undefined =>
+  typeof v === 'string' && v.length <= 400_000 && /^data:image\/(png|jpeg);base64,[A-Za-z0-9+/=]+$/.test(v) ? v : undefined;
+
 export class CertificateRequestService {
   /** Scope: students see their own, teachers see their courses', admins see all. */
   async list(

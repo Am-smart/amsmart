@@ -7,6 +7,14 @@ import { rbac } from '../auth/rbac';
 import { Certificate, CertificateTemplate, User } from '../types';
 import { ForbiddenError, NotFoundError, ConflictError, BadRequestError } from '../api-error';
 
+const brandingOf = (t: CertificateTemplate) => ({
+  institution_name: t.institution_name,
+  institution_subtitle: t.institution_subtitle,
+  logo_data_url: t.logo_data_url,
+  signer_left: t.signer_left,
+  signer_right: t.signer_right,
+});
+
 export class CertificateService {
   private async templates(sessionId: string): Promise<CertificateTemplate[]> {
     const stored = await certificateRequestDb.getTemplates(sessionId);
@@ -35,6 +43,7 @@ export class CertificateService {
           title: selected.title,
           accent: selected.accent,
           body: selected.body,
+          ...brandingOf(selected),
         },
       },
     };
@@ -144,6 +153,7 @@ export class CertificateService {
             title: selectedTemplate.title,
             accent: selectedTemplate.accent,
             body: selectedTemplate.body,
+            ...brandingOf(selectedTemplate),
           },
         },
       },

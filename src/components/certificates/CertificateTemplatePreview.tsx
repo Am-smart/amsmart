@@ -29,6 +29,7 @@ export function CertificateTemplatePreview({ template }: { template: Certificate
           recipient_name: 'Sample Student', course_title: 'Sample Course',
           final_grade: 95, template: template.id, template_name: template.name,
           template_accent: template.accent, template_body: template.body,
+          branding: template,
           pdf_url: null, issued_at: '2026-01-15T12:00:00Z',
           revoked: false, revoked_reason: null,
         };
@@ -74,7 +75,9 @@ export function CertificateTemplatePreview({ template }: { template: Certificate
       destroyDocument?.();
       if (url) URL.revokeObjectURL(url);
     };
-  }, [template.id, template.name, template.title, template.accent, template.body, retry]);
+  }, [template.id, template.name, template.title, template.accent, template.body,
+    template.institution_name, template.institution_subtitle, template.logo_data_url,
+    template.signer_left, template.signer_right, retry]);
 
   return (
     <div className="min-w-0 space-y-2 border-t border-border pt-3">
