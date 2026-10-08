@@ -17,6 +17,27 @@ import { CertificateTemplatePreview } from '@/components/certificates/Certificat
 import { EmptyState, Skeleton } from '@/components/ui-legacy';
 import type { CertificateDTO, CertificateRequestDTO, CertificateTemplate } from '@/lib/types';
 
+/** Downscale a logo to ≤320px PNG so it fits in template settings. */
+async function resizeLogo(file: File): Promise<string> {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const el = new Image();
+      el.onload = () => resolve(el);
+      el.onerror = reject;
+      el.src = url;
+    });
+    const scale = Math.min(1, 320 / Math.max(img.width, img.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(img.width * scale));
+    canvas.height = Math.max(1, Math.round(img.height * scale));
+    canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL('image/png');
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
 function AdminCertificatesPage() {
   const { user } = useAuth();
   const { addToast } = useAppContext();
@@ -247,6 +268,53 @@ function AdminCertificatesPage() {
                     className="rounded-lg border border-border bg-background px-3 py-2"
                   />
                 </label>
+                <fieldset className="grid gap-3 rounded-lg border border-border p-3 sm:grid-cols-2">
+                  <legend className="px-1 text-sm font-medium text-foreground">Institution branding</legend>
+                  {([
+                    ['institution_name', 'School name', 'Smart LMS Academy'],
+                    ['institution_subtitle', 'Line under the name', 'Official Certificate'],
+                    ['signer_left', 'Left signer title', 'Director of Studies'],
+                    ['signer_right', 'Right signer title', 'Registrar'],
+                  ] as const).map(([key, label, placeholder]) => (
+                    <label key={key} className="flex flex-col gap-1 text-sm">
+                      <span className="text-foreground">{label}</span>
+                      <input
+                        value={t[key] ?? ''}
+                        placeholder={placeholder}
+                        maxLength={key.startsWith('signer') ? 60 : 100}
+                        onChange={(e) => updateTemplate(index, { [key]: e.target.value })}
+                        className="rounded-lg border border-border bg-background px-3 py-2"
+                      />
+                    </label>
+                  ))}
+                  <div className="flex flex-wrap items-center gap-3 text-sm sm:col-span-2">
+                    <span className="text-foreground">Logo</span>
+                    {t.logo_data_url && (
+                      <img src={t.logo_data_url} alt="Institution logo" className="h-12 w-12 rounded border border-border bg-background object-contain" />
+                    )}
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg"
+                      aria-label="Upload institution logo"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        e.target.value = '';
+                        if (!file) return;
+                        try {
+                          updateTemplate(index, { logo_data_url: await resizeLogo(file) });
+                        } catch {
+                          addToast('Could not read that image', 'error');
+                        }
+                      }}
+                      className="text-xs text-muted-foreground"
+                    />
+                    {t.logo_data_url && (
+                      <button type="button" onClick={() => updateTemplate(index, { logo_data_url: undefined })} className="text-xs text-destructive hover:underline">
+                        Remove logo
+                      </button>
+                    )}
+                  </div>
+                </fieldset>
                 <div className="flex flex-wrap items-center gap-4">
                   <label className="flex items-center gap-2 text-sm">
                     <span className="font-medium text-foreground">Accent</span>

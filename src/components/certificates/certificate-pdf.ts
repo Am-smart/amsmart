@@ -48,22 +48,40 @@ export async function renderCertificatePdf(cert: CertificateDTO) {
   doc.setFont('times', 'bold');
   doc.setFontSize(24);
   doc.setTextColor(...INK);
-  center('SMART LMS ACADEMY', 85);
+  const b = cert.branding ?? {};
+  const institution = (b.institution_name || 'SMART LMS ACADEMY').toUpperCase();
+  const nameLines = doc.splitTextToSize(institution, w - 120) as string[];
+  doc.text(nameLines.slice(0, 2), cx, 85, { align: 'center', lineHeightFactor: 1.1 });
   doc.setFontSize(13);
-  center('OFFICIAL CERTIFICATE', 104);
+  center((b.institution_subtitle || 'OFFICIAL CERTIFICATE').toUpperCase(), 104 + (Math.min(nameLines.length, 2) - 1) * 26);
 
-  // Emblem (accent ring with monogram)
+  // Emblem: uploaded logo, else accent ring with monogram
   const ey = 175;
-  doc.setDrawColor(...A);
-  doc.setFillColor(255, 255, 255);
-  doc.setLineWidth(3);
-  doc.circle(cx, ey, 40, 'FD');
-  doc.setLineWidth(1);
-  doc.circle(cx, ey, 32);
-  doc.setFont('times', 'bold');
-  doc.setFontSize(22);
-  doc.setTextColor(...A);
-  center('SL', ey + 8);
+  let drewLogo = false;
+  if (b.logo_data_url) {
+    try {
+      const props = doc.getImageProperties(b.logo_data_url);
+      const max = 84;
+      const scale = Math.min(max / props.width, max / props.height);
+      const lw = props.width * scale;
+      const lh = props.height * scale;
+      doc.addImage(b.logo_data_url, props.fileType, cx - lw / 2, ey - lh / 2, lw, lh);
+      drewLogo = true;
+    } catch { /* fall back to monogram */ }
+  }
+  if (!drewLogo) {
+    const initials = institution.split(/\s+/).filter((x) => /^[A-Z]/.test(x)).slice(0, 2).map((x) => x[0]).join('') || 'SL';
+    doc.setDrawColor(...A);
+    doc.setFillColor(255, 255, 255);
+    doc.setLineWidth(3);
+    doc.circle(cx, ey, 40, 'FD');
+    doc.setLineWidth(1);
+    doc.circle(cx, ey, 32);
+    doc.setFont('times', 'bold');
+    doc.setFontSize(22);
+    doc.setTextColor(...A);
+    center(initials, ey + 8);
+  }
 
   // Attestation
   doc.setFont('times', 'bolditalic');
@@ -124,8 +142,8 @@ export async function renderCertificatePdf(cert: CertificateDTO) {
   doc.setLineWidth(0.6);
   doc.line(200, sy - 8, 330, sy - 8);
   doc.line(360, sy - 8, 490, sy - 8);
-  doc.text('Director of Studies', 265, sy + 8, { align: 'center' });
-  doc.text('Registrar', 425, sy + 8, { align: 'center' });
+  doc.text(b.signer_left || 'Director of Studies', 265, sy + 8, { align: 'center' });
+  doc.text(b.signer_right || 'Registrar', 425, sy + 8, { align: 'center' });
 
   // Verification footer
   doc.setFont('helvetica', 'normal');
