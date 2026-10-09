@@ -1,14 +1,23 @@
 import React, { useMemo } from 'react';
-import { FileText, FileSpreadsheet, Users, Crown } from 'lucide-react';
+import { FileText, FileSpreadsheet, Users, Crown, RefreshCw } from 'lucide-react';
 import { exportToPDF, exportToCSV } from '@/lib/report-utils';
-import type { CourseDTO, EnrollmentDTO, SubmissionDTO, QuizSubmissionDTO } from '@/lib/types';
+import type { AssignmentDTO, CourseDTO, EnrollmentDTO, QuizDTO, SubmissionDTO, QuizSubmissionDTO, ViolationDTO } from '@/lib/types';
 
 interface TeacherAnalyticsProps {
   courses: CourseDTO[];
   enrollments: EnrollmentDTO[];
   submissions: SubmissionDTO[];
   quizSubmissions: QuizSubmissionDTO[];
+  assignments?: AssignmentDTO[];
+  quizzes?: QuizDTO[];
+  violations?: ViolationDTO[];
+  onRefresh?: () => void;
+  isRefreshing?: boolean;
 }
+
+/** Grade as a percentage of points possible (raw points otherwise). */
+const pct = (value: number, max?: number | null) =>
+  max && max > 0 ? Math.min(100, (value / max) * 100) : value;
 
 /**
  * Teaching performance analytics. Pure presentation: all data is fetched by
@@ -19,15 +28,25 @@ export const TeacherAnalytics: React.FC<TeacherAnalyticsProps> = ({
   enrollments,
   submissions,
   quizSubmissions,
+  assignments = [],
+  quizzes = [],
+  violations = [],
+  onRefresh,
+  isRefreshing,
 }) => {
   const stats = useMemo(() => {
     const graded = submissions.filter((s) => s.status === 'graded');
-    const pending = submissions.filter((s) => s.status !== 'graded');
+    // Legacy rule: pending = submitted awaiting grade OR an open regrade request.
+    const pending = submissions.filter((s) => s.status === 'submitted' || !!s.regrade_request);
     const avgGrade = graded.length
-      ? Math.round(graded.reduce((acc, s) => acc + (s.final_grade ?? s.grade ?? 0), 0) / graded.length)
+      ? Math.round(
+          graded.reduce((acc, s) => acc + pct(s.final_grade ?? s.grade ?? 0, s.assignment?.points_possible), 0) /
+            graded.length,
+        )
       : 0;
-    const avgQuizScore = quizSubmissions.length
-      ? Math.round(quizSubmissions.reduce((acc, s) => acc + (s.score || 0), 0) / quizSubmissions.length)
+    const doneQuizzes = quizSubmissions.filter((s) => s.status === 'submitted');
+    const avgQuizScore = doneQuizzes.length
+      ? Math.round(doneQuizzes.reduce((acc, s) => acc + pct(s.score || 0, s.total_points), 0) / doneQuizzes.length)
       : 0;
     const avgProgress = enrollments.length
       ? Math.round(enrollments.reduce((acc, e) => acc + (e.progress || 0), 0) / enrollments.length)
@@ -35,6 +54,10 @@ export const TeacherAnalytics: React.FC<TeacherAnalyticsProps> = ({
 
     return {
       courses: courses.length,
+      assignments: assignments.length,
+      quizzes: quizzes.length,
+      submissions: submissions.length,
+      violations: violations.length,
       students: new Set(enrollments.map((e) => e.student_id)).size,
       graded: graded.length,
       pending: pending.length,
@@ -81,11 +104,17 @@ export const TeacherAnalytics: React.FC<TeacherAnalyticsProps> = ({
 
   const avgGroupGrade = useMemo(() => {
     const scored = groupResults.filter((g) => g.grade !== null);
-    return scored.length ? Math.round(scored.reduce((acc, g) => acc + (g.grade || 0), 0) / scored.length) : 0;
+    return scored.length
+      ? Math.round(scored.reduce((acc, g) => acc + pct(g.grade || 0, g.points), 0) / scored.length)
+      : 0;
   }, [groupResults]);
 
   const rows: [string, string][] = [
     ['Courses', String(stats.courses)],
+    ['Assignments', String(stats.assignments)],
+    ['Quizzes', String(stats.quizzes)],
+    ['Total Submissions', String(stats.submissions)],
+    ['Security Alerts', String(stats.violations)],
     ['Unique Students', String(stats.students)],
     ['Graded Submissions', String(stats.graded)],
     ['Pending Grading', String(stats.pending)],
@@ -104,16 +133,34 @@ export const TeacherAnalytics: React.FC<TeacherAnalyticsProps> = ({
 
   const cards = [
     { label: 'Courses', value: stats.courses, tone: 'bg-blue-100 text-blue-600', emoji: '📘' },
-    { label: 'Students', value: stats.students, tone: 'bg-emerald-100 text-emerald-600', emoji: '🎓' },
+    { label: 'Assignments', value: stats.assignments, tone: 'bg-indigo-100 text-indigo-600', emoji: '🗂️' },
+    { label: 'Total Submissions', value: stats.submissions, tone: 'bg-sky-100 text-sky-600', emoji: '📥' },
     { label: 'Pending Grading', value: stats.pending, tone: 'bg-amber-100 text-amber-600', emoji: '⏳' },
+    {
+      label: 'Security Alerts',
+      value: stats.violations,
+      tone: stats.violations > 0 ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-500',
+      emoji: '🛡️',
+    },
+    { label: 'Students', value: stats.students, tone: 'bg-emerald-100 text-emerald-600', emoji: '🎓' },
     { label: 'Avg Grade', value: `${stats.avgGrade}%`, tone: 'bg-purple-100 text-purple-600', emoji: '📝' },
+    { label: 'Quiz Average', value: `${stats.avgQuizScore}%`, tone: 'bg-pink-100 text-pink-600', emoji: '⚡' },
   ];
 
   return (
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <h2 className="text-2xl font-bold text-slate-900">Teaching Analytics</h2>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
+          {onRefresh && (
+            <button
+              onClick={onRefresh}
+              disabled={isRefreshing}
+              className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-slate-100 text-slate-600 px-5 py-3 rounded-2xl hover:bg-slate-200 transition-all disabled:opacity-50"
+            >
+              <RefreshCw size={16} className={isRefreshing ? 'animate-spin' : ''} /> Refresh
+            </button>
+          )}
           <button
             onClick={handleExportCSV}
             className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest bg-slate-100 text-slate-600 px-5 py-3 rounded-2xl hover:bg-slate-200 transition-all"
@@ -129,11 +176,18 @@ export const TeacherAnalytics: React.FC<TeacherAnalyticsProps> = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <section className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+        <h3 className="font-bold text-slate-900">Teacher Overview</h3>
+        <p className="text-sm text-slate-600 mt-1">
+          You have <span className="font-bold">{stats.pending}</span> submission{stats.pending === 1 ? '' : 's'} waiting to be graded.
+        </p>
+      </section>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {cards.map((c) => (
           <div
             key={c.label}
-            className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center"
+            className="bg-white p-5 sm:p-8 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center"
           >
             <div className={`w-16 h-16 ${c.tone} rounded-2xl flex items-center justify-center text-2xl mb-4`}>
               {c.emoji}
@@ -210,7 +264,7 @@ export const TeacherAnalytics: React.FC<TeacherAnalyticsProps> = ({
                     </span>
                   ) : (
                     <>
-                      <div className="text-xl font-bold text-slate-900">{g.grade}%</div>
+                      <div className="text-xl font-bold text-slate-900">{Math.round(pct(g.grade, g.points))}%</div>
                       {g.points !== null && (
                         <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
                           of {g.points} pts
