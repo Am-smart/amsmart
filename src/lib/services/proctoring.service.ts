@@ -65,10 +65,17 @@ export class ProctoringService {
     return proctoringDb.findAll(sessionId, scoped);
   }
 
-  /** Live monitoring console — admins only. */
+  /** Live monitoring console — admins see all; teachers only assessments they own. */
   async activeSessions(currentUser: User, sessionId: string): Promise<ProctoredSessionDTO[]> {
     if (!rbac.can(currentUser, 'proctoring:monitor')) throw new ForbiddenError('Not allowed');
-    return proctoringDb.findActiveSessions(sessionId);
+    const sessions = await proctoringDb.findActiveSessions(sessionId);
+    if (currentUser.role === 'admin') return sessions;
+    const owned = new Map<string, boolean>();
+    for (const id of new Set(sessions.map((s) => s.assessment_id).filter((x): x is string => !!x))) {
+      try { await this.assertOwnsAssessment(currentUser, id, sessionId); owned.set(id, true); }
+      catch { owned.set(id, false); }
+    }
+    return sessions.filter((s) => !!s.assessment_id && owned.get(s.assessment_id));
   }
 
   async riskScore(currentUser: User, proctorSessionId: string, sessionId: string): Promise<{ score: number }> {

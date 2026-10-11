@@ -62,6 +62,7 @@ export const NAVIGATION: Record<UserRole, NavItem[]> = {
     { id: 'help',        label: 'Help',           icon: icon(CircleHelp) },
     { id: 'live',        label: 'Live Classes',   icon: icon(Video) },
     { id: 'anti-cheat',  label: 'Anti-Cheat',     icon: icon(ShieldCheck) },
+    { id: 'live-proctoring', label: 'Live Proctoring', icon: icon(Radio), permission: 'proctoring:monitor' },
     { id: 'settings',    label: 'Settings',       icon: icon(Settings) },
   ],
   admin: [

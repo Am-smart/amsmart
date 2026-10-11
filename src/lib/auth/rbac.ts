@@ -33,7 +33,7 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
     'user:view',
     'ticket:view', 'ticket:create', 'ticket:manage',
     'certificate:view', 'certificate:manage',
-    'proctoring:view'
+    'proctoring:view', 'proctoring:monitor'
   ],
   student: [
     'course:view',
