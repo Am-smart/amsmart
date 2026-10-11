@@ -9,6 +9,7 @@ import { UserRole, User } from "@/lib/types";
 import { ForcePasswordChange } from "@/components/auth/ForcePasswordChange";
 import { useAppContext } from '../AppContext';
 import { MaintenanceOverlay } from './MaintenanceOverlay';
+import { NetworkStatusBanner } from '@/components/common/NetworkStatusBanner';
 
 interface HeaderComponentProps {
   className?: string;
@@ -76,6 +77,7 @@ export const BaseDashboardLayout: React.FC<BaseDashboardLayoutProps> = ({
           <ForcePasswordChange onSuccess={() => updateProfile({ reset_request: null })} />
       )}
 
+      <NetworkStatusBanner />
       <UnifiedSidebar role={role as UserRole} />
       <SidebarInset className="bg-[#f8fafc]">
         <DashboardShell
