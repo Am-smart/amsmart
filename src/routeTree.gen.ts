@@ -62,6 +62,7 @@ import { Route as TeacherGradebookRouteImport } from './routes/teacher/gradebook
 import { Route as TeacherGradingRouteImport } from './routes/teacher/grading'
 import { Route as TeacherHelpRouteImport } from './routes/teacher/help'
 import { Route as TeacherLiveRouteImport } from './routes/teacher/live'
+import { Route as TeacherLiveProctoringRouteImport } from './routes/teacher/live-proctoring'
 import { Route as TeacherMaterialsRouteImport } from './routes/teacher/materials'
 import { Route as TeacherQuizzesRouteImport } from './routes/teacher/quizzes'
 import { Route as TeacherSettingsRouteImport } from './routes/teacher/settings'
@@ -342,6 +343,11 @@ const TeacherLiveRoute = TeacherLiveRouteImport.update({
   path: '/live',
   getParentRoute: () => TeacherRouteRoute,
 } as any)
+const TeacherLiveProctoringRoute = TeacherLiveProctoringRouteImport.update({
+  id: '/live-proctoring',
+  path: '/live-proctoring',
+  getParentRoute: () => TeacherRouteRoute,
+} as any)
 const TeacherMaterialsRoute = TeacherMaterialsRouteImport.update({
   id: '/materials',
   path: '/materials',
@@ -466,6 +472,7 @@ export interface FileRoutesByFullPath {
   '/teacher/grading': typeof TeacherGradingRoute
   '/teacher/help': typeof TeacherHelpRoute
   '/teacher/live': typeof TeacherLiveRoute
+  '/teacher/live-proctoring': typeof TeacherLiveProctoringRoute
   '/teacher/materials': typeof TeacherMaterialsRoute
   '/teacher/quizzes': typeof TeacherQuizzesRoute
   '/teacher/settings': typeof TeacherSettingsRoute
@@ -532,6 +539,7 @@ export interface FileRoutesByTo {
   '/teacher/grading': typeof TeacherGradingRoute
   '/teacher/help': typeof TeacherHelpRoute
   '/teacher/live': typeof TeacherLiveRoute
+  '/teacher/live-proctoring': typeof TeacherLiveProctoringRoute
   '/teacher/materials': typeof TeacherMaterialsRoute
   '/teacher/quizzes': typeof TeacherQuizzesRoute
   '/teacher/settings': typeof TeacherSettingsRoute
@@ -602,6 +610,7 @@ export interface FileRoutesById {
   '/teacher/grading': typeof TeacherGradingRoute
   '/teacher/help': typeof TeacherHelpRoute
   '/teacher/live': typeof TeacherLiveRoute
+  '/teacher/live-proctoring': typeof TeacherLiveProctoringRoute
   '/teacher/materials': typeof TeacherMaterialsRoute
   '/teacher/quizzes': typeof TeacherQuizzesRoute
   '/teacher/settings': typeof TeacherSettingsRoute
@@ -673,6 +682,7 @@ export interface FileRouteTypes {
     | '/teacher/grading'
     | '/teacher/help'
     | '/teacher/live'
+    | '/teacher/live-proctoring'
     | '/teacher/materials'
     | '/teacher/quizzes'
     | '/teacher/settings'
@@ -739,6 +749,7 @@ export interface FileRouteTypes {
     | '/teacher/grading'
     | '/teacher/help'
     | '/teacher/live'
+    | '/teacher/live-proctoring'
     | '/teacher/materials'
     | '/teacher/quizzes'
     | '/teacher/settings'
@@ -808,6 +819,7 @@ export interface FileRouteTypes {
     | '/teacher/grading'
     | '/teacher/help'
     | '/teacher/live'
+    | '/teacher/live-proctoring'
     | '/teacher/materials'
     | '/teacher/quizzes'
     | '/teacher/settings'
@@ -1216,6 +1228,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TeacherLiveRouteImport
       parentRoute: typeof TeacherRouteRoute
     }
+    '/teacher/live-proctoring': {
+      id: '/teacher/live-proctoring'
+      path: '/live-proctoring'
+      fullPath: '/teacher/live-proctoring'
+      preLoaderRoute: typeof TeacherLiveProctoringRouteImport
+      parentRoute: typeof TeacherRouteRoute
+    }
     '/teacher/materials': {
       id: '/teacher/materials'
       path: '/materials'
@@ -1419,6 +1438,7 @@ interface TeacherRouteRouteChildren {
   TeacherGradingRoute: typeof TeacherGradingRoute
   TeacherHelpRoute: typeof TeacherHelpRoute
   TeacherLiveRoute: typeof TeacherLiveRoute
+  TeacherLiveProctoringRoute: typeof TeacherLiveProctoringRoute
   TeacherMaterialsRoute: typeof TeacherMaterialsRoute
   TeacherQuizzesRoute: typeof TeacherQuizzesRoute
   TeacherSettingsRoute: typeof TeacherSettingsRoute
@@ -1438,6 +1458,7 @@ const TeacherRouteRouteChildren: TeacherRouteRouteChildren = {
   TeacherGradingRoute: TeacherGradingRoute,
   TeacherHelpRoute: TeacherHelpRoute,
   TeacherLiveRoute: TeacherLiveRoute,
+  TeacherLiveProctoringRoute: TeacherLiveProctoringRoute,
   TeacherMaterialsRoute: TeacherMaterialsRoute,
   TeacherQuizzesRoute: TeacherQuizzesRoute,
   TeacherSettingsRoute: TeacherSettingsRoute,

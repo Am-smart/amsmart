@@ -1,0 +1,11 @@
+# Roadmap (legacy parity)
+- [x] Stage 1 (partial): view toggle, offline banner
+- [ ] Stage 1: DataToolbar, central export module
+- [ ] Stage 2: teacher list regressions (toggle/countdowns, quiz results, grading filters, dashboard links)
+- [ ] Stage 3: admin ops (change owner, user lock/flag, dashboard metrics + quick broadcast, scheduled maintenance, cleanup/backup, reports PDF)
+- [x] Stage 4: teacher live proctoring (own assessments) + report export
+- [ ] Stage 4: live feed / config modals
+- [ ] Stage 5: analytics RPCs, heatmap, grades PDF
+- [ ] Stage 6: in-app live classes
+- [ ] Stage 7: AI tutor + voice (needs answers on chat history)
+- [ ] Stage 8: per-role smoke tests
